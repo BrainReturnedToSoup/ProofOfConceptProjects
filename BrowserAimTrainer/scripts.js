@@ -97,8 +97,8 @@ const getRandomInt = (max) => {
 
 const moveTheTarget = () => {
     if(timeLeft === 0) return;
-    targetContainer.style.top = getRandomInt(600) + 'px';
-    targetContainer.style.left = getRandomInt(600) + 'px';
+    targetContainer.style.top = getRandomInt(325) + 'px';
+    targetContainer.style.left = getRandomInt(700) + 'px';
 }
 
 document.addEventListener('click', (e) => {
