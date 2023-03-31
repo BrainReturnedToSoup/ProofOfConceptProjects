@@ -82,10 +82,23 @@ const moveTheTarget = () => {
 // properties equal to the numbers generated in pixels
 
 const getRandomInt = (max) => {
-    return Math.floor(Math.random() * max);
+    let PosOrNeg = Math.floor(Math.random() * 2)
+    let randomNumber = Math.floor(Math.random() * max);
+    if(PosOrNeg === 1) {
+        return randomNumber;
+    } else {
+        return -randomNumber;
+    }
 }
 
-// ^^^ generates and returns a random integer between 0 and the value of the inputed argument
+// ^^^ generates two random integers, the variable PosOrNeg will hold the value 0 or 1, and the variable randomNumber
+// will hold the value of the returned number. If PosOrNeg is equal to 1, randomNumber will be returned, if randomNumber is equal
+// to 0, the negative value stored in randomNumber is returned.
+// 
+//<Why is PosOrNeg important?> the way the properties top and left work is that top = 0 and left = 0 is the starting point of the target,
+// thus if we were to only output positive integers, the target will group in the bottom right of the web page.
+// to combat this, the function getRandomInt will also return negative values at random, so that the area at which the target can appear
+// is anywhere on the web page.
 
 const gameOver = () => {
     targetContainer.children[0].remove();
