@@ -92,10 +92,12 @@ const getRandomInt = (max) => {
 }
 
 // ^^^ generates two random integers, the variable PosOrNeg will hold the value 0 or 1, and the variable randomNumber
-// will hold the value of the returned number. If PosOrNeg is equal to 1, randomNumber will be returned, if randomNumber is equal
-// to 0, the negative value stored in randomNumber is returned.
+// will hold the value of the returned number. If PosOrNeg is equal to 1, randomNumber will be returned, if PosOrNeg is equal
+// to 0, the value stored in randomNumber is returned but negative.
 // 
 //<Why is PosOrNeg important?> the way the properties top and left work is that top = 0 and left = 0 is the starting point of the target,
+// and if you were to edit these properties to equal a positive number, top with a positive integer will move the target down, and
+// left will move the target right.
 // thus if we were to only output positive integers, the target will group in the bottom right of the web page.
 // to combat this, the function getRandomInt will also return negative values at random, so that the area at which the target can appear
 // is anywhere on the web page.
@@ -147,7 +149,7 @@ const onStart = (event) => {
 
 };  
 
-// ^^^ this is the function that is called when you start the game by clicking the target
+// ^^^ this is the function that is called when you start the game by clicking within the target area
 // the function check to see if the variable onClick is defined. If not, onClick will be set 
 // equal to the function resposible for interpreting and responding based on which element was clicked, whether it be
 // the target or not. After the variable onClick is set equal to this function, an event listener is initialized on the 
