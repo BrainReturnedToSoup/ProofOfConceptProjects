@@ -20,7 +20,7 @@ const accuracyCalc = (accuracy) => {
     accuracyValues.forEach( element => {
         sumOfAccuracyValues += element;
     })
-    let avgAccuracy = sumOfAccuracyValues/accuracyValues.length;
+    let avgAccuracy = (sumOfAccuracyValues/accuracyValues.length).toFixed(1);
     return accuracyBox.innerText = `Accuracy: ${avgAccuracy}%`;
 }
 
