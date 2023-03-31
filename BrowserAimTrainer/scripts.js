@@ -11,7 +11,7 @@ const title = document.querySelector('.title')
 const HTML = document.getElementsByTagName('html')
 
 let accuracyValues = [];
-let scoreValue = 0
+let scoreValue = 0;
 let timeLeft = 30;
 let onClick;
 let intervalFunction;
@@ -36,10 +36,6 @@ const scoreCalc = () => {
     }
 }
 
-const getRandomInt = (max) => {
-    return Math.floor(Math.random() * max);
-}
-
 const minusOneSecond = () => {
     timerBox.innerText = `Timer: ${timeLeft} seconds left`;
     if(timeLeft === 0) {
@@ -49,18 +45,22 @@ const minusOneSecond = () => {
     timeLeft--;
 }
 
+const moveTheTarget = () => {
+    if(timeLeft === 0) return;
+    targetContainer.style.top = getRandomInt(325) + 'px';
+    targetContainer.style.left = getRandomInt(700) + 'px';
+}
+
+const getRandomInt = (max) => {
+    return Math.floor(Math.random() * max);
+}
+
 const gameOver = () => {
     targetContainer.style.top = "0px";
     targetContainer.style.left = "0px";
     storedTarget = targetContainer.children[0];
     targetContainer.children[0].remove();
         title.innerText = 'Refresh to try again!';
-}
-
-const moveTheTarget = () => {
-    if(timeLeft === 0) return;
-    targetContainer.style.top = getRandomInt(325) + 'px';
-    targetContainer.style.left = getRandomInt(700) + 'px';
 }
 
 const onStart = (event) => {
@@ -91,14 +91,16 @@ const onStart = (event) => {
         };
     
     }
-}
+};
     document.addEventListener('click', (e) => {
         onClick(e);
-    })
+    });
+
     intervalFunction = setInterval(minusOneSecond, 1000);
-}  
+
+};  
 
 document.addEventListener('click', (e) => {
     onStart(e); 
-})
+});
 
