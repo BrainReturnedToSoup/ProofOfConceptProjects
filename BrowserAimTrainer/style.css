@@ -1,12 +1,37 @@
 * {
     margin: 0px;
     padding: 0px;
+
+}
+
+.viewport {
+    width: 96vw;
+    height: 97vh;
 }
 
 .scoreboardContainer {
     height: 10vh;
-    width: 100%;
-    background-color: aquamarine;
+    width: 100vw;
+    background-color: lightgrey;
+    display: flex;
+    align-items: center;
+}
+
+.scoreboardBoxContainer {
+    display: inherit;
+    flex-grow: 1;
+}
+
+.score, .timer, .accuracy{
+    height: 100%;
+    display: inherit;
+    align-items: center;
+}
+
+
+
+.title {
+    text-decoration: underline;
 }
 
 .targetArea {
