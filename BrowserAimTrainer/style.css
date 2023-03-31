@@ -2,3 +2,54 @@
     margin: 0px;
     padding: 0px;
 }
+
+.scoreboardContainer {
+    height: 10vh;
+    width: 100%;
+    background-color: aquamarine;
+}
+
+.targetArea {
+    width: 100%;
+    height: 80vh;
+    padding: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.targetContainer {
+    height: 75px;
+    width: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.outerRing {
+    background-color: red;
+    height: 75px;
+    width: 75px;
+    border-radius: 37.5px;
+    display: inherit;
+    justify-content: inherit;
+    align-items: inherit;
+}
+
+.middleRing {
+    background-color: lightgrey;
+    height: 50px;
+    width: 50px;
+    border-radius: 25px;
+    display: inherit;
+    justify-content: inherit;
+    align-items: inherit;
+}
+
+.centerDot {
+    background-color: red;
+    height: 25px;
+    width: 25px;
+    border-radius: 12.5px;
+}
