@@ -7,24 +7,30 @@ const scoreboardContainer = document.querySelector('.scoreboardContainer');
 const scoreBox = document.querySelector('.score');
 const accuracyBox = document.querySelector('.accuracy');
 const timerBox = document.querySelector('.timer');
-
-console.log(centerDot);
+const title = document.querySelector('.title')
+const HTML = document.getElementsByTagName('html')
 
 let accuracyValues = [];
 let scoreValue = 0
 
 const accuracyCalc = (accuracy) => {
+    if(timeLeft === 0) return;
     accuracyValues.push(accuracy);
-    let SumAccuracyValues = accuracyValues.reduce( (accumulator, currentValue) => {
-        accumulator + currentValue;
-    });
-    let avgAccuracy = SumAccuracyValues/accuracyValues.length;
+    let sumOfAccuracyValues = 0;
+    accuracyValues.forEach( element => {
+        sumOfAccuracyValues += element;
+    })
+    let avgAccuracy = sumOfAccuracyValues/accuracyValues.length;
     return accuracyBox.innerText = `Accuracy: ${avgAccuracy}%`;
 }
 
 const scoreCalc = () => {
+    if(timeLeft === 0) {
+        return;
+    } else {
     scoreValue++;
     scoreBox.innerText = `Score: ${scoreValue}`;
+    }
 }
 
 let timeLeft = 30;
@@ -32,12 +38,13 @@ let onClick;
 let intervalFunction;
 
 const onStart = (event) => {
-    if(onClick !== undefined) return;
-    onClick = (arg) => {
+    if(onClick !== undefined) { 
+        return;
+    } else {
+        onClick = (arg) => {
 
         let elementClicked = arg.target;
-        console.log(elementClicked);
-        console.log(centerDot);
+
         if(elementClicked === centerDot) {
             moveTheTarget();
             accuracyCalc(100);
@@ -54,25 +61,33 @@ const onStart = (event) => {
             moveTheTarget();
             accuracyCalc(0);
         } else {
-            
             return;
-    
         };
     
     }
+}
     document.addEventListener('click', (e) => {
         onClick(e);
     })
     intervalFunction = setInterval(minusOneSecond, 1000);
-    
-}
+}  
+
 
 const minusOneSecond = () => {
     timerBox.innerText = `Timer: ${timeLeft} seconds left`;
     if(timeLeft === 0) {
-        return clearInterval(intervalFunction);
+        clearInterval(intervalFunction);
+        return gameOver();
     }
     timeLeft--;
+}
+
+const gameOver = () => {
+    targetContainer.style.top = "0px";
+    targetContainer.style.left = "0px";
+    storedTarget = targetContainer.children[0];
+    targetContainer.children[0].remove();
+        title.innerText = 'Refresh to try again!';
 }
 
 const getRandomInt = (max) => {
@@ -81,13 +96,12 @@ const getRandomInt = (max) => {
 
 
 const moveTheTarget = () => {
+    if(timeLeft === 0) return;
     targetContainer.style.top = getRandomInt(600) + 'px';
     targetContainer.style.left = getRandomInt(600) + 'px';
 }
 
 document.addEventListener('click', (e) => {
-    onStart(e);
-});
-
-
+    onStart(e); 
+})
 
