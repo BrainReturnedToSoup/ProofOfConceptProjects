@@ -2,3 +2,19 @@
     margin: 0px;
     padding: 0px;
 }
+
+body {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+}
+
+.calculatorCasing {
+    height: 700px;
+    width: 500px;
+    padding: 20px;
+    background-color: #00111c;
+    border-radius: 5px;
+}
