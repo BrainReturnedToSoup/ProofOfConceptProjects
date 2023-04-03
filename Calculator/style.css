@@ -31,6 +31,7 @@ body {
 .bottomstructureBlock {
     height: 50%;
     border-radius: 3px;
+    margin-top: 15px;
     padding-inline: 14px;
     background-color: silver;
     display: flex;
