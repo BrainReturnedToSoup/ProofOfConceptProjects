@@ -3,7 +3,7 @@ const buttonContainer = document.querySelector('.buttonContainer');
 const arrayOfButtons = [{buttonLabel: ''}, {buttonLabel: 'CM'}, {buttonLabel: 'RM'}, {buttonLabel: 'M-'}, {buttonLabel: 'M+'}, {buttonLabel: '√'},
 {buttonLabel: '7'}, {buttonLabel: '8'}, {buttonLabel: '9'}, {buttonLabel: '-'}, {buttonLabel: '%'}, {buttonLabel: '4'}, {buttonLabel: '5'},
 {buttonLabel: '6'}, {buttonLabel: '÷'}, {buttonLabel: 'π'}, {buttonLabel: '1'}, {buttonLabel: '2'}, {buttonLabel: '3'}, {buttonLabel: 'x'},
-{buttonLabel: 'C/CE'}, {buttonLabel: '0'}, {buttonLabel: '.'}, {buttonLabel: '='}, {buttonLabel: '+'}]
+{buttonLabel: 'C'}, {buttonLabel: '0'}, {buttonLabel: '.'}, {buttonLabel: '='}, {buttonLabel: '+'}]
 
 const redLabels = [1, 2, 3, 4];
 const blueLabels = [5, 9, 10, 14, 15, 19, 20, 23, 24];

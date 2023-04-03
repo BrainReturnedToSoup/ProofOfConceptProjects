@@ -1,6 +1,7 @@
 * {
     margin: 0px;
     padding: 0px;
+    font-family: Eurostyle T, sans-serif;
 }
 
 body {
@@ -73,7 +74,7 @@ body {
 
 .outputBox {
     background-color:rgb(27, 27, 27);
-    width: 80%;
+    width: 70%;
     height: 50%;
     padding-inline: 10px;
     display: flex;
@@ -103,8 +104,15 @@ body {
     align-items: center;
 } 
 
+.logo div {
+    font-size: 18px;
+    transform: scale(1.65,1);
+}
+
 .model {
     background-color: #00bfff;
+    color: white;
+    font-size: 14px;
     width: 55%;
     height: 100%;
     display: flex;
@@ -133,8 +141,9 @@ body {
 }
 
 .buttonLabel {
-    width: 45px;
-    height: 38px;
+    width: 44px;
+    height: 39px;
+    font-size: 20px;
     background-color: black;
     border-radius: 6px;
     display: flex;
