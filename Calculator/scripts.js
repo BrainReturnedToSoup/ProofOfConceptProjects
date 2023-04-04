@@ -1,54 +1,56 @@
+let buttons = [];
+let redButtonIndex = [];
+let blueButtonIndex = [];
+
 const buttonContainer = document.querySelector('.buttonContainer');
 
-const arrayOfButtons = [{buttonLabel: ''}, {buttonLabel: 'CM'}, {buttonLabel: 'RM'}, {buttonLabel: 'M-'}, {buttonLabel: 'M+'}, {buttonLabel: '√'},
-{buttonLabel: '7'}, {buttonLabel: '8'}, {buttonLabel: '9'}, {buttonLabel: '-'}, {buttonLabel: '%'}, {buttonLabel: '4'}, {buttonLabel: '5'},
-{buttonLabel: '6'}, {buttonLabel: '÷'}, {buttonLabel: 'π'}, {buttonLabel: '1'}, {buttonLabel: '2'}, {buttonLabel: '3'}, {buttonLabel: 'x'},
-{buttonLabel: 'C'}, {buttonLabel: '0'}, {buttonLabel: '.'}, {buttonLabel: '='}, {buttonLabel: '+'}]
+async function fetchButtonFile() {
 
-const redLabels = [1, 2, 3, 4];
-const blueLabels = [5, 9, 10, 14, 15, 19, 20, 23, 24];
+    const response = await fetch('./buttons.json');
+    const data = await response.json(); 
 
-const buttonContructor = (object) => {
-    for (let i = 0; i < arrayOfButtons.length; i++) {
-
-            let buttonBackground = document.createElement('div');
-
-        if(i === 0) {
-            buttonBackground.setAttribute('class', 'onAndOffBackground');
-        } else {
-            buttonBackground.setAttribute('class', 'buttonBackground');
-        };
-
-            let buttonLabel = document.createElement('button');
-
-        if(i === 0) {
-            buttonLabel.setAttribute('class', 'onAndOffButtonLabel')
-        } else {
-            buttonLabel.setAttribute('class', 'buttonLabel');
-        };
-
-        buttonLabel.classList.add(`${object.buttonLabel}`);
-
-        if(redLabels.includes(i)){
-            buttonLabel.classList.add('red')
-        } else if(blueLabels.includes(i)) {
-            buttonLabel.classList.add('blue')
-        } else {
-            buttonLabel.classList.add('black')
-        };
-
-            let buttonText = document.createElement('h4');
-            buttonText.setAttribute('class', 'textLabel');
-            buttonText.innerText = object[i].buttonLabel;
-            buttonLabel.appendChild(buttonText);
-            buttonBackground.appendChild(buttonLabel);
-            buttonContainer.appendChild(buttonBackground);
-
-    };
+    buttons = data.buttons;
+    redButtonIndex = data.redButtonIndex;
+    blueButtonIndex = data.blueButtonIndex;
 
 }
 
-buttonContructor(arrayOfButtons);
+const buttonMaker = (array) => {
+    
+    for(let i = 0; i < array.length; i++) {
+
+        let buttonBackground = document.createElement('div');
+        let button = document.createElement('button');
+        let textOnButton = document.createElement('h4');
+
+        button.setAttribute('id', `${array[i]}`);
+
+        if(i === 0) {
+            buttonBackground.classList.add('onAndOffBackground');
+            button.classList.add('onAndOffButtonLabel');
+        } else {
+            buttonBackground.classList.add('buttonBackground');
+            button.classList.add('buttonLabel');
+        }
+
+        redButtonIndex.includes(i) ? button.classList.add('red') : blueButtonIndex.includes(i) ? button.classList.add('blue') : button.classList.add('black');
+
+        textOnButton.classList.add('textLabel');
+        textOnButton.innerText = array[i];
+
+
+        button.appendChild(textOnButton);
+        buttonBackground.appendChild(button);
+        buttonContainer.appendChild(buttonBackground);
+
+    }
+
+}
+
+fetchButtonFile().then(() => {
+    buttonMaker(buttons);
+});
+
 
 document.addEventListener('mousedown', (e) => {
 
