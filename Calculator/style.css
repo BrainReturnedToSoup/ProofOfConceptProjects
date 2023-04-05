@@ -151,6 +151,7 @@ body {
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    color: white;
 }
 
 .red {
@@ -165,22 +166,6 @@ body {
     background-color: black;
 }
 
-.textLabel {
-    display: flex;
-    justify-self: center;
-    align-items: center;
-    color: white;
-}
-
-.textLabelMove {
-    display: flex;
-    justify-self: center;
-    align-items: center;
-    position: relative;
-    color: white;
-    top: 1.5px;
-    left: 3px;
-}
 
 .onAndOffBackground {
     background-color: #111111;
