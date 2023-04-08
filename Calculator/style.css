@@ -1,0 +1,46 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+.casing {
+    display: inherit;
+    flex-direction: column;
+    align-items: inherit;
+    width: 375px;
+    height: 650px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: grey
+}
+
+.display {
+    width: 375px;
+    height: 200px;
+    background-color: red;
+}
+
+.buttonContainer {
+    width: 375px;
+    flex: 1;
+    display: inherit;
+    flex-wrap: wrap;
+}
+
+.button {
+    width: 25%;
+    font-size: 32px;
+}
+
+.backspace {
+    font-size: 16px;
+}
+
