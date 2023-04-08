@@ -25,11 +25,15 @@ body {
 .display {
     width: 375px;
     height: 200px;
-    background-color: red;
+    padding-bottom: 25px;
+    border-top-right-radius: 7.5px;
+    border-top-left-radius: 7.5px;
+    background-color: white;
 }
 
 .buttonContainer {
     width: 375px;
+    padding-top: 15px;
     flex: 1;
     display: inherit;
     flex-wrap: wrap;
@@ -38,9 +42,36 @@ body {
 .button {
     width: 25%;
     font-size: 32px;
+    border-radius: 4px;
+}
+
+.number {
+    background-color: lightgray;
 }
 
 .backspace {
     font-size: 16px;
 }
 
+.memory {
+    height: 20%;
+    padding-inline: 5px;
+    display: flex;
+    align-items: center;
+    background-color: green;
+}
+
+.currentOutputContainer {
+    height: 80%;
+    display: flex;
+    justify-content: end;
+    align-items: end;
+}
+
+.output {
+    height: 20%;
+    padding-inline: 5px;
+    font-size: 46px;
+    font-weight: 300;
+    background-color: yellow;
+}
