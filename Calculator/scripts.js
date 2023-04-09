@@ -1,72 +1,100 @@
-const output = [];
+const methodNames= new Array();
+document.querySelectorAll('button').forEach(element => {
+    methodNames.push(element.getAttribute('data-id'));
+})
 
-const elementsObj = {};
-const buttonActions = {
-    'percent': () => {
+class Calculator {
+    calculationsObject() {
+        this.currentValue = new String('');
+        this.history = new Array();
+    }
 
-    },
-    'sqrt': () => {
+    [methodNames[0]]() {
+        //percent
+    }
 
-    },
-    'clear': () => {
+    [methodNames[1]]() {
+        //sqrt
+    }
 
-    },
-    'backspace': () => {
+    [methodNames[2]]() {
+        //clear
+    }
 
-    },
-    'add': () => {
+    [methodNames[3]]() {
+        //backspace
+    }
 
-    },
-    'subtract': () => {
+    [methodNames[4]]() {
+        //add
+    }
 
-    },
-    'multiply': () => {
+    [methodNames[5]]() {
+        //subtract
+    }
 
-    },
-    'divide': () => {
+    [methodNames[6]]() {
+        //multiply
+    }
 
-    },
-    'seven': () => {
+    [methodNames[7]]() {
+        //divide
+    }
 
-    },
-    'eight': () => {
+    [methodNames[8]]() {
+        //seven
+    }
 
-    },
-    'nine': () => {
+    [methodNames[9]]() {
+        //eight
+    }
 
-    },
-    'decimal': () => {
+    [methodNames[10]]() {
+        //nine
+    }
 
-    },
-    'four': () => {
+    [methodNames[11]]() {
+        //decimal
+    }
 
-    },
-    'five': () => {
+    [methodNames[12]]() {
+        //four
+    }
 
-    },
-    'six': () => {
+    [methodNames[13]]() {
+        //five
+    }
 
-    },
-    'zero': () => {
+    [methodNames[14]]() {
+        //six
+    }
 
-    },
-    'one': () => {
+    [methodNames[15]]() {
+        //zero
+    }
 
-    },
-    'two': () => {
+    [methodNames[16]]() {
+        //one
+    }
 
-    },
-    'three': () => {
+    [methodNames[17]]() {
+        //two
+    }
 
-    },
-    'equal': () => {
+    [methodNames[18]]() {
+        //three
+    }
+
+    [methodNames[19]]() {
+        //equal
+    }
+
+    displayToDOM() {
 
     }
+    
 }
 
-document.querySelectorAll('button').forEach( element => {
-    elementsObj[`${element.getAttribute('data-id')}`] = element;
-})
 
 document.querySelector('.buttonContainer').addEventListener('click', (e) => {
     const dataId = e.target.getAttribute('data-id');
