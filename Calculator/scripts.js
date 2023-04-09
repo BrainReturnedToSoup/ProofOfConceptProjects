@@ -1,56 +1,76 @@
+const output = [];
+
 const elementsObj = {};
+const buttonActions = {
+    'percent': () => {
+
+    },
+    'sqrt': () => {
+
+    },
+    'clear': () => {
+
+    },
+    'backspace': () => {
+
+    },
+    'add': () => {
+
+    },
+    'subtract': () => {
+
+    },
+    'multiply': () => {
+
+    },
+    'divide': () => {
+
+    },
+    'seven': () => {
+
+    },
+    'eight': () => {
+
+    },
+    'nine': () => {
+
+    },
+    'decimal': () => {
+
+    },
+    'four': () => {
+
+    },
+    'five': () => {
+
+    },
+    'six': () => {
+
+    },
+    'zero': () => {
+
+    },
+    'one': () => {
+
+    },
+    'two': () => {
+
+    },
+    'three': () => {
+
+    },
+    'equal': () => {
+
+    }
+}
 
 document.querySelectorAll('button').forEach( element => {
     elementsObj[`${element.getAttribute('data-id')}`] = element;
 })
 
-document.querySelector('.buttonContainer').addEventListener('click', whichButton(e))
+document.querySelector('.buttonContainer').addEventListener('click', (e) => {
+    const dataId = e.target.getAttribute('data-id');
+    buttonActions[dataId]();
+})
 
-function whichButton(event) {
-    const dataId = event.target.getAttribute('data-id');
-    if(dataId != undefined) {
-        switch(dataId) {
-            case 'percent':
 
-            case 'sqrt':
-
-            case 'clear':
-
-            case 'backspace':
-
-            case 'add':
-
-            case 'subtract':
-
-            case 'multiply':
-
-            case 'divide':
-
-            case 'seven':
-
-            case 'eigth':
-
-            case 'nine':
-
-            case 'decimal':
-
-            case 'four':
-
-            case 'five':
-
-            case 'six':
-
-            case 'zero':
-
-            case 'one':
-
-            case 'two':
-
-            case 'three':
-
-            case 'equal':
-        }
-    } else {
-        return;
-    }
-}
