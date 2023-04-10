@@ -21,14 +21,14 @@ class Calculator {
     }
 
     [methodNames[1]]() {
-        //sqrt
-        const memoryArray = this.memoryDisplay.split('');
-        if (this.display.length !== 0 && this.checkForOperators(memoryArray[memoryArray.length-1])) {
-            const sqrtValue = Math.sqrt(parseFloat(this.display));
+        // sqrt
+         const memoryArray = this.memoryDisplay.split('');
+            if (this.display.length !== 0) {
+            const sqrtValue = Math.sqrt(parseFloat(this.display)).toFixed(6);
             this.display = sqrtValue.toString();
-            this.memoryDisplay += this.display;
-            this.history += this.display};
-        
+            this.memoryDisplay += 'sqrt(' + this.display + ')';
+            this.history += 'sqrt(' + this.display + ')';
+            }
     }
 
     [methodNames[2]]() {
@@ -104,8 +104,13 @@ class Calculator {
 
     [methodNames[11]]() {
         //decimal
+        if(this.display.includes('.')) {
+            return;
+        }
+
         const displayArray = this.display.split(' ')
-        if(this.display.length !== 0 && this.checkForOperators(displayArray) === false) {
+        
+        if(this.display.length !== 0) {
         this.display += '.';
         this.history += '.';
         } else {
@@ -167,14 +172,24 @@ class Calculator {
     }
 
     finalCalculation() {
-        this.display = eval(this.history).toFixed(2)
-        this.displayToDOM()
+        const output = eval(this.history);
+        if (output.toString().length > 14) {
+            this.display = output.toExponential(8);
+        } else {
+            this.display = output;
+        }
+        this.displayToDOM();
         this.equals = true;
     }
-
+    
     displayToDOM() {
-        displayElement.textContent = this.display;
-        memoryElement.textContent = this.memoryDisplay;
+        if (this.display.toString().length > 14) {
+            displayElement.textContent = parseFloat(this.display).toExponential(8);
+            memoryElement.textContent = parseFloat(this.memoryDisplay).toExponential(4);
+        } else {
+            displayElement.textContent = this.display;
+            memoryElement.textContent = this.memoryDisplay;
+        }
     }
 
     checkForOperators(element) {
