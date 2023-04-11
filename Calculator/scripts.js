@@ -1,237 +1,173 @@
-const methodNames = new Array();
-document.querySelectorAll('button').forEach(element => {
-    methodNames.push(element.getAttribute('data-id'));
-})
+const buttonIDs = Array.from(document.querySelectorAll('button')).map(element => element.getAttribute('data-id'));
 
 class Calculator {
     constructor() {
-        this.display = ''
-        this.memoryDisplay = ''
-        this.history = ''
-        this.equals = false;
+        this.display = '';
+        this.memory = '';
+        this.lastButton = '';
     }
 
-    [methodNames[0]]() {
+    [buttonIDs[0]]() {
         //power
-        if(this.checkForOperators() === false) {
-            this.memoryDisplay += this.display + ' ^ ';
-            this.display = '';
-            this.history += ' ** ';
-            }
+        this.memory = parseInt(this.memory + this.display).toString();
+        this.display = '**';
+        this.lastButton = 'power';
     }
-
-    [methodNames[1]]() {
-        // sqrt
-         const memoryArray = this.memoryDisplay.split('');
-            if (this.display.length !== 0) {
-            const sqrtValue = Math.sqrt(parseFloat(this.display)).toFixed(6);
-            this.display = sqrtValue.toString();
-            this.memoryDisplay += 'sqrt(' + this.display + ')';
-            this.history += 'sqrt(' + this.display + ')';
-            }
+    [buttonIDs[1]]() {
+        //squareRoot
+        this.memory = parseInt(this.memory + this.display).toString();
+        this.display = '';
+        this.lastButton = '√';
     }
-
-    [methodNames[2]]() {
+    [buttonIDs[2]]() {
         //clear
-        this.memoryDisplay = '';
         this.display = '';
-        this.history = '';
+        this.memory = '';
+        this.lastButton = '';
     }
-
-    [methodNames[3]]() {
+    [buttonIDs[3]]() {
         //backspace
-        if(this.display.split('').length !== undefined) {
-        this.display = this.display.substring(0, this.display.length - 1)
-        this.history = this.history.substring(0, this.display.length - 1)
-        } else {
-            return;
-        }
+        this.display = this.display.substring(0, this.display.length - 1);
+        this.lastButton = this.display[this.display.length - 1];
     }
-
-    [methodNames[4]]() {
+    [buttonIDs[4]]() {
         //add
-        const historyArray = this.history.split('')
-        if(this.checkForOperators() === false) {
-        this.memoryDisplay += this.display + ' + '
-        this.display = '';
-        this.history += ' + ';
-        }
+        this.memory = parseInt(this.memory + this.display).toString();
+        this.display = '+';
+        this.lastButton = '+';
     }
-
-    [methodNames[5]]() {
+    [buttonIDs[5]]() {
         //subtract
-        const historyArray = this.history.split('')
-        if(this.checkForOperators() === false) {
-        this.memoryDisplay += this.display + ' - ';
-        this.display = '';
-        this.history += ' - ';
-        }
+        this.memory = parseInt(this.memory + this.display).toString();
+        this.display = '-';
+        this.lastButton = '-';
     }
-
-    [methodNames[6]]() {
+    [buttonIDs[6]]() {
         //multiply
-        const historyArray = this.history.split('')
-        if(this.checkForOperators() === false) {
-        this.memoryDisplay += this.display + ' * ';
-        this.display = '';
-        this.history += ' * ';
-        }
+        this.memory = parseInt(this.memory + this.display).toString();
+        this.display = '*';
+        this.lastButton = '*';
     }
-
-    [methodNames[7]]() {
+    [buttonIDs[7]]() {
         //divide
-        const historyArray = this.history.split('')
-        if(this.checkForOperators() === false) {
-        this.memoryDisplay += this.display + ' ÷ ';
-        this.display = '';
-        this.history += ' / ';
-        }
+        this.memory = parseInt(this.memory + this.display).toString();
+        this.display = '/';
+        this.lastButton = '/';
     }
-
-    [methodNames[8]]() {
+    [buttonIDs[8]]() {
         //seven
         this.display += '7';
-        this.history += '7';
+        this.lastButton = 'seven';
     }
-
-    [methodNames[9]]() {
+    [buttonIDs[9]]() {
         //eight
         this.display += '8';
-        this.history += '8';
+        this.lastButton = 'eight';
     }
-
-    [methodNames[10]]() {
+    [buttonIDs[10]]() {
         //nine
         this.display += '9';
-        this.history += '9';
+        this.lastButton = 'nine';
     }
-
-    [methodNames[11]]() {
+    [buttonIDs[11]]() {
         //decimal
-        if(this.display.includes('.')) {
-            return;
-        }
-
-        const displayArray = this.display.split(' ')
-        
-        if(this.display.length !== 0) {
         this.display += '.';
-        this.history += '.';
-        } else {
-            return;
-        }
+        this.lastButton = 'decimal';
     }
-
-    [methodNames[12]]() {
+    [buttonIDs[12]]() {
         //four
         this.display += '4';
-        this.history += '4';
+        this.lastButton = 'four';
     }
-
-    [methodNames[13]]() {
+    [buttonIDs[13]]() {
         //five
         this.display += '5';
-        this.history += '5';
+        this.lastButton = 'five';
     }
-
-    [methodNames[14]]() {
+    [buttonIDs[14]]() {
         //six
         this.display += '6';
-        this.history += '6';
+        this.lastButton = 'six';
     }
-
-    [methodNames[15]]() {
+    [buttonIDs[15]]() {
         //zero
         this.display += '0';
-        this.history += '0';
+        this.lastButton = 'zero';
     }
-
-    [methodNames[16]]() {
+    [buttonIDs[16]]() {
         //one
-        this.display += '1';
-        this.history += '1';
+        this.display += '9';
+        this.lastButton = 'nine';
     }
-
-    [methodNames[17]]() {
+    [buttonIDs[17]]() {
         //two
-        this.display += '2';
-        this.history += '2';
+        this.display += '9';
+        this.lastButton = 'nine';
     }
-
-    [methodNames[18]]() {
+    [buttonIDs[18]]() {
         //three
-        this.display += '3';
-        this.history += '3';
+        this.display += '9';
+        this.lastButton = 'nine';
     }
-
-    [methodNames[19]]() {
+    [buttonIDs[19]]() {
         //equal
-        if(this.checkForOperators())  {
-            this.memoryDisplay += this.display;
-            this.finalCalculation();
-        } else {
+        const total = this.memory + this.display;
+        console.log(total)
+        this.display = parseInt(total);
+    }
+}
+
+const numberButtons = Array.from(document.querySelectorAll('.number')).map(element => element.getAttribute('data-id'));
+const operatorButtons = Array.from(document.querySelectorAll('.operator')).map(element => element.getAttribute('data-id'));
+
+console.log(buttonIDs);
+console.log(numberButtons);
+console.log(operatorButtons);
+
+function handleClick(event) {
+    //grabs the data-id property of the button clicked in order to determine which button was clicked
+    const dataID = event.target.getAttribute('data-id')
+    if(numberButtons.includes(dataID)) {
+        //handles number button being clicked, separated it from other buttons like clear, backspace, and equal just for structure
+        CalculatorObj[dataID]()
+        displayToDOM();
+
+    } else if(operatorButtons.includes(dataID)) {
+        //handles operator being clicked, if the last button inputed is an operator, then you wont be able to add another
+        if(operatorButtons.includes(CalculatorObj.lastButton) || CalculatorObj.lastButton === '') {
             return;
-        }
-    }
-
-    finalCalculation() {
-        const output = eval(this.history);
-        if (output.toString().length > 14) {
-            this.display = output.toExponential(8);
         } else {
-            this.display = output;
+            CalculatorObj[dataID]()
+            displayToDOM();
         }
-        this.displayToDOM();
-        this.equals = true;
-    }
-    
-    displayToDOM() {
-        if (this.display.toString().length > 14) {
-            displayElement.textContent = parseFloat(this.display).toExponential(8);
-            memoryElement.textContent = parseFloat(this.memoryDisplay).toExponential(4);
+
+    } else if(dataID === buttonIDs[11]) {
+        //handles decimal point being clicked, if already present in the displayed value, then you wont be able to add another
+        if(CalculatorObj.display.split('').includes(buttonIDs[11])) {
+            return;
         } else {
-            displayElement.textContent = this.display;
-            memoryElement.textContent = this.memoryDisplay;
+            CalculatorObj[dataID]()
+            displayToDOM();
         }
+
+    } else {
+        //where all other buttons will fall under, since you always want to be able to activate backspace, clear, and equal when you want
+        CalculatorObj[dataID]()
+        displayToDOM();
     }
-
-    checkForOperators() {
-        const operators = ['+', '-', '*', '/', '**'];
-        const historyArray = this.history.split(' ');
-        
-        if (historyArray.length < 2) {
-          return false; // not enough values in history to check for operators
-        }
-        
-        const lastValue = historyArray[historyArray.length - 1];
-        const secondLastValue = historyArray[historyArray.length - 2];
-        
-        return operators.includes(lastValue) || operators.includes(secondLastValue);
-      }
-
+ 
 
 }
 
-const displayElement = document.querySelector('.output')
-const memoryElement = document.querySelector('.memory')
+const outputBox = document.querySelector('.output');
+const memoryBox = document.querySelector('.memory');
 
-const calculatorObj = new Calculator();
+function displayToDOM() {
+    outputBox.textContent = CalculatorObj.display;
+    memoryBox.textContent = CalculatorObj.memory;
+}
 
-document.querySelector('.buttonContainer').addEventListener('click', (e) => {
-    const dataId = e.target.getAttribute('data-id');
-    if(dataId != undefined) {
-        if(calculatorObj.equals === false) {
-        calculatorObj[dataId]()
-        calculatorObj.displayToDOM();
-        } else {
-        calculatorObj.history = '';
-        calculatorObj.memoryDisplay = '';
-        calculatorObj.display = '';
-        calculatorObj.equals = false;
-        calculatorObj[dataId]();
-        calculatorObj.displayToDOM();    
-        }
-    }
-});
+//create a calculator object that will be used to store the data that will be calculated and displayed
+const CalculatorObj = new Calculator();
 
-
+document.querySelector('.buttonContainer').addEventListener('click', e => handleClick(e))
