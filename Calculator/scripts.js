@@ -13,7 +13,7 @@ class Calculator {
 
     [methodNames[0]]() {
         //power
-        if(this.display.length != undefined) {
+        if(this.checkForOperators() === false) {
             this.memoryDisplay += this.display + ' ^ ';
             this.display = '';
             this.history += ' ** ';
@@ -40,7 +40,7 @@ class Calculator {
 
     [methodNames[3]]() {
         //backspace
-        if(this.display.length != undefined) {
+        if(this.display.split('').length !== undefined) {
         this.display = this.display.substring(0, this.display.length - 1)
         this.history = this.history.substring(0, this.display.length - 1)
         } else {
@@ -50,7 +50,8 @@ class Calculator {
 
     [methodNames[4]]() {
         //add
-        if(this.display.length != undefined) {
+        const historyArray = this.history.split('')
+        if(this.checkForOperators() === false) {
         this.memoryDisplay += this.display + ' + '
         this.display = '';
         this.history += ' + ';
@@ -59,7 +60,8 @@ class Calculator {
 
     [methodNames[5]]() {
         //subtract
-        if(this.display.length != undefined) {
+        const historyArray = this.history.split('')
+        if(this.checkForOperators() === false) {
         this.memoryDisplay += this.display + ' - ';
         this.display = '';
         this.history += ' - ';
@@ -68,7 +70,8 @@ class Calculator {
 
     [methodNames[6]]() {
         //multiply
-        if(this.display.length != undefined) {
+        const historyArray = this.history.split('')
+        if(this.checkForOperators() === false) {
         this.memoryDisplay += this.display + ' * ';
         this.display = '';
         this.history += ' * ';
@@ -77,7 +80,8 @@ class Calculator {
 
     [methodNames[7]]() {
         //divide
-        if(this.display.length != undefined) {
+        const historyArray = this.history.split('')
+        if(this.checkForOperators() === false) {
         this.memoryDisplay += this.display + ' ÷ ';
         this.display = '';
         this.history += ' / ';
@@ -162,8 +166,7 @@ class Calculator {
 
     [methodNames[19]]() {
         //equal
-        const historyArray = this.history.split(' ')
-        if(this.checkForOperators(historyArray[historyArray.length - 1]) === false)  {
+        if(this.checkForOperators())  {
             this.memoryDisplay += this.display;
             this.finalCalculation();
         } else {
@@ -192,10 +195,19 @@ class Calculator {
         }
     }
 
-    checkForOperators(element) {
-        const operators = ['sqrt',' + ',' - ',' * ',' / ',' ** ', '.']
-        return operators.includes(element)
-    }
+    checkForOperators() {
+        const operators = ['+', '-', '*', '/', '**'];
+        const historyArray = this.history.split(' ');
+        
+        if (historyArray.length < 2) {
+          return false; // not enough values in history to check for operators
+        }
+        
+        const lastValue = historyArray[historyArray.length - 1];
+        const secondLastValue = historyArray[historyArray.length - 2];
+        
+        return operators.includes(lastValue) || operators.includes(secondLastValue);
+      }
 
 
 }
