@@ -5,17 +5,22 @@ class Calculator {
         this.display = '';
         this.memory = '';
         this.lastButton = '';
+        this.equals = false;
     }
 
     [buttonIDs[0]]() {
         //power
-        this.memory = parseInt(this.memory + this.display).toString();
+        if(this.equals === false) {
+            this.memory = eval(this.memory + this.display)
+        }
         this.display = '**';
         this.lastButton = 'power';
     }
     [buttonIDs[1]]() {
         //squareRoot
-        this.memory = parseInt(this.memory + this.display).toString();
+        if(this.equals === false) {
+            this.memory = eval(this.memory + this.display)
+        }
         this.display = '';
         this.lastButton = '√';
     }
@@ -24,7 +29,8 @@ class Calculator {
         this.display = '';
         this.memory = '';
         this.lastButton = '';
-    }
+        this.equals = false;
+    }   
     [buttonIDs[3]]() {
         //backspace
         this.display = this.display.substring(0, this.display.length - 1);
@@ -32,25 +38,33 @@ class Calculator {
     }
     [buttonIDs[4]]() {
         //add
-        this.memory = parseInt(this.memory + this.display).toString();
+        if(this.equals === false) {
+            this.memory = eval(this.memory + this.display)
+        }
         this.display = '+';
         this.lastButton = '+';
     }
     [buttonIDs[5]]() {
         //subtract
-        this.memory = parseInt(this.memory + this.display).toString();
+        if(this.equals === false) {
+            this.memory = eval(this.memory + this.display)
+        }
         this.display = '-';
         this.lastButton = '-';
     }
     [buttonIDs[6]]() {
         //multiply
-        this.memory = parseInt(this.memory + this.display).toString();
+        if(this.equals === false) {
+            this.memory = eval(this.memory + this.display)
+        }
         this.display = '*';
         this.lastButton = '*';
     }
     [buttonIDs[7]]() {
         //divide
-        this.memory = parseInt(this.memory + this.display).toString();
+        if(this.equals === false) {
+            this.memory = eval(this.memory + this.display)
+        }
         this.display = '/';
         this.lastButton = '/';
     }
@@ -96,24 +110,25 @@ class Calculator {
     }
     [buttonIDs[16]]() {
         //one
-        this.display += '9';
-        this.lastButton = 'nine';
+        this.display += '1';
+        this.lastButton = 'one';
     }
     [buttonIDs[17]]() {
         //two
-        this.display += '9';
-        this.lastButton = 'nine';
+        this.display += '2';
+        this.lastButton = 'two';
     }
     [buttonIDs[18]]() {
         //three
-        this.display += '9';
-        this.lastButton = 'nine';
+        this.display += '3';
+        this.lastButton = 'three';
     }
     [buttonIDs[19]]() {
         //equal
-        const total = this.memory + this.display;
-        console.log(total)
-        this.display = parseInt(total);
+        const addToMemory = this.display;
+        this.display = eval(this.memory + this.display);
+        this.memory = eval(this.memory + addToMemory);
+        this.equals = true;
     }
 }
 
