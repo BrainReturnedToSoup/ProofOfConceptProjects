@@ -22,17 +22,19 @@ class Calculator {
         //squareRoot
         if (this.equals === false && this.sqrt === false) {
             // If the equal button and button sqrt haven't been pressed within the context of display
-            if (operatorSymbols.includes(this.display[0]) && this.display.length > 1) {
+            if (operatorSymbols.includes(this.display.split('').shift()) && this.display.split('').length > 1) {
                 // If the first character of the display property is an operator and the display value is longer that 1, so not just an operator
                 const operator = this.display[0];
                 const displayValue = parseFloat(this.display.substring(1));
                 this.display = eval(`${this.memory} ${operator} Math.sqrt(${displayValue})`);
                 this.sqrt = true;
+
             } else {
                 // If the first character isn't an operator, and cases of multiple operators in the display won't ever happen
                 this.display = eval(this.display);
                 this.memory = this.display;
                 this.sqrt = true;
+
             }
             
         } else if(this.equals === true && this.sqrt === false) {
@@ -41,13 +43,8 @@ class Calculator {
             this.memory = this.display;
             this.equals = false;
             this.sqrt = true;
-        } else if(this.equals === false && this.sqrt === true) {
-            //if equals hasn't been pressed, but sqrt has within the context of display
 
-        } else {
-            //if both have been pressed and not reset within the context of display
         }
-
     }
 
     [buttonIDs[2]]() {
@@ -200,7 +197,7 @@ class Calculator {
     }
     [buttonIDs[19]]() {
         //equal
-        if(this.equals === true || this.sqrt === true) {
+        if(this.equals === true || this.sqrt === true || this.display[0] === undefined) {
             return;
         } else {
         const addToMemory = this.display;
