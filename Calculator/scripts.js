@@ -20,24 +20,43 @@ class Calculator {
     }
     [buttonIDs[1]]() {
         //squareRoot
-        if(this.equals === false) {
-            this.memory = eval(this.memory + Math.sqrt(this.display))
-        }
-        if(operatorButtons.includes(this.lastButton)) {
-            const displayValue = this.display;
-            const operator = displayValue.shift();
-            this.display = eval(operator + Math.sqrt(displayValue));
+        if (this.equals === false && this.sqrt === false) {
+            // If the equal button and button sqrt haven't been pressed within the context of display
+            if (operatorSymbols.includes(this.display[0]) && this.display.length > 1) {
+                // If the first character of the display property is an operator and the display value is longer that 1, so not just an operator
+                const operator = this.display[0];
+                const displayValue = parseFloat(this.display.substring(1));
+                this.display = eval(`${this.memory} ${operator} Math.sqrt(${displayValue})`);
+                this.sqrt = true;
+            } else {
+                // If the first character isn't an operator, and cases of multiple operators in the display won't ever happen
+                this.display = eval(this.display);
+                this.memory = this.display;
+                this.sqrt = true;
+            }
+            
+        } else if(this.equals === true && this.sqrt === false) {
+            //if equals has been pressed already and not reset along with sqrt not being pressed within the context of display
+            this.display = eval(Math.sqrt(this.display));
+            this.memory = this.display;
+            this.equals = false;
+            this.sqrt = true;
+        } else if(this.equals === false && this.sqrt === true) {
+            //if equals hasn't been pressed, but sqrt has within the context of display
+
         } else {
-            this.display = Math.sqrt(this.display);
+            //if both have been pressed and not reset within the context of display
         }
-        this.lastButton = '√';
+
     }
+
     [buttonIDs[2]]() {
         //clear
         this.display = '';
         this.memory = '';
         this.lastButton = '';
         this.equals = false;
+        this.sqrt = false;
     }   
     [buttonIDs[3]]() {
         //backspace
@@ -109,9 +128,9 @@ class Calculator {
     }
     [buttonIDs[11]]() {
         //decimal
-        if(this.equals === true) {
+        if(this.equals === true || this.display.split('').includes('.')) {
             return;
-        } 
+        }
         this.display += '.';
         this.lastButton = 'decimal';
         this.equals = false;
@@ -181,7 +200,7 @@ class Calculator {
     }
     [buttonIDs[19]]() {
         //equal
-        if(this.equals === true) {
+        if(this.equals === true || this.sqrt === true) {
             return;
         } else {
         const addToMemory = this.display;
@@ -195,6 +214,7 @@ class Calculator {
 
 const numberButtons = Array.from(document.querySelectorAll('.number')).map(element => element.getAttribute('data-id'));
 const operatorButtons = Array.from(document.querySelectorAll('.operator')).map(element => element.getAttribute('data-id'));
+const operatorSymbols = ['0','1','2','3','4','5','6','7','8','9','+','-','/','*','**']
 
 console.log(buttonIDs);
 console.log(numberButtons);
@@ -205,7 +225,7 @@ function handleClick(event) {
     const dataID = event.target.getAttribute('data-id')
     if(numberButtons.includes(dataID)) {
         //handles number button being clicked, separated it from other buttons like clear, backspace, and equal just for structure
-        CalculatorObj[dataID]()
+        CalculatorObj[dataID]();
         displayToDOM();
 
     } else if(operatorButtons.includes(dataID)) {
@@ -213,7 +233,7 @@ function handleClick(event) {
         if(operatorButtons.includes(CalculatorObj.lastButton) || CalculatorObj.lastButton === '') {
             return;
         } else {
-            CalculatorObj[dataID]()
+            CalculatorObj[dataID]();
             displayToDOM();
         }
 
@@ -222,7 +242,7 @@ function handleClick(event) {
         if(CalculatorObj.display.split('').includes(buttonIDs[11])) {
             return;
         } else {
-            CalculatorObj[dataID]()
+            CalculatorObj[dataID]();
             displayToDOM();
         }
 
