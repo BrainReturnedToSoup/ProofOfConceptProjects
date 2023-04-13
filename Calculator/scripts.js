@@ -6,6 +6,7 @@ class Calculator {
         this.memory = '';
         this.lastButton = '';
         this.equals = false;
+        this.sqrt = false;
     }
 
     [buttonIDs[0]]() {
@@ -15,13 +16,20 @@ class Calculator {
         }
         this.display = '**';
         this.lastButton = 'power';
+        this.equals = false;
     }
     [buttonIDs[1]]() {
         //squareRoot
         if(this.equals === false) {
-            this.memory = eval(this.memory + this.display)
+            this.memory = eval(this.memory + Math.sqrt(this.display))
         }
-        this.display = '';
+        if(operatorButtons.includes(this.lastButton)) {
+            const displayValue = this.display;
+            const operator = displayValue.shift();
+            this.display = eval(operator + Math.sqrt(displayValue));
+        } else {
+            this.display = Math.sqrt(this.display);
+        }
         this.lastButton = '√';
     }
     [buttonIDs[2]]() {
@@ -38,11 +46,12 @@ class Calculator {
     }
     [buttonIDs[4]]() {
         //add
-        if(this.equals === false) {
+        if(this.equals === false ) {
             this.memory = eval(this.memory + this.display)
         }
         this.display = '+';
         this.lastButton = '+';
+        this.equals = false;
     }
     [buttonIDs[5]]() {
         //subtract
@@ -51,6 +60,7 @@ class Calculator {
         }
         this.display = '-';
         this.lastButton = '-';
+        this.equals = false;
     }
     [buttonIDs[6]]() {
         //multiply
@@ -59,6 +69,7 @@ class Calculator {
         }
         this.display = '*';
         this.lastButton = '*';
+        this.equals = false;
     }
     [buttonIDs[7]]() {
         //divide
@@ -67,68 +78,118 @@ class Calculator {
         }
         this.display = '/';
         this.lastButton = '/';
+        this.equals = false;
     }
     [buttonIDs[8]]() {
         //seven
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '7';
         this.lastButton = 'seven';
+        this.equals = false;
     }
     [buttonIDs[9]]() {
         //eight
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '8';
         this.lastButton = 'eight';
+        this.equals = false;
     }
     [buttonIDs[10]]() {
         //nine
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '9';
         this.lastButton = 'nine';
+        this.equals = false;
     }
     [buttonIDs[11]]() {
         //decimal
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '.';
         this.lastButton = 'decimal';
+        this.equals = false;
     }
     [buttonIDs[12]]() {
         //four
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '4';
         this.lastButton = 'four';
+        this.equals = false;
     }
     [buttonIDs[13]]() {
         //five
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '5';
         this.lastButton = 'five';
+        this.equals = false;
     }
     [buttonIDs[14]]() {
         //six
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '6';
         this.lastButton = 'six';
+        this.equals = false;
     }
     [buttonIDs[15]]() {
         //zero
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '0';
         this.lastButton = 'zero';
+        this.equals = false;
     }
     [buttonIDs[16]]() {
         //one
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '1';
         this.lastButton = 'one';
+        this.equals = false;
     }
     [buttonIDs[17]]() {
         //two
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '2';
         this.lastButton = 'two';
+        this.equals = false;
     }
     [buttonIDs[18]]() {
         //three
+        if(this.equals === true) {
+            return;
+        } 
         this.display += '3';
         this.lastButton = 'three';
+        this.equals = false;
     }
     [buttonIDs[19]]() {
         //equal
+        if(this.equals === true) {
+            return;
+        } else {
         const addToMemory = this.display;
         this.display = eval(this.memory + this.display);
         this.memory = eval(this.memory + addToMemory);
         this.equals = true;
+        this.sqrt = false;
+        }
     }
 }
 
