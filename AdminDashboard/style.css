@@ -47,6 +47,10 @@ table {
 	border-spacing: 0;
 }
 
+:root {
+    font-family: 'Roboto', sans-serif;
+}
+
 body {
     width: 99.9vw;
     height: 99.9vh;
@@ -120,13 +124,13 @@ form > input {
     border: none;
 }
 
-.profileCard {
+.miniProfileCard {
     width: 30%;
     height: 100%;
     display: inherit;
 }
 
-.notifBell {
+.notifBell, .miniProfileIcon {
     aspect-ratio: 1/1;
     height: 100%;
     width: auto;
@@ -138,4 +142,23 @@ form > input {
 .notifBell > img {
     height: 1.7rem;
     width: 1.9rem;
+}
+
+.miniProfileIcon > img {
+    height: 2.5rem;
+    width: 2.5rem;
+}
+
+.username {
+    height: 100%;
+    display: inherit;
+    justify-content: start;
+    align-items: center;
+    flex-grow: 1;
+    padding-left: 15px;
+}
+
+.username > h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
 }
