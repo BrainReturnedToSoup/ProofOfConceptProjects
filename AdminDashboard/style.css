@@ -75,19 +75,67 @@ main {
 .header-top {
     width: 100%;
     height: 40%;
-    background-color: red;
+    display: flex;
 }
 
 .header-bottom {
     width: 100%;
     height: 60%;
+    display: flex;
     background-color: blue;
 }
 
 .searchBar {
+    width: 70%;
+    height: 100%;
+    padding-left: 30px;
+    display: inherit;
+    justify-content: start;
+    align-items: center;
+}
 
+.searchIcon {
+    width: clamp(20px, 3.125rem, 50px);
+    height: clamp(20px, 3.125rem, 50px);
+    display: inherit;
+    justify-content: center;
+    align-items: center;
+}
+
+.searchIcon > img {
+    width: 1.3rem;
+    height: 1.3rem;
+}
+
+.searchBar > form {
+    width: 85%;
+    height: 45%;
+}
+
+form > input {
+    width: 100%;
+    height: 100%;
+    border-radius: 200px;
+    background-color: #e5e7eb;
+    border: none;
 }
 
 .profileCard {
+    width: 30%;
+    height: 100%;
+    display: inherit;
+}
 
+.notifBell {
+    aspect-ratio: 1/1;
+    height: 100%;
+    width: auto;
+    display: inherit;
+    justify-content: center;
+    align-items: center;
+}
+
+.notifBell > img {
+    height: 1.7rem;
+    width: 1.9rem;
 }
