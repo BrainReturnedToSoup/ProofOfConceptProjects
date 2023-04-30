@@ -129,6 +129,8 @@ form > input {
     width: 30%;
     height: 100%;
     display: inherit;
+    padding-right: 30px;
+    justify-content: end;
 }
 
 .notifBell, .miniProfileIcon, .mainProfileIcon {
@@ -136,7 +138,7 @@ form > input {
     height: 100%;
     width: auto;
     display: inherit;
-    justify-content: center;
+    justify-content: end;
     align-items: center;
 }
 
@@ -163,8 +165,7 @@ form > input {
     display: inherit;
     justify-content: start;
     align-items: center;
-    flex-grow: 1;
-    padding-left: 15px;
+    padding-inline: 15px;
 }
 
 .username > h2 {
@@ -227,8 +228,8 @@ form > input {
     display: inherit;
     height: 100%;
     width: 35%;
-    justify-content: space-around;
     align-items: center;
+    justify-content: end;
 }
 
 button {
@@ -239,6 +240,7 @@ button {
     background-color:#20a1fe;
     color: white;
     font-weight: 600;
+    margin-inline: clamp(8px, 1rem, 16px);
 }
 
 button:hover {
