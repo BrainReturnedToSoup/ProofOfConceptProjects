@@ -353,11 +353,14 @@ a:hover {
 .content {
     display: inherit;
     flex-grow: 1;
+    margin-bottom: 20px;
 }
 
 .content-headers {
     width: 100%;
-    height: 7.5%;
+    height: 5%;
+    display: flex;
+    align-items: end;
 }
 
 .content-left-side {
@@ -370,6 +373,7 @@ a:hover {
     grid-template-rows: repeat(3, 1fr);
     gap: 15px;
     overflow: auto;
+    margin-bottom: 20px;
 }
 
 .content-right-side {
@@ -378,7 +382,51 @@ a:hover {
     width: 30%;
     display: grid;
     padding: 15px;
+    padding-left: 0px;
     grid-template-columns: 1fr;
     grid-template-rows: repeat(2, 1fr);
     overflow: auto;
+}
+
+.left-card {
+    background-color: red;
+    border-radius: 10px;
+}
+
+.right-card {
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+}
+
+.announcement-box {
+    margin-bottom: 35px;
+    border-radius: 10px;
+    background-color: green;
+}
+
+.trending-box {
+    margin-top: 10px;
+    border-radius: 35px;
+    background-color: blue;
+    flex-grow: 1;
+}
+
+.trending-header {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.your-project-header {
+    width: 69.5%;
+    padding-left: 15px;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.announcement-header {
+    width: 30.5%;
+    font-size: 1.2rem;
+    font-weight: 500;
 }
