@@ -369,6 +369,7 @@ a:hover {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
     gap: 15px;
+    overflow: auto;
 }
 
 .content-right-side {
@@ -379,4 +380,5 @@ a:hover {
     padding: 15px;
     grid-template-columns: 1fr;
     grid-template-rows: repeat(2, 1fr);
+    overflow: auto;
 }
