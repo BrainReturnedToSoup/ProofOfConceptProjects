@@ -86,13 +86,12 @@ main {
     width: 100%;
     height: 60%;
     display: flex;
-    background-color: blue;
 }
 
 .searchBar {
     width: 70%;
     height: 100%;
-    padding-left: 30px;
+    margin-left: 30px;
     display: inherit;
     justify-content: start;
     align-items: center;
@@ -130,7 +129,7 @@ form > input {
     display: inherit;
 }
 
-.notifBell, .miniProfileIcon {
+.notifBell, .miniProfileIcon, .mainProfileIcon {
     aspect-ratio: 1/1;
     height: 100%;
     width: auto;
@@ -144,9 +143,17 @@ form > input {
     width: 1.9rem;
 }
 
+.notifBell > img:hover {
+    cursor: pointer;
+}
+
 .miniProfileIcon > img {
     height: 2.5rem;
     width: 2.5rem;
+}
+
+.miniProfileIcon > img:hover {
+    cursor: pointer;
 }
 
 .username {
@@ -162,3 +169,78 @@ form > input {
     font-size: 1.1rem;
     font-weight: 700;
 }
+
+.username > h2:hover {
+    cursor: pointer;
+}
+
+.mainProfileCard {
+    height: 100%;
+    width: 65%;
+    padding-left: 30px;
+    display: inherit;
+}
+
+.mainProfileIcon > img {
+    width: 5rem;
+}
+
+.mainProfileIcon > img:hover {
+    cursor: pointer;
+}
+
+.mainUsernameContainer {
+    display: inherit;
+    flex-direction: column;
+}
+
+.greeting{
+    box-sizing: border-box;
+    display: inherit;
+    height: 40%;
+    align-items: end;
+    padding-bottom: 3px;
+}
+
+.greeting > h3 {
+    font-size: 0.8rem;
+}
+
+.mainUsername {
+    display: inherit;
+    height: 60%;
+}
+
+.mainUsername > h1 {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.mainUsername > h1:hover {
+    cursor: pointer;
+}
+
+.headerButtons {
+    box-sizing: border-box;
+    display: inherit;
+    height: 100%;
+    width: 35%;
+    justify-content: space-around;
+    align-items: center;
+}
+
+button {
+    height: clamp(24px, 2.375rem, 120px);
+    width: clamp(60px, 6rem, 120px);
+    border-radius: 50px;
+    border: none;
+    background-color:#20a1fe;
+    color: white;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: lightblue;
+    cursor: pointer;
+}
+
