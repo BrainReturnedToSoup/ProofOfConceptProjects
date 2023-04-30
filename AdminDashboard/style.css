@@ -267,3 +267,80 @@ button:hover {
 .navLogo > img {
     height: 48px;
 }
+
+.firstNavButtons {
+    margin-bottom: 40px;
+    padding-left: 15px;
+}
+
+.secondNavButtons {
+    padding-left: 15px;
+}
+
+ol {
+    line-height: 40px;
+    list-style-type: none;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: inline-block;
+}
+
+a:hover {
+    color: lightblue;
+}
+
+.Home-link,
+.Profile-link,
+.Messages-link,
+.History-link,
+.Tasks-link,
+.Communities-link,
+.Settings-link,
+.Support-link,
+.Privacy-link {
+    background-size: 1.6rem;
+    background-repeat: no-repeat;
+    background-position: left center;
+    padding-left: 2em;
+}
+
+.Home-link {
+    background-image: url('images/home_icon.svg') ;
+}
+
+.Profile-link {
+    background-image: url('images/edit_profile_icon.svg');
+}
+
+.Messages-link {
+    background-image: url('images/messages_icon.svg');
+}
+
+.History-link {
+    background-image: url('images/history_icon.svg');
+}
+
+.Tasks-link {
+    background-image: url('images/tasks_icon.svg');
+}
+
+.Communities-link {
+    background-image: url('images/communities_icon.svg');
+}
+
+.Settings-link {
+    background-image: url('images/settings_icon.svg');
+}
+
+.Support-link {
+    background-image: url('images/support_icon.svg');
+}
+
+.Privacy-link {
+    background-image: url('images/privacy_icon.svg');
+}
