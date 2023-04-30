@@ -58,9 +58,11 @@ body {
 }
 
 nav {
+    box-sizing: border-box;
     height: 100%;
     width: clamp(150px, 15.5rem, 265px);
     background-color:#20a1fe;
+    padding-inline: 10px;
 }
 
 main {
@@ -244,3 +246,24 @@ button:hover {
     cursor: pointer;
 }
 
+.navHeader {
+    width: 100%;
+    height: 12%;
+    display: flex;
+    align-items: center;
+    padding-bottom: 30px;
+}
+
+.navName {
+    margin-left: 5px;
+}
+
+.navName > h1 {
+    color: white;
+    font-weight: 600;
+    font-size: 1.5rem
+}
+
+.navLogo > img {
+    height: 48px;
+}
