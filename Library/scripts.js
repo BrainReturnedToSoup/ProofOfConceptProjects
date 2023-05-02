@@ -5,15 +5,15 @@ class Book {
         this.author = Author;
         this.pagesLeft = PagesLeft;
         this.readYet = ReadYetBool;
-        this.libraryOwner = LibraryOwner;
     }
 
 }
 
 class Library {
 
-    constructor(...bookObj) {
+    constructor(LibraryOwner, ...bookObj) {
         this.array = [...bookObj];
+        this.libraryOwner = LibraryOwner;
     }
 
     addToLibrary(bookObj) {
@@ -27,7 +27,7 @@ class Library {
 
 }
 
-function initializeLibrary(...bookProperties) {
-    return new Library(new Book(...bookProperties));
+function initializeLibrary(LibraryOwner, ...bookProperties) {
+    return new Library(new Book(LibraryOwner, ...bookProperties));
 }
 

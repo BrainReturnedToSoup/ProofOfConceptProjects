@@ -135,3 +135,23 @@ main {
     grid-template-rows: 1fr repeat(5, 2fr);
     overflow: auto;
 }
+
+.Library-Owner {
+
+}
+
+.Book-Title {
+
+}
+
+.Book-Author {
+
+}
+
+.Book-Pages-Left {
+
+}
+
+.Book-Read-Yet {
+    
+}
