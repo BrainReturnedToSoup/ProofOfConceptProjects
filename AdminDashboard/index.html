@@ -1,328 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
     <script src="scripts.js" defer></script>
     <title>Document</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <nav>
-        <div class="navHeader">
-            <div class="navLogo">
-                <img src="images/dashboard_logo.svg" alt="dashboard_logo_svg">
-            </div>
-            <div class="navName">
-                <h1>Dashboard</h1>
-            </div>
+      <div class="navHeader">
+        <div class="navLogo">
+          <img src="images/dashboard_logo.svg" alt="dashboard_logo_svg" />
         </div>
-        <div class="firstNavButtons">
-            <ol>
-                <li><a class="Home-link" href="">Home</a></li>
-                <li><a class="Profile-link" href="">Profile</a></li>
-                <li><a class="Messages-link" href="">Messages</a></li>
-                <li><a class="History-link" href="">History</a></li>
-                <li><a class="Tasks-link" href="">Tasks</a></li>
-                <li><a class="Communities-link" href="">Communities</a></li>
-            </ol>
+        <div class="navName">
+          <h1>Dashboard</h1>
         </div>
-        <div class="secondNavButtons">
-            <ol>
-                <li><a class="Settings-link" href="">Settings</a></li>
-                <li><a class="Support-link" href="">Support</a></li>
-                <li><a class="Privacy-link" href="">Privacy</a></li>
-            </ol>
-        </div>
+      </div>
+      <div class="firstNavButtons">
+        <ol>
+          <li><a class="Home-link" href="">Home</a></li>
+          <li><a class="Profile-link" href="">Profile</a></li>
+          <li><a class="Messages-link" href="">Messages</a></li>
+          <li><a class="History-link" href="">History</a></li>
+          <li><a class="Tasks-link" href="">Tasks</a></li>
+          <li><a class="Communities-link" href="">Communities</a></li>
+        </ol>
+      </div>
+      <div class="secondNavButtons">
+        <ol>
+          <li><a class="Settings-link" href="">Settings</a></li>
+          <li><a class="Support-link" href="">Support</a></li>
+          <li><a class="Privacy-link" href="">Privacy</a></li>
+        </ol>
+      </div>
     </nav>
     <main>
-        <div class="header">
-            <div class="header-top">
-                <div class="searchBar">
-                    <div class="searchIcon">
-                        <img src="images/search_icon.svg" alt="search_icon_svg">
-                    </div>
-                    <form action="">
-                        <input type="text">
-                    </form>
-                </div>
-                <div class="miniProfileCard">
-                    <div class="notifBell">
-                        <img src="images/bell_icon.svg" alt="notif_bell_icon">
-                    </div>
-                    <div class="miniProfileIcon">
-                        <img src="images/profile_icon.svg" alt="mini_profile_icon">
-                    </div>
-                    <div class="username">
-                        <h2>Person Example</h2>
-                    </div>
-                </div>
+      <div class="header">
+        <div class="header-top">
+          <div class="searchBar">
+            <div class="searchIcon">
+              <img src="images/search_icon.svg" alt="search_icon_svg" />
             </div>
-            <div class="header-bottom">
-                <div class="mainProfileCard">
-                    <div class="mainProfileIcon">
-                        <img src="images/profile_icon.svg" alt="mini_profile_icon">
-                    </div>
-                    <div class="mainUsernameContainer">
-                        <div class="greeting">
-                            <h3>Hi there,</h3>
-                        </div>
-                        <div class="mainUsername">
-                            <h1>Person Example</h1>
-                        </div>
-                    </div>
-                </div>
-                <div class="headerButtons">
-                    <button class="new">New</button>
-                    <button class="upload">Upload</button>
-                    <button class="share">Share</button>
-                </div>
+            <form action="">
+              <input type="text" />
+            </form>
+          </div>
+          <div class="miniProfileCard">
+            <div class="notifBell">
+              <img src="images/bell_icon.svg" alt="notif_bell_icon" />
             </div>
+            <div class="miniProfileIcon">
+              <img src="images/profile_icon.svg" alt="mini_profile_icon" />
+            </div>
+            <div class="username">
+              <h2>Person Example</h2>
+            </div>
+          </div>
         </div>
-        <div class="content-headers">
-            <h1 class="your-project-header">Your Projects</h1>
-            <h1 class="announcement-header">Announcements</h1>
-        </div>
-        <div class="content">
-            <div class="content-left-side">
-                <div class="left-card cool-project">
-                    <div class="color-block"></div>
-                    <div class="individual-content">
-                        <div class="content-description">
-                            <h3>Super Cool Project</h3>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus blanditiis fugit
-                                repellendus ad hic enim excepturi, omnis rem unde sequi.</p>
-                        </div>
-                        <div class="content-buttons">
-                            <div class="content-button favorite">
-                                <a href="">
-                                    <img src="images/favorite_icon.svg" alt="favorite_icon">
-                                </a>
-                            </div>
-                            <div class="content-button follow">
-                                <a href="">
-                                    <img src="images/watch_icon.svg" alt="">
-                                </a>
-                            </div>
-                            <div class="content-button connect">
-                                <a href="">
-                                    <img src="images/connect_icon.svg" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="left-card less-cool-project">
-                    <div class="color-block"></div>
-                    <div class="individual-content">
-                        <div class="content-description">
-                            <h3>Less Cool Project</h3>
-                            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Repellat ex labore quam
-                                dignissimos distinctio est explicabo laboriosam. Minima, excepturi fugiat?</p>
-                        </div>
-                        <div class="content-buttons">
-                            <div class="content-button favorite">
-                                <a href="">
-                                    <img src="images/favorite_icon.svg" alt="favorite_icon">
-                                </a>
-                            </div>
-                            <div class="content-button follow">
-                                <a href="">
-                                    <img src="images/watch_icon.svg" alt="">
-                                </a>
-                            </div>
-                            <div class="content-button connect">
-                                <a href="">
-                                    <img src="images/connect_icon.svg" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="left-card impossible-app">
-                    <div class="color-block"></div>
-                    <div class="individual-content">
-                        <div class="content-description">
-                            <h3>Impossible App</h3>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eveniet quidem sequi, atque in
-                                ex quod dolores dignissimos ipsum saepe facere architecto est?</p>
-                        </div>
-                        <div class="content-buttons">
-                            <div class="content-button favorite">
-                                <a href="">
-                                    <img src="images/favorite_icon.svg" alt="favorite_icon">
-                                </a>
-                            </div>
-                            <div class="content-button follow">
-                                <a href="">
-                                    <img src="images/watch_icon.svg" alt="">
-                                </a>
-                            </div>
-                            <div class="content-button connect">
-                                <a href="">
-                                    <img src="images/connect_icon.svg" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="left-card easy-app">
-                    <div class="color-block"></div>
-                    <div class="individual-content">
-                        <div class="content-description">
-                            <h3>Easy Peasy App</h3>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio tempore dicta ut magnam
-                                ratione nisi omnis.</p>
-                        </div>
-                        <div class="content-buttons">
-                            <div class="content-button favorite">
-                                <a href="">
-                                    <img src="images/favorite_icon.svg" alt="favorite_icon">
-                                </a>
-                            </div>
-                            <div class="content-button follow">
-                                <a href="">
-                                    <img src="images/watch_icon.svg" alt="">
-                                </a>
-                            </div>
-                            <div class="content-button connect">
-                                <a href="">
-                                    <img src="images/connect_icon.svg" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="left-card ad-blocker">
-                    <div class="color-block"></div>
-                    <div class="individual-content">
-                        <div class="content-description">
-                            <h3>Ad Blocker</h3>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil incidunt ea dolorum facere
-                                repudiandae nobis quasi! Accusamus vel laboriosam consequatur optio?</p>
-                        </div>
-                        <div class="content-buttons">
-                            <div class="content-button favorite">
-                                <a href="">
-                                    <img src="images/favorite_icon.svg" alt="favorite_icon">
-                                </a>
-                            </div>
-                            <div class="content-button follow">
-                                <a href="">
-                                    <img src="images/watch_icon.svg" alt="">
-                                </a>
-                            </div>
-                            <div class="content-button connect">
-                                <a href="">
-                                    <img src="images/connect_icon.svg" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="left-card money-maker">
-                    <div class="color-block"></div>
-                    <div class="individual-content">
-                        <div class="content-description">
-                            <h3>Money Maker</h3>
-                            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Placeat error modi ab
-                                perspiciatis unde consequuntur hic illo dolorem? Mollitia, aspernatur.</p>
-                        </div>
-                        <div class="content-buttons">
-                            <div class="content-button favorite">
-                                <a href="">
-                                    <img src="images/favorite_icon.svg" alt="favorite_icon">
-                                </a>
-                            </div>
-                            <div class="content-button follow">
-                                <a href="">
-                                    <img src="images/watch_icon.svg" alt="">
-                                </a>
-                            </div>
-                            <div class="content-button connect">
-                                <a href="">
-                                    <img src="images/connect_icon.svg" alt="">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="header-bottom">
+          <div class="mainProfileCard">
+            <div class="mainProfileIcon">
+              <img src="images/profile_icon.svg" alt="mini_profile_icon" />
             </div>
-            <div class="content-right-side">
-                <div class="right-card announcement-box">
-                    <div class="announcement-box-top">
-                        <a href="">
-                            <h4>Site Maintenance</h4>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet reprehenderit quas quis
-                                eum quasi corrupti.</p>
-                        </a>
-                    </div>
-                    <div class="announcement-box-middle">
-                        <a href="">
-                            <h4>Community Share Day</h4>
-                            <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem vero ad laudantium.</p>
-                        </a>
-                    </div>
-                    <div class="announcement-box-bottom">
-                        <a href="">
-                            <h4>Updated Private Policy</h4>
-                            <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nam suscipit rem vero eveniet
-                                praesentium.</p>
-                        </a>
-                    </div>
-                </div>
-                <div class="right-card trending-box-and-header">
-                    <h3 class="trending-header">Trending</h3>
-                    <div class="trending-box">
-                        <div class="trending-profiles">
-                            <div class="trending-profile-icon">
-                                <img src="images/profile_icon.svg" alt="">
-                            </div>
-                            <div class="trending-profile-name">
-                                <h3 class="at-tag">@tegan</h3>
-                                <h3 class="at-tag-theme">World Peace Builder</h3>
-                            </div>
-                        </div>
-                        <div class="trending-profiles">
-                            <div class="trending-profile-icon">
-                                <img src="images/profile_icon.svg" alt="">
-                            </div>
-                            <div class="trending-profile-name">
-                                <h3 class="at-tag">@morgan</h3>
-                                <h3 class="at-tag-theme">Super Cool Project</h3>
-                            </div>
-                        </div>
-                        <div class="trending-profiles">
-                            <div class="trending-profile-icon">
-                                <img src="images/profile_icon.svg" alt="">
-                            </div>
-                            <div class="trending-profile-name">
-                                <h3 class="at-tag">@kendall</h3>
-                                <h3 class="at-tag-theme">Life Changing App</h3>
-                            </div>
-                        </div>
-                        <div class="trending-profiles">
-                            <div class="trending-profile-icon">
-                                <img src="images/profile_icon.svg" alt="">
-                            </div>
-                            <div class="trending-profile-name">
-                                <h3 class="at-tag">@alex</h3>
-                                <h3 class="at-tag-theme">No Traffic Maker</h3>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="mainUsernameContainer">
+              <div class="greeting">
+                <h3>Hi there,</h3>
+              </div>
+              <div class="mainUsername">
+                <h1>Person Example</h1>
+              </div>
             </div>
+          </div>
+          <div class="headerButtons">
+            <button class="new">New</button>
+            <button class="upload">Upload</button>
+            <button class="share">Share</button>
+          </div>
         </div>
+      </div>
+      <div class="content-headers">
+        <h1 class="your-project-header">Your Projects</h1>
+        <h1 class="announcement-header">Announcements</h1>
+      </div>
+      <div class="content">
+        <div class="content-left-side">
+          <div class="left-card cool-project">
+            <div class="color-block"></div>
+            <div class="individual-content">
+              <div class="content-description">
+                <h3>Super Cool Project</h3>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Temporibus blanditiis fugit repellendus ad hic enim excepturi,
+                  omnis rem unde sequi.
+                </p>
+              </div>
+              <div class="content-buttons">
+                <div class="content-button favorite">
+                  <a href="">
+                    <img src="images/favorite_icon.svg" alt="favorite_icon" />
+                  </a>
+                </div>
+                <div class="content-button follow">
+                  <a href="">
+                    <img src="images/watch_icon.svg" alt="" />
+                  </a>
+                </div>
+                <div class="content-button connect">
+                  <a href="">
+                    <img src="images/connect_icon.svg" alt="" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left-card less-cool-project">
+            <div class="color-block"></div>
+            <div class="individual-content">
+              <div class="content-description">
+                <h3>Less Cool Project</h3>
+                <p>
+                  Lorem ipsum dolor sit, amet consectetur adipisicing elit.
+                  Repellat ex labore quam dignissimos distinctio est explicabo
+                  laboriosam. Minima, excepturi fugiat?
+                </p>
+              </div>
+              <div class="content-buttons">
+                <div class="content-button favorite">
+                  <a href="">
+                    <img src="images/favorite_icon.svg" alt="favorite_icon" />
+                  </a>
+                </div>
+                <div class="content-button follow">
+                  <a href="">
+                    <img src="images/watch_icon.svg" alt="" />
+                  </a>
+                </div>
+                <div class="content-button connect">
+                  <a href="">
+                    <img src="images/connect_icon.svg" alt="" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left-card impossible-app">
+            <div class="color-block"></div>
+            <div class="individual-content">
+              <div class="content-description">
+                <h3>Impossible App</h3>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Eveniet quidem sequi, atque in ex quod dolores dignissimos
+                  ipsum saepe facere architecto est?
+                </p>
+              </div>
+              <div class="content-buttons">
+                <div class="content-button favorite">
+                  <a href="">
+                    <img src="images/favorite_icon.svg" alt="favorite_icon" />
+                  </a>
+                </div>
+                <div class="content-button follow">
+                  <a href="">
+                    <img src="images/watch_icon.svg" alt="" />
+                  </a>
+                </div>
+                <div class="content-button connect">
+                  <a href="">
+                    <img src="images/connect_icon.svg" alt="" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left-card easy-app">
+            <div class="color-block"></div>
+            <div class="individual-content">
+              <div class="content-description">
+                <h3>Easy Peasy App</h3>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio
+                  tempore dicta ut magnam ratione nisi omnis.
+                </p>
+              </div>
+              <div class="content-buttons">
+                <div class="content-button favorite">
+                  <a href="">
+                    <img src="images/favorite_icon.svg" alt="favorite_icon" />
+                  </a>
+                </div>
+                <div class="content-button follow">
+                  <a href="">
+                    <img src="images/watch_icon.svg" alt="" />
+                  </a>
+                </div>
+                <div class="content-button connect">
+                  <a href="">
+                    <img src="images/connect_icon.svg" alt="" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left-card ad-blocker">
+            <div class="color-block"></div>
+            <div class="individual-content">
+              <div class="content-description">
+                <h3>Ad Blocker</h3>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nihil
+                  incidunt ea dolorum facere repudiandae nobis quasi! Accusamus
+                  vel laboriosam consequatur optio?
+                </p>
+              </div>
+              <div class="content-buttons">
+                <div class="content-button favorite">
+                  <a href="">
+                    <img src="images/favorite_icon.svg" alt="favorite_icon" />
+                  </a>
+                </div>
+                <div class="content-button follow">
+                  <a href="">
+                    <img src="images/watch_icon.svg" alt="" />
+                  </a>
+                </div>
+                <div class="content-button connect">
+                  <a href="">
+                    <img src="images/connect_icon.svg" alt="" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="left-card money-maker">
+            <div class="color-block"></div>
+            <div class="individual-content">
+              <div class="content-description">
+                <h3>Money Maker</h3>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Placeat error modi ab perspiciatis unde consequuntur hic illo
+                  dolorem? Mollitia, aspernatur.
+                </p>
+              </div>
+              <div class="content-buttons">
+                <div class="content-button favorite">
+                  <a href="">
+                    <img src="images/favorite_icon.svg" alt="favorite_icon" />
+                  </a>
+                </div>
+                <div class="content-button follow">
+                  <a href="">
+                    <img src="images/watch_icon.svg" alt="" />
+                  </a>
+                </div>
+                <div class="content-button connect">
+                  <a href="">
+                    <img src="images/connect_icon.svg" alt="" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content-right-side">
+          <div class="right-card announcement-box">
+            <div class="announcement-box-top">
+              <a href="">
+                <h4>Site Maintenance</h4>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                  Eveniet reprehenderit quas quis eum quasi corrupti.
+                </p>
+              </a>
+            </div>
+            <div class="announcement-box-middle">
+              <a href="">
+                <h4>Community Share Day</h4>
+                <p>
+                  Lorem ipsum dolor, sit amet consectetur adipisicing elit. Rem
+                  vero ad laudantium.
+                </p>
+              </a>
+            </div>
+            <div class="announcement-box-bottom">
+              <a href="">
+                <h4>Updated Private Policy</h4>
+                <p>
+                  Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nam
+                  suscipit rem vero eveniet praesentium.
+                </p>
+              </a>
+            </div>
+          </div>
+          <div class="right-card trending-box-and-header">
+            <h3 class="trending-header">Trending</h3>
+            <div class="trending-box">
+              <div class="trending-profiles">
+                <div class="trending-profile-icon">
+                  <img src="images/profile_icon.svg" alt="" />
+                </div>
+                <div class="trending-profile-name">
+                  <h3 class="at-tag">@tegan</h3>
+                  <h3 class="at-tag-theme">World Peace Builder</h3>
+                </div>
+              </div>
+              <div class="trending-profiles">
+                <div class="trending-profile-icon">
+                  <img src="images/profile_icon.svg" alt="" />
+                </div>
+                <div class="trending-profile-name">
+                  <h3 class="at-tag">@morgan</h3>
+                  <h3 class="at-tag-theme">Super Cool Project</h3>
+                </div>
+              </div>
+              <div class="trending-profiles">
+                <div class="trending-profile-icon">
+                  <img src="images/profile_icon.svg" alt="" />
+                </div>
+                <div class="trending-profile-name">
+                  <h3 class="at-tag">@kendall</h3>
+                  <h3 class="at-tag-theme">Life Changing App</h3>
+                </div>
+              </div>
+              <div class="trending-profiles">
+                <div class="trending-profile-icon">
+                  <img src="images/profile_icon.svg" alt="" />
+                </div>
+                <div class="trending-profile-name">
+                  <h3 class="at-tag">@alex</h3>
+                  <h3 class="at-tag-theme">No Traffic Maker</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
-</body>
-
+  </body>
 </html>
