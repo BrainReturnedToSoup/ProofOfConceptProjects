@@ -1,10 +1,11 @@
 class Book {
 
-    constructor(Title, Author, PagesLeft, ReadYetBool) {
+    constructor(Title, Author, PagesLeft, ReadYetBool, LibraryOwner) {
         this.title = Title;
         this.author = Author;
         this.pagesLeft = PagesLeft;
         this.readYet = ReadYetBool;
+        this.libraryOwner = LibraryOwner;
     }
 
 }
