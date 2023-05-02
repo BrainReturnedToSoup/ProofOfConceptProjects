@@ -30,6 +30,3 @@ function initializeLibrary(...bookProperties) {
     return new Library(new Book(...bookProperties));
 }
 
-const myLibrary = initializeLibrary('The Hobbit', 'J.R.R. Tolkien', 234, false);
-myLibrary.addToLibrary(new Book('The True Meaning of Smekday', 'Adam Rex', 0, true))
-
