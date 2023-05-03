@@ -12,14 +12,53 @@
         rel="stylesheet">
     <link rel="stylesheet" href="stylesheets/home-screen-style.css">
     <link rel="stylesheet" href="stylesheets/new-library-style.css">
+    <link rel="stylesheet" href="stylesheets/add-book-to-library.css">
 
-    <title>Document</title>
+    <title>LibraryTracker</title>
 </head>
 
 <body>
+    <div class="Add-Book-PopUp-Background">
+        <div class="Add-Book-PopUp">
+            <form action="">
+                <div class="Book-Details">
+                    <fieldset>
+                        <div class="Legend-Submit-Back">
+                            <legend>Book Details</legend>
+                            <div class="Submit-Back">
+                                <button type="submit" class="Form-Add-Book">Add</button>
+                                <button type="button" class="Back-To-Main">Back</button>
+                            </div>
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Title">Title</label>
+                            <input type="text" id="Title" name="Title" required>
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Author">Author</label>
+                            <input type="text" id="Author" name="Author" required>
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Pages-Left">Pages Left</label>
+                            <input type="number" id="Pages-Left" name="PagesLeft" required>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="Have-You-Read-This-Book">
+                    <fieldset>
+                        <legend>Have You Read This Book?</legend>
+                        <label for="Yes">Yes</label>
+                        <input type="radio" id="Yes" name="ReadYet" value="true" required>
+                        <label for="No">No</label>
+                        <input type="radio" id="No" name="ReadYet" value="false" required>
+                    </fieldset>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="New-Library-PopUp-Background">
         <div class="New-Library-PopUp">
-            <form action="scripts.js">
+            <form action="">
                 <div class="Book-Details">
                     <fieldset>
                         <div class="Legend-Submit-Back">
