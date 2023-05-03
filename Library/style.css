@@ -121,37 +121,172 @@ main {
     grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: clamp(240px, 16rem, 16rem);
     gap: 30px;
-    width: clamp(1000px, 100%, 100%);
+    width: clamp(1100px, 100%, 100%);
     box-sizing: border-box;
 }
 
 .gridTest {
-    background-color: red;
+    background-color: rgb(244, 244, 244);
     border-radius: 10px;
     padding: 15px;
     padding-top: 5px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 50%);
     grid-template-rows: 1fr repeat(5, 2fr);
-    overflow: auto;
+    box-shadow: 0px 1px 2px 2px rgba(0, 0, 0, 0.15);
+}
+
+.X-Button {
+    position: relative;
+    grid-column: 2/3;
+    grid-row: 1/2;
+    display: flex;
+    justify-self: end;
+    align-self: center;
+    justify-content: center;
+    align-items: center;
+    height: clamp(24px, 2rem, 48px);
+    width: clamp(24px, 2rem, 48px);
+    border: none;
+    background-color: lightgray;
+    border-radius: 64px;
+    left: 28px;
+    top: -16px;
+    font-size: 1.3rem;
+}
+
+.X-Button:hover {
+    background-color: red;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0px 1px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
 .Library-Owner {
+    grid-column: 1/2;
+    grid-row: 1/2;
+    font-size: 0.7rem;
+    display: flex;
+    justify-self: end;
+}
 
+.Library-Owner-Name {
+    grid-column: 2/3;
+    grid-row: 1/2;
+    display: flex;
+    justify-content: start;
+    font-size: 0.7rem;
+    padding-left: 2px;
 }
 
 .Book-Title {
+    grid-column: 1/2;
+    grid-row: 2/3;
+    font-size: 1.2rem;
+}
 
+.Book-Title-Name {
+    grid-column: 2/3;
+    grid-row: 2/3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3rem;
+    font-weight: 700;
 }
 
 .Book-Author {
+    grid-column: 1/2;
+    grid-row: 3/4;
+}
 
+.Book-Author-Name {
+    grid-column: 2/3;
+    grid-row: 3/4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 700;
 }
 
 .Book-Pages-Left {
+    grid-column: 1/2;
+    grid-row: 4/5;
+}
 
+.Pages-Left-Value {
+    grid-column: 2/3;
+    grid-row: 4/5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 400;
 }
 
 .Book-Read-Yet {
-    
+    grid-column: 1/2;
+    grid-row: 5/6;
+}
+
+.Read-Yet-Value {
+    grid-column: 2/3;
+    grid-row: 5/6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 400;
+}
+
+.Book-Read-Yet, .Book-Pages-Left, .Book-Author, .Book-Title {
+    display: flex;
+    justify-self: center;
+    align-self: center;
+    border-top: 1px solid lightgray;
+    border-bottom: 1px solid lightgray;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    width: auto;
+}
+
+.Increment-Page-Value, .Decrement-Page-Value{
+    height: 80%;
+    width: 95%;
+    display: flex;
+    align-self: end;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    color: white;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.Increment-Page-Value {
+    background-color: green;
+}
+
+.Decrement-Page-Value {
+    background-color: rgb(210, 0, 0);
+}
+
+.Increment-Page-Value:hover {
+    box-shadow: 0px 0.5px 1px 1px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+.Decrement-Page-Value:hover {
+    box-shadow: 0px 0.5px 1px 1px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+.Increment-Page-Value:active {
+    background-color: rgb(0, 100, 0);
+}
+
+.Decrement-Page-Value:active {
+    background-color: rgb(180, 0, 0);
 }
