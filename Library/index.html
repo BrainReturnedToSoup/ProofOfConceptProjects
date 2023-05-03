@@ -19,24 +19,42 @@
     <div class="New-Library-PopUp-Background">
         <div class="New-Library-PopUp">
             <form action="scripts.js">
-                <fieldset>
-                    <legend>Book Details</legend>
-                    <label for="Library-Owner-Name-Input">Owner</label>
-                    <input type="text" id="Library-Owner-Name-Input" name="LibraryOwnerNameInput">
-                    <label for="Title">Title</label>
-                    <input type="text" id="Title" name="Title">
-                    <label for="Author">Author</label>
-                    <input type="text" id="Author" name="Author">
-                    <label for="Pages-Left">Pages Left</label>
-                    <input type="text" id="Pages-Left" name="PagesLeft">
-                </fieldset>
-                <fieldset>
-                    <legend>Have You Read This Book?</legend>
-                    <label for="Yes">Yes</label>
-                    <input type="radio" id="Yes" name="ReadYet" value="true">
-                    <label for="No">No</label>
-                    <input type="radio" id="No" name="ReadYet" value="false">
-                </fieldset>
+                <div class="Book-Details">
+                    <fieldset>
+                        <div class="Legend-Submit-Back">
+                            <legend>Book Details</legend>
+                            <div class="Submit-Back">
+                                <button type="submit" class="Create-Library">Create Library</button>
+                                <button type="button" class="Back-To-Main">Back</button>
+                            </div>
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Library-Owner-Name-Input">Owner</label>
+                            <input type="text" id="Library-Owner-Name-Input" name="LibraryOwnerNameInput">
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Title">Title</label>
+                            <input type="text" id="Title" name="Title">
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Author">Author</label>
+                            <input type="text" id="Author" name="Author">
+                        </div>
+                        <div class="Input-Wrapper">
+                            <label for="Pages-Left">Pages Left</label>
+                            <input type="text" id="Pages-Left" name="PagesLeft">
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="Have-You-Read-This-Book">
+                    <fieldset>
+                        <legend>Have You Read This Book?</legend>
+                        <label for="Yes">Yes</label>
+                        <input type="radio" id="Yes" name="ReadYet" value="true">
+                        <label for="No">No</label>
+                        <input type="radio" id="No" name="ReadYet" value="false">
+                    </fieldset>
+                </div>
             </form>
         </div>
     </div>
