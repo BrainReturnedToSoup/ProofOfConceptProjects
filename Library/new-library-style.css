@@ -1,0 +1,113 @@
+.New-Library-PopUp-Background{
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(240, 240, 240);
+}
+
+.New-Library-PopUp {
+    width: 450px;
+    height: 650px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 1px 5px 2px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+}
+
+.New-Library-PopUp > form {
+    height: 100%;
+    width: 100%;
+}
+
+.Book-Details {
+    height: 80%;
+}
+
+.Legend-Submit-Back {
+    display: flex;
+    justify-content: space-between;
+}
+
+.Legend-Submit-Back > legend {
+    font-weight: 700;
+    font-size: 1.3rem;
+    align-self: center;
+    text-decoration: underline;
+}
+
+.Book-Details > fieldset {
+    display: flex;
+    flex-direction: column;
+}
+
+.Book-Details > fieldset > legend {
+    align-self: center;
+}
+
+.Input-Wrapper {
+    display: inherit;
+    flex-direction: inherit;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.Input-Wrapper > input {
+    margin-top: 5px;
+    background-color: lightgray;
+    border: 1px solid gray;
+    border-radius: 15px;
+    height: 20px;
+}
+
+.Have-You-Read-This-Book {
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid lightgray;
+}
+
+.Have-You-Read-This-Book > fieldset {
+    display: inherit;
+    justify-content: center;
+}
+
+.Have-You-Read-This-Book > fieldset > legend {
+    margin-bottom: 20px;
+}
+
+.Submit-Back {
+    display: inherit;
+    align-items: center;
+}
+
+.Create-Library, .Back-To-Main{
+    border: none;
+    height: 36px;
+    width: 84px;
+    border-radius: 48px;
+    margin-inline: 10px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.Back-To-Main {
+    background-color: rgb(252, 107, 107);
+}
+
+.Create-Library {
+    background-color: rgb(90, 90, 255);
+}
+
+.Create-Library:hover, .Back-To-Main:hover {
+    background-color: lightblue;
+    cursor: pointer;
+    box-shadow: 0px 0.5px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+.Create-Library:active, .Back-To-Main:active {
+    background-color: skyblue;
+}
