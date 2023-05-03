@@ -1,53 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="scripts.js" defer></script>
     <title>Document</title>
 </head>
+
 <body>
     <div class="New-Library-PopUp-Background">
         <div class="New-Library-PopUp">
             <form action="scripts.js">
-                
+                <fieldset>
+                    <legend>Book Details</legend>
+                    <label for="Library-Owner-Name-Input">Owner</label>
+                    <input type="text" id="Library-Owner-Name-Input" name="LibraryOwnerNameInput">
+                    <label for="Title">Title</label>
+                    <input type="text" id="Title" name="Title">
+                    <label for="Author">Author</label>
+                    <input type="text" id="Author" name="Author">
+                    <label for="Pages-Left">Pages Left</label>
+                    <input type="text" id="Pages-Left" name="PagesLeft">
+                </fieldset>
+                <fieldset>
+                    <legend>Have You Read This Book?</legend>
+                    <label for="Yes">Yes</label>
+                    <input type="radio" id="Yes" name="ReadYet" value="true">
+                    <label for="No">No</label>
+                    <input type="radio" id="No" name="ReadYet" value="false">
+                </fieldset>
             </form>
         </div>
     </div>
     <div class="Content-Wrapper">
-    <nav>
-        <div class="Logo-and-Header">
-            <img src="Images/library_logo.svg" alt="library-logo" class="logo">
-            <h1 class="header">LibraryTracker</h1>
-        </div>
-        <div class="Nav-Buttons">
-            <button class="New-Library">New Library</button>
-            <button class="Add-Book">Add</button>
-            <button class="Remove-Book">Remove</button>
-        </div>
-    </nav>
-    <main>
-        <div class="gridTest">
-            <button class="X-Button">X</button>
-            <h1 class="Library-Owner">Library Owner:</h1>
+        <nav>
+            <div class="Logo-and-Header">
+                <img src="Images/library_logo.svg" alt="library-logo" class="logo">
+                <h1 class="header">LibraryTracker</h1>
+            </div>
+            <div class="Nav-Buttons">
+                <button class="New-Library">New Library</button>
+                <button class="Add-Book">Add</button>
+                <button class="Remove-Book">Remove</button>
+            </div>
+        </nav>
+        <main>
+            <div class="gridTest">
+                <button class="X-Button">X</button>
+                <h1 class="Library-Owner">Library Owner:</h1>
                 <div class="Library-Owner-Name">Steve</div>
-            <h1 class="Book-Title">Title</h1>
+                <h1 class="Book-Title">Title</h1>
                 <div class="Book-Title-Name">Joe Mama</div>
-            <h2 class="Book-Author">By</h2>
+                <h2 class="Book-Author">By</h2>
                 <div class="Book-Author-Name">Joe M.</div>
-            <h2 class="Book-Pages-Left">Pages Left</h2>
+                <h2 class="Book-Pages-Left">Pages Left</h2>
                 <div class="Pages-Left-Value">234</div>
-            <h3 class="Book-Read-Yet">Read Before?</h3>
+                <h3 class="Book-Read-Yet">Read Before?</h3>
                 <div class="Read-Yet-Value">No</div>
-            <button class="Increment-Page-Value">+ Page Read</button>
-            <button class="Decrement-Page-Value">- Page Read</button>
-        </div>
-    </main>
-</div>
+                <button class="Increment-Page-Value">+ Page Read</button>
+                <button class="Decrement-Page-Value">- Page Read</button>
+            </div>
+        </main>
+    </div>
 </body>
+
 </html>
