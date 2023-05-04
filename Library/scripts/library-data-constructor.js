@@ -8,9 +8,8 @@ class Book {
     }
 
     removePagesLeft() {
-        if (this.pagesLeft > 0) {
-            this.pagesLeft--;
-        }
+        if(this.pagesLeft < 0) return console.log(`ERROR: trying to decrease pages left to below zero`);
+        this.pagesLeft--;
     }
 
     addPagesLeft() {
@@ -18,7 +17,7 @@ class Book {
     }
 
     changeReadYet() {
-        if (this.readYet !== undefined && this.readYet !== null && this.readYet !== '') return;
+        if (typeof this.readYet !== 'boolean') return console.log(`ERROR: readYet property is not a boolean, reads ${this.readYet}`);
         this.readYet = !this.readYet;
     }
 

@@ -15,20 +15,22 @@ class DOMstateAndLibraryList {
     }
 
     deleteLibrary(LibraryOwnerValue) {
-
-        for (let i = 0; i < libraryList.length; i++) {
-            if (this.libraryList[i].libraryOwner === LibraryOwnerValue) {
-                this.libraryList.splice(i, 1);
-                return;
+        if (typeof LibraryOwnerValue === 'string')
+            for (let i = 0; i < libraryList.length; i++) {
+                if (this.libraryList[i].libraryOwner === LibraryOwnerValue) {
+                    this.libraryList.splice(i, 1);
+                    return;
+                }
             }
-        }
 
-        return console.log(`The library for ${this.LibraryOwner} was not found`);
+        return console.log(`The library for ${LibraryOwnerValue} was not found`);
 
     }
 
-    compareStates() {
-        
+    recursiveComparison() {
+
+
+
     }
 
 }
@@ -115,9 +117,11 @@ const bookCardElements = {
 
 }
 
+const mainElement = document.querySelector('main');
+
 function bookCardElementConstructor(title) {
 
-    if (title === undefined || title === null || title === '') return console.log('ERROR: Need book valid title before book card construction');
+    if (title === undefined || title === null || title === '') return console.log('ERROR: Need book valid title before book card template construction');
 
     const identifierClass = title.replaceAll(/ /, '_') + '_';
     let bookCellCreated = false, bookCellElementTemplate;
@@ -128,16 +132,16 @@ function bookCardElementConstructor(title) {
 
             bookCellElementTemplate = document.createElement(bookCardElements[key].element);
             bookCellElementTemplate.setAttribute('class', bookCardElements[key].class);
-            bookCellElementTemplate.classList.add(`${title}`);
+            bookCellElementTemplate.classList.add(`${identifierClass}`);
             bookCellCreated = !bookCellCreated;
 
         } else {
 
-            if (bookCellElement === false) return console.log('ERROR: parent element book cell not created in bookCardElementConstructor()');
+            if (bookCellElement === false) return console.log('ERROR: parent element "book cell" not initialized in bookCardElementConstructor() scope');
 
             let childElement = document.createElement(bookCardElements[key].element);
             childElement.setAttribute('class', bookCardElements[key].class);
-            childElement.classList.add(`${title}`);
+            childElement.classList.add(`${identifierClass}`);
             bookCellElementTemplate.appendChild(childElement);
 
         }
@@ -148,17 +152,22 @@ function bookCardElementConstructor(title) {
 
 }
 
-//creates a template book card element with all necessary elements within it, along with a unique identifier to all associated elements specific to the title
-//of the book, though the relevant data still needs to be added to each of the value elements
+function updateInfo(dataInstructions) {
 
 
-function allValuesSetter (Title) {
 
 }
 
+function addBookCard() {
 
-const comparisonObj = new DOMstateAndLibraryList;
 
-//to encapsulate book cards, try assigning a custom class attribute to all associated elements on a book card, perhaps using the book title as the
-//name but replace spacing with and underscore along with adding one at the end like this "The_Hobbit_", this way to target corresponding elements,
-//use the title value and alter it to the class format equivalent
+
+}
+
+function removeBookCard(title) {
+
+    const identifierClass = title.replaceAll(/ /, '_') + '_';
+    document.querySelector(`.Book-Cell.${identifierClass}`).remove();
+
+}
+
