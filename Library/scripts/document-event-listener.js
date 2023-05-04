@@ -1,7 +1,11 @@
-document.addEventListener('click')
+document.addEventListener('click', clickEventHandler)
 
 function clickEventHandler () {
     
 }
 
-document.addEventListener('submit', )
+document.addEventListener('submit', submitEventHandler)
+
+function submitEventHandler () {
+
+}

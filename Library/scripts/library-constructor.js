@@ -1,4 +1,4 @@
-import './element-constructor-DOM-updater';
+import './Element-Constructor-DOM-Updater';
 
 class Book {
 
@@ -18,43 +18,64 @@ class Library {
         this.libraryOwner = LibraryOwner;
     }
 
-    addToLibrary(bookObj) {
-        if (this instanceof Library) {
-            if (bookObj instanceof Book) {
-                this.bookList.push(bookObj);
-            } else {
-                console.log(`ERROR: trying to add a non-book OBJ to ${this.libraryOwner} library book list`)
+    addToLibrary(...bookProperties) {
+        this.booksList.push(new Book(...bookProperties));
+    }
+
+    removeFromLibrary(Title) {
+        for(let i = 0; i < this.booksList.length; i++) {
+            if(this.booksList[i].title === Title) {
+                this.booksList.splice(i, 1);
+                return;
             }
-        } else {
-            console.log(`ERROR: not a valid library to add to`)
         }
+        console.log(`ERROR: ${Title} was not found in ${this.libraryOwner}'s list of books`);
     }
 
     displayLibrary() {
-        if (this instanceof Library) {
+        if (this.booksList.length > 0) {
 
-            if (this.bookList.length > 0) {
-
-                for (let bookObj of this.bookList) {
-                    console.log(bookObj);
-                }
-
-            } else {
-                console.log(`ERROR: no books within this library`);
+            for (let book of this.booksList) {
+                console.log(book);
             }
-        } else {
-            console.log(`ERROR: not a valid library to display`);
-        }
 
+        } else {
+            console.log(`ERROR: no books within this library`);
+        }
     }
 
 }
+
+// libraryObjExample = {
+//      libraryOwner: 'Steve'
+//      bookList: [
+//          {
+//              title: 'The Hobbit',
+//              author: 'J.R.R. Tolkien',
+//              pagesLeft: 124,
+//              readYet: false
+//          },
+//          {...},
+//          {...}
+//      ]
+// }
 
 function initializeLibrary(LibraryOwner, ...bookProperties) {
     const newLibrary = new Library(LibraryOwner, new Book(...bookProperties));
     libraryList.push(newLibrary);
     createBookCardElement(newLibrary.booksList[0]);
 }
+
+function deleteLibrary(LibraryOwner) {
+    for(let i = 0; i < libraryList.length; i++) {
+        if(libraryList[i].libraryOwner === LibraryOwner) {
+            libraryList.splice(i, 1);
+        }
+    }
+    console.log(`The library for ${LibraryOwner} was not found`);
+}
+
+
 
 
 
