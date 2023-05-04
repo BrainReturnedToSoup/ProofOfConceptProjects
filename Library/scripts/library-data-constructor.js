@@ -1,5 +1,3 @@
-import './Element-Constructor-DOM-Updater';
-
 class Book {
 
     constructor(Title, Author, PagesLeft, ReadYetBool, LibraryOwner) {
@@ -60,19 +58,26 @@ class Library {
 //      ]
 // }
 
+const libraryList = [];
+
 function initializeLibrary(LibraryOwner, ...bookProperties) {
+
     const newLibrary = new Library(LibraryOwner, new Book(...bookProperties));
     libraryList.push(newLibrary);
     createBookCardElement(newLibrary.booksList[0]);
+
 }
 
 function deleteLibrary(LibraryOwner) {
+
     for(let i = 0; i < libraryList.length; i++) {
         if(libraryList[i].libraryOwner === LibraryOwner) {
             libraryList.splice(i, 1);
         }
     }
+
     console.log(`The library for ${LibraryOwner} was not found`);
+
 }
 
 
