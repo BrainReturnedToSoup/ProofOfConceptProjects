@@ -7,6 +7,21 @@ class Book {
         this.readYet = ReadYetBool;
     }
 
+    removePagesLeft() {
+        if(this.pagesLeft > 0) {
+        this.pagesLeft--;
+        }
+    }
+
+    addPagesLeft() {
+        this.pagesLeft++;
+    }
+
+    changeReadYet() {
+        if(this.readYet === undefined || null || '') return;
+        this.readYet = !this.readYet;
+    }
+
 }
 
 class Library {
@@ -58,27 +73,6 @@ class Library {
 //      ]
 // }
 
-const libraryList = [];
-
-function initializeLibrary(LibraryOwner, ...bookProperties) {
-
-    const newLibrary = new Library(LibraryOwner, new Book(...bookProperties));
-    libraryList.push(newLibrary);
-    createBookCardElement(newLibrary.booksList[0]);
-
-}
-
-function deleteLibrary(LibraryOwner) {
-
-    for(let i = 0; i < libraryList.length; i++) {
-        if(libraryList[i].libraryOwner === LibraryOwner) {
-            libraryList.splice(i, 1);
-        }
-    }
-
-    console.log(`The library for ${LibraryOwner} was not found`);
-
-}
 
 
 
