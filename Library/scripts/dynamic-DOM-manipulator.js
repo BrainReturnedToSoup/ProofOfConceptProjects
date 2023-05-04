@@ -3,6 +3,7 @@ import './library-data-constructor'
 
 
 class DOMstateAndLibraryList {
+
     constructor() {
         this.libraryList = [];
         this.DOMstate = [];
@@ -14,21 +15,117 @@ class DOMstateAndLibraryList {
 
     deleteLibrary(LibraryOwnerValue) {
 
-        for(let i = 0; i < libraryList.length; i++) {
-            if(this.libraryList[i].libraryOwner === LibraryOwnerValue) {
+        for (let i = 0; i < libraryList.length; i++) {
+            if (this.libraryList[i].libraryOwner === LibraryOwnerValue) {
                 this.libraryList.splice(i, 1);
             }
         }
-    
+
         console.log(`The library for ${this.LibraryOwner} was not found`);
-    
+
     }
 
-    compareStates() {
+    compareStates() {   
 
     }
 
 }
+
+const bookCardElements = {
+
+    bookCell: {
+        element: 'div',
+        class: 'Book-Cell'
+    },
+
+    xButton: {
+        element: 'button',
+        class: 'X-Button',
+        innerText: 'X'
+    },
+
+    libraryOwnerHeader: {
+        element: 'h1',
+        class: 'Library-Owner',
+        innerText: 'Library Owner:'
+    },
+
+    libraryOwnerName: {
+        element: 'h1',
+        class: 'Library-Owner-Name'
+    },
+
+    bookTitleHeader: {
+        element: 'h1',
+        class: 'Book-Title',
+        innerText: 'Title'
+    },
+
+    bookTitleName: {
+        element: 'div',
+        class: 'Book-Title-Name'
+    },
+
+    bookAuthorHeader: {
+        element: 'h2',
+        class: 'Book-Author',
+        innerText: 'By'
+    },
+
+    bookAuthorName: {
+        element: 'div',
+        class: 'Book-Author-Name'
+    },
+
+    bookPagesLeftHeader: {
+        element: 'h2',
+        class: 'Book-Pages-Left',
+        innerText: 'Pages Left'
+    },
+
+    bookPagesLeftValue: {
+        element: 'div',
+        class: 'Pages-Left-Value'
+    },
+
+    bookReadYetHeader: {
+        element: 'h3',
+        class: 'Book-Read-Yet',
+        innerText: 'Read Before?'
+    },
+
+    bookReadYetValue: {
+        element: 'div',
+        class: 'Read-Yet-Value'
+    },
+
+    incrementButton: {
+        element: 'button',
+        class: 'Increment-Page-Value',
+        innerText: '+ Page Read'
+    },
+
+    decrementButton: {
+        element: 'button',
+        class: 'Decrement-Page-Value',
+        innerText: '- Page Read'
+    }
+
+}
+
+function bookCardElementConstructor(title) {
+
+    if(title === undefined || null || '') return console.log('ERROR: Need book title before book card construction');
+
+    const identifierClass = title.replaceAll(/ /, '_') + '_';
+    let bookCellCreated = false;
+
+
+
+
+}
+
+
 
 const comparisonObj = new DOMstateAndLibraryList;
 
