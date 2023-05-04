@@ -1,6 +1,6 @@
 class Book {
 
-    constructor(Title, Author, PagesLeft, ReadYetBool, LibraryOwner) {
+    constructor(Title, Author, PagesLeft, ReadYetBool) {
         this.title = Title;
         this.author = Author;
         this.pagesLeft = PagesLeft;
@@ -8,8 +8,8 @@ class Book {
     }
 
     removePagesLeft() {
-        if(this.pagesLeft > 0) {
-        this.pagesLeft--;
+        if (this.pagesLeft > 0) {
+            this.pagesLeft--;
         }
     }
 
@@ -18,7 +18,7 @@ class Book {
     }
 
     changeReadYet() {
-        if(this.readYet === undefined || null || '') return;
+        if (this.readYet !== undefined && this.readYet !== null && this.readYet !== '') return;
         this.readYet = !this.readYet;
     }
 
@@ -36,16 +36,26 @@ class Library {
     }
 
     removeFromLibrary(Title) {
-        for(let i = 0; i < this.booksList.length; i++) {
-            if(this.booksList[i].title === Title) {
-                this.booksList.splice(i, 1);
-                return;
+
+        if (typeof Title === string) {
+
+            for (let i = 0; i < this.booksList.length; i++) {
+
+                if (this.booksList[i].title === Title) {
+                    this.booksList.splice(i, 1);
+                    return;
+                }
+                
             }
+
+            console.log(`ERROR: ${Title} was not found in ${this.libraryOwner}'s list of books`);
+
         }
-        console.log(`ERROR: ${Title} was not found in ${this.libraryOwner}'s list of books`);
+
     }
 
     displayLibrary() {
+
         if (this.booksList.length > 0) {
 
             for (let book of this.booksList) {
@@ -55,11 +65,12 @@ class Library {
         } else {
             console.log(`ERROR: no books within this library`);
         }
+
     }
 
 }
 
-// libraryObjExample = {
+// libraryObjectExample = {
 //      libraryOwner: 'Steve'
 //      bookList: [
 //          {

@@ -1,4 +1,5 @@
-import './library-data-constructor'
+import './library-data-constructor' //constructor of objects that represent an individual library and individual books which are stored in the libraryList property
+
 //compare the libraryList array to the RepresentingTheDOM array in order to dynamically change the DOM on each event
 
 
@@ -18,15 +19,16 @@ class DOMstateAndLibraryList {
         for (let i = 0; i < libraryList.length; i++) {
             if (this.libraryList[i].libraryOwner === LibraryOwnerValue) {
                 this.libraryList.splice(i, 1);
+                return;
             }
         }
 
-        console.log(`The library for ${this.LibraryOwner} was not found`);
+        return console.log(`The library for ${this.LibraryOwner} was not found`);
 
     }
 
-    compareStates() {   
-
+    compareStates() {
+        
     }
 
 }
@@ -41,13 +43,13 @@ const bookCardElements = {
     xButton: {
         element: 'button',
         class: 'X-Button',
-        innerText: 'X'
+        textContent: 'X'
     },
 
     libraryOwnerHeader: {
         element: 'h1',
         class: 'Library-Owner',
-        innerText: 'Library Owner:'
+        textContent: 'Library Owner:'
     },
 
     libraryOwnerName: {
@@ -58,7 +60,7 @@ const bookCardElements = {
     bookTitleHeader: {
         element: 'h1',
         class: 'Book-Title',
-        innerText: 'Title'
+        textContent: 'Title'
     },
 
     bookTitleName: {
@@ -69,7 +71,7 @@ const bookCardElements = {
     bookAuthorHeader: {
         element: 'h2',
         class: 'Book-Author',
-        innerText: 'By'
+        textContent: 'By'
     },
 
     bookAuthorName: {
@@ -80,7 +82,7 @@ const bookCardElements = {
     bookPagesLeftHeader: {
         element: 'h2',
         class: 'Book-Pages-Left',
-        innerText: 'Pages Left'
+        textContent: 'Pages Left'
     },
 
     bookPagesLeftValue: {
@@ -91,7 +93,7 @@ const bookCardElements = {
     bookReadYetHeader: {
         element: 'h3',
         class: 'Book-Read-Yet',
-        innerText: 'Read Before?'
+        textContent: 'Read Before?'
     },
 
     bookReadYetValue: {
@@ -102,29 +104,57 @@ const bookCardElements = {
     incrementButton: {
         element: 'button',
         class: 'Increment-Page-Value',
-        innerText: '+ Page Read'
+        textContent: '+ Page Read'
     },
 
     decrementButton: {
         element: 'button',
         class: 'Decrement-Page-Value',
-        innerText: '- Page Read'
+        textContent: '- Page Read'
     }
 
 }
 
 function bookCardElementConstructor(title) {
 
-    if(title === undefined || null || '') return console.log('ERROR: Need book title before book card construction');
+    if (title === undefined || title === null || title === '') return console.log('ERROR: Need book valid title before book card construction');
 
     const identifierClass = title.replaceAll(/ /, '_') + '_';
-    let bookCellCreated = false;
+    let bookCellCreated = false, bookCellElementTemplate;
 
+    for (const key in bookCardElements) {
 
+        if (key == 'bookCell') {
 
+            bookCellElementTemplate = document.createElement(bookCardElements[key].element);
+            bookCellElementTemplate.setAttribute('class', bookCardElements[key].class);
+            bookCellElementTemplate.classList.add(`${title}`);
+            bookCellCreated = !bookCellCreated;
+
+        } else {
+
+            if (bookCellElement === false) return console.log('ERROR: parent element book cell not created in bookCardElementConstructor()');
+
+            let childElement = document.createElement(bookCardElements[key].element);
+            childElement.setAttribute('class', bookCardElements[key].class);
+            childElement.classList.add(`${title}`);
+            bookCellElementTemplate.appendChild(childElement);
+
+        }
+
+    }
+
+    return bookCellElementTemplate;
 
 }
 
+//creates a template book card element with all necessary elements within it, along with a unique identifier to all associated elements specific to the title
+//of the book, though the relevant data still needs to be added to each of the value elements
+
+
+function allValuesSetter (Title) {
+
+}
 
 
 const comparisonObj = new DOMstateAndLibraryList;
