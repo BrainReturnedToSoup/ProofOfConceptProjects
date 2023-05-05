@@ -6,15 +6,20 @@ import './library-data-constructor' //constructor of objects that represent an i
 class DOMstateAndLibraryList {
 
     constructor() {
+
         this.libraryList = [];
         this.DOMstate = [];
+
     }
 
     initializeLibrary(LibraryOwner, ...bookProperties) {
+
         this.libraryList.push(new Library(LibraryOwner, new Book(...bookProperties)));
+
     }
 
     deleteLibrary(LibraryOwnerValue) {
+
         if (typeof LibraryOwnerValue === 'string')
             for (let i = 0; i < libraryList.length; i++) {
                 if (this.libraryList[i].libraryOwner === LibraryOwnerValue) {
@@ -27,11 +32,40 @@ class DOMstateAndLibraryList {
 
     }
 
-    recursiveComparison() {
+    compareState() {
 
+        let changesObj = {}, maxLength;
 
+        if (this.libraryList.length > this.DOMstate.length) {
+            maxLength = this.libraryList.length;
+        } else {
+            maxLength = this.DOMstate.length;
+        }
+
+        for(let i = 0; i < maxLength; i++) {
+
+            if(this.libraryList[i].libraryOwner !== this.DOMstate[i].libraryOwner) {
+
+                changesObj[i] = {libraryOwner: this.libraryList[i].libraryOwner }
+                compareBooks(this.libraryList[i], this.DOMstate[i], i);
+            } else {
+                compareBooks(this.libraryList[i], this.DOMstate[i], i);
+            }
+
+        }
+
+        function compareBooks(dataLibraryBookList, DOMLibraryBookList, changeObjIndex) {
+
+        }
+        
+        if(Object.keys(changesObj).length !== 0) {
+            updateInfoOnDOM(changesObj);
+        } else {
+            return;
+        }
 
     }
+
 
 }
 
@@ -152,19 +186,19 @@ function bookCardElementConstructor(title) {
 
 }
 
-function updateInfo(dataInstructions) {
+function updateInfoOnDOM(recordedChanges) {
 
 
 
 }
 
-function addBookCard() {
+function addBookCardToDOM() {
 
 
 
 }
 
-function removeBookCard(title) {
+function removeBookCardFromDOM(title) {
 
     const identifierClass = title.replaceAll(/ /, '_') + '_';
     document.querySelector(`.Book-Cell.${identifierClass}`).remove();
