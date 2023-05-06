@@ -36,7 +36,7 @@ class Library {
 
     removeFromLibrary(Title) {
 
-        if (typeof Title === string) {
+        if (typeof Title === 'string') {
 
             for (let i = 0; i < this.booksList.length; i++) {
 

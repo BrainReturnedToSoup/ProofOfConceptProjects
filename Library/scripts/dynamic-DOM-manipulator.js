@@ -36,17 +36,17 @@ class LibraryManager {
 
         let currentLibraryIndex = 0, currentBookIndex = 0;
 
-        function compareLibraries() {
+        const compareLibraries = () => {
 
-            let maxLengthOfLibraryArray;
+            let maxLengthOfStateArray;
 
-            if (this.libraryList[currentLibraryIndex].length > this.DOMstate[currentLibraryIndex].length) {
-                maxLengthOfLibraryArray = this.libraryList[currentLibraryIndex].length;
+            if (this.libraryList.length > this.DOMstate.length) {
+                maxLengthOfStateArray = this.libraryList.length;
             } else {
-                maxLengthOfLibraryArray = this.DOMstate[currentLibraryIndex].length;
+                maxLengthOfStateArray = this.DOMstate.length;
             }
 
-            while (maxLengthOfLibraryArray > currentLibraryIndex) {
+            while (maxLengthOfStateArray > currentLibraryIndex) {
 
                 let totalDifferences, libraryOwnerDifferences = [];
 
@@ -58,9 +58,9 @@ class LibraryManager {
                 let maxBookListLength;
 
                 if (libraryBookListDataSide.length > libraryBookListDOMside.length) {
-                    maxBookListLength = libraryBookListDataSide;
+                    maxBookListLength = libraryBookListDataSide.length;
                 } else {
-                    maxBookListLength = libraryBookListDOMside;
+                    maxBookListLength = libraryBookListDOMside.length;
                 }
 
                 if (libraryOwnerDataSide !== libraryOwnerDOMSide) {
@@ -99,33 +99,33 @@ class LibraryManager {
 
         }
 
-        function compareBooks(dataLibraryBookList, DOMLibraryBookList) {
+        const compareBooks = (dataLibraryBookList, DOMLibraryBookList) => {
 
             let bookDiff = []
 
             const bookInfoDataSide = dataLibraryBookList[currentBookIndex], bookInfoDOMSide = DOMLibraryBookList[currentBookIndex]
 
-            switch (false) {
+            switch (true) {
 
-                case (bookInfoDataSide.title === bookInfoDOMSide.title):
+                case (bookInfoDataSide.title !== bookInfoDOMSide.title):
                     bookDiff.push({ titleDif: bookInfoDataSide.title });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
-                    'fallthrough';
+                    //fallthrough
 
-                case (bookInfoDataSide.author === bookInfoDOMSide.author):
+                case (bookInfoDataSide.author !== bookInfoDOMSide.author):
                     bookDiff.push({ authorDif: bookInfoDataSide.author });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].author = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].author;
-                    'fallthrough';
+                    //fallthrough
 
-                case (bookInfoDataSide.pagesLeft === bookInfoDOMSide.pagesLeft):
+                case (bookInfoDataSide.pagesLeft !== bookInfoDOMSide.pagesLeft):
                     bookDiff.push({ pagesLeftDif: bookInfoDataSide.pagesLeft });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].pagesLeft = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].pagesLeft;
-                    'fallthrough';
+                    //fallthrough
 
-                case (bookInfoDataSide.readYet === bookInfoDOMSide.readYet):
+                case (bookInfoDataSide.readYet !== bookInfoDOMSide.readYet):
                     bookDiff.push({ readYetDif: bookInfoDataSide.readYet });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].readYet = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].readYet;
-                    'fallthrough';
+                    //fallthrough
 
             }
 
@@ -133,14 +133,15 @@ class LibraryManager {
 
         }
 
-        function packageAndSendData(inputRefTitle, libraryDifs) {
+        const packageAndSendData = (inputRefTitle, libraryDifs) => {
 
-            const convertedRefTitle = { refTitle: inputRefTitle.replaceAll(/ /, '_') + '_' }
             const dataInstructions = libraryDifs.reduce((acc, curr) => {
                 return Object.assign(acc, curr);
-            }, convertedRefTitle)
+            })
 
-            DOMChangeHandler(dataInstructions);
+            dataInstructions.refTitle = inputRefTitle.replace(/ /g, '_') + '_';
+
+            DOMChangesInterpreter(dataInstructions);
 
         }
 
@@ -266,7 +267,7 @@ function bookCardElementConstructor(refTitle) {
 
 }
 
-function DOMChangeHandler(instructionsData) {
+function DOMChangesInterpreter(instructionsData) {
 
     const definedOrUndefined = {
         defined: 0,
@@ -321,7 +322,7 @@ function addBookCardToDOM(completeCardInfo) {
     }
 
     mainElement.appendChild(newBookCard);
-    
+
 }
 
 function removeBookCardFromDOM(refTitle) {
