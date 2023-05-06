@@ -44,7 +44,7 @@ class DOMstateAndLibraryList {
                 let libraryDifferences, libraryOwnerDifferences = [];
 
                 if (this.libraryList[currentLibraryIndex].libraryOwner !== this.DOMstate[currentLibraryIndex].libraryOwner) {
-                    libraryOwnerDifferences.push({libraryOwnerDif: this.libraryList[currentLibraryIndex].libraryOwner});
+                    libraryOwnerDifferences.push({ libraryOwnerDif: this.libraryList[currentLibraryIndex].libraryOwner });
                     this.DOMstate[currentLibraryIndex].libraryOwner = this.libraryList[currentLibraryIndex].libraryOwner;
                 }
 
@@ -52,7 +52,7 @@ class DOMstateAndLibraryList {
 
                     const bookDifferences = compareBooks(this.libraryList[currentLibraryIndex].bookList, this.DOMstate[currentLibraryIndex].bookList)
                     let referenceTitle;
-                    if(this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title !== undefined) {
+                    if (this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title !== undefined) {
                         referenceTitle = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
                     } else {
                         referenceTitle = this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title;
@@ -111,9 +111,9 @@ class DOMstateAndLibraryList {
 
         function packageAndSendData(inputRefTitle, libraryDifs) {
 
-            const refTitleObj = {refTitle: inputRefTitle.replaceAll(/ /, '_') + '_'}
+            const refTitleObj = { refTitle: inputRefTitle.replaceAll(/ /, '_') + '_' }
             const dataInstructions = libraryDifs.reduce((acc, curr) => {
-               return Object.assign(acc, curr);
+                return Object.assign(acc, curr);
             }, refTitleObj)
 
             DOMChangeHandler(dataInstructions);
@@ -243,7 +243,26 @@ function bookCardElementConstructor(title) {
 
 function DOMChangeHandler(instructionsData) {
 
+    const definedOrUndefined = {
+        defined: 0,
+        undefined: 0
+    }
 
+    for(let key in instructionsData) {
+        if(instructionsData[key] === undefined) {
+            definedOrUndefined.undefined++;
+        } else if(instructionsData[key] !== undefined) {
+            definedOrUndefined.defined++;
+        }
+    }
+
+    if(instructionsData.refTitle !== undefined && definedOrUndefined.undefined === 5) {
+        removeBookCardFromDOM(instructionsData.refTitle);
+    } else if(definedOrUndefined.defined === 6) {
+        addBookCardToDOM(instructionsData);
+    } else {
+        updateInfoOnDOM(instructionsData);
+    }
 
 }
 
