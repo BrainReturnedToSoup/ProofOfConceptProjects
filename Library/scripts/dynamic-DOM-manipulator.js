@@ -21,7 +21,7 @@ class DOMstateAndLibraryList {
     deleteLibrary(LibraryOwnerValue) {
 
         if (typeof LibraryOwnerValue === 'string')
-            for (let i = 0; i < libraryList.length; i++) {
+            for (let i = 0; i < this.libraryList.length; i++) {
                 if (this.libraryList[i].libraryOwner === LibraryOwnerValue) {
                     this.libraryList.splice(i, 1);
                     return;
@@ -32,40 +32,95 @@ class DOMstateAndLibraryList {
 
     }
 
-    compareState() {
+    compareDOMstate() {
 
-        let changesObj = {}, maxLength;
+        let currentLibraryIndex = 0;
+        let currentBookIndex = 0;
 
-        if (this.libraryList.length > this.DOMstate.length) {
-            maxLength = this.libraryList.length;
-        } else {
-            maxLength = this.DOMstate.length;
-        }
+        function compareLibraries() {
 
-        for(let i = 0; i < maxLength; i++) {
+            while (this.libraryList.length > currentLibraryIndex) {
 
-            if(this.libraryList[i].libraryOwner !== this.DOMstate[i].libraryOwner) {
+                let libraryDifferences, libraryOwnerDifferences = [];
 
-                changesObj[i] = {libraryOwner: this.libraryList[i].libraryOwner }
-                compareBooks(this.libraryList[i], this.DOMstate[i], i);
-            } else {
-                compareBooks(this.libraryList[i], this.DOMstate[i], i);
+                if (this.libraryList[currentLibraryIndex].libraryOwner !== this.DOMstate[currentLibraryIndex].libraryOwner) {
+                    libraryOwnerDifferences.push({libraryOwnerDif: this.libraryList[currentLibraryIndex].libraryOwner});
+                    this.DOMstate[currentLibraryIndex].libraryOwner = this.libraryList[currentLibraryIndex].libraryOwner;
+                }
+
+                while (this.libraryList[currentLibraryIndex].bookList.length > currentBookIndex) {
+
+                    const bookDifferences = compareBooks(this.libraryList[currentLibraryIndex].bookList, this.DOMstate[currentLibraryIndex].bookList)
+                    let referenceTitle;
+                    if(this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title !== undefined) {
+                        referenceTitle = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
+                    } else {
+                        referenceTitle = this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title;
+                    }
+
+                    libraryDifferences = bookDifferences.concat(libraryOwnerDifferences);
+
+                    if (libraryDifferences.length > 0) {
+                        packageAndSendData(referenceTitle, libraryDifferences);
+                    }
+
+                    currentBookIndex++;
+                    libraryDifferences = undefined;
+                    libraryOwnerDifferences = [];
+
+                }
+
+                currentLibraryIndex++;
+                currentBookIndex = 0;
+
             }
 
         }
 
-        function compareBooks(dataLibraryBookList, DOMLibraryBookList, changeObjIndex) {
+        function compareBooks(dataLibraryBookList, DOMLibraryBookList) {
+
+            let bookDiff = []
+
+            switch (false) {
+
+                case (dataLibraryBookList[currentBookIndex].title === DOMLibraryBookList[currentBookIndex].title):
+                    bookDiff.push({ titleDif: dataLibraryBookList[currentBookIndex].title });
+                    this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
+                    fallthrough;
+
+                case (dataLibraryBookList[currentBookIndex].author === DOMLibraryBookList[currentBookIndex].author):
+                    bookDiff.push({ authorDif: dataLibraryBookList[currentBookIndex].author });
+                    this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].author = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].author;
+                    fallthrough;
+
+                case (dataLibraryBookList[currentBookIndex].pagesLeft === DOMLibraryBookList[currentBookIndex].pagesLeft):
+                    bookDiff.push({ pagesLeftDif: dataLibraryBookList[currentBookIndex].pagesLeft });
+                    this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].pagesLeft = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].pagesLeft;
+                    fallthrough;
+
+                case (dataLibraryBookList[currentBookIndex].readYet === DOMLibraryBookList[currentBookIndex].readYet):
+                    bookDiff.push({ readYetDif: dataLibraryBookList[currentBookIndex].readYet });
+                    this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].readYet = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].readYet;
+                    fallthrough;
+
+            }
+
+            return bookDiff;
 
         }
-        
-        if(Object.keys(changesObj).length !== 0) {
-            updateInfoOnDOM(changesObj);
-        } else {
-            return;
+
+        function packageAndSendData(inputRefTitle, libraryDifs) {
+
+            const refTitleObj = {refTitle: inputRefTitle.replaceAll(/ /, '_') + '_'}
+            const dataInstructions = libraryDifs.reduce((acc, curr) => {
+               return Object.assign(acc, curr);
+            }, refTitleObj)
+
+            DOMChangeHandler(dataInstructions);
+
         }
 
     }
-
 
 }
 
@@ -186,21 +241,27 @@ function bookCardElementConstructor(title) {
 
 }
 
-function updateInfoOnDOM(recordedChanges) {
+function DOMChangeHandler(instructionsData) {
 
 
 
 }
 
-function addBookCardToDOM() {
+function updateInfoOnDOM() {
 
 
 
 }
 
-function removeBookCardFromDOM(title) {
+function addBookCardToDOM(completeCardInfo) {
 
-    const identifierClass = title.replaceAll(/ /, '_') + '_';
+
+
+}
+
+function removeBookCardFromDOM(titleReference) {
+
+    const identifierClass = titleReference.replaceAll(/ /, '_') + '_';
     document.querySelector(`.Book-Cell.${identifierClass}`).remove();
 
 }
