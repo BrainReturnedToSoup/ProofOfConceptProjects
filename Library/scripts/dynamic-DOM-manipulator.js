@@ -3,7 +3,7 @@ import './library-data-constructor' //constructor of objects that represent an i
 //compare the libraryList array to the RepresentingTheDOM array in order to dynamically change the DOM on each event
 
 
-class DOMstateAndLibraryList {
+class LibraryManager {
 
     constructor() {
 
@@ -34,38 +34,58 @@ class DOMstateAndLibraryList {
 
     compareDOMstate() {
 
-        let currentLibraryIndex = 0;
-        let currentBookIndex = 0;
-
         function compareLibraries() {
 
-            while (this.libraryList.length > currentLibraryIndex) {
+            let currentLibraryIndex = 0, currentBookIndex = 0, maxLengthOfLibraryArray;
 
-                let libraryDifferences, libraryOwnerDifferences = [];
+            if (this.libraryList[currentLibraryIndex].length > this.DOMstate[currentLibraryIndex.length]) {
+                maxLengthOfLibraryArray = this.libraryList[currentLibraryIndex].length;
+            } else {
+                maxLengthOfLibraryArray = this.DOMstate[currentLibraryIndex].length;
+            }
 
-                if (this.libraryList[currentLibraryIndex].libraryOwner !== this.DOMstate[currentLibraryIndex].libraryOwner) {
-                    libraryOwnerDifferences.push({ libraryOwnerDif: this.libraryList[currentLibraryIndex].libraryOwner });
+            while (maxLengthOfLibraryArray > currentLibraryIndex) {
+
+                let totalDifferences, libraryOwnerDifferences = [];
+
+                let libraryOwnerDataSide = this.libraryList[currentLibraryIndex].libraryOwner,
+                    libraryOwnerDOMSide = this.DOMstate[currentLibraryIndex].libraryOwner,
+                    libraryBookListDataSide = this.libraryList[currentLibraryIndex].bookList,
+                    libraryBookListDOMside = this.DOMstate[currentLibraryIndex].bookList;
+
+                let maxBookListLength;
+
+                if (libraryBookListDataSide.length > libraryBookListDOMside.length) {
+                    maxBookListLength = libraryBookListDataSide;
+                } else {
+                    maxBookListLength = libraryBookListDOMside;
+                }
+
+                if (libraryOwnerDataSide !== libraryOwnerDOMSide) {
+                    libraryOwnerDifferences.push({ libraryOwnerDif: libraryOwnerDataSide });
                     this.DOMstate[currentLibraryIndex].libraryOwner = this.libraryList[currentLibraryIndex].libraryOwner;
                 }
 
-                while (this.libraryList[currentLibraryIndex].bookList.length > currentBookIndex) {
+                while (maxBookListLength > currentBookIndex) {
 
-                    const bookDifferences = compareBooks(this.libraryList[currentLibraryIndex].bookList, this.DOMstate[currentLibraryIndex].bookList)
+                    const bookDifferences = compareBooks(libraryBookListDataSide, libraryBookListDOMside);
+                    
                     let referenceTitle;
-                    if (this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title !== undefined) {
-                        referenceTitle = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
+
+                    if (libraryBookListDataSide[currentBookIndex].title !== undefined) {
+                        referenceTitle = libraryBookListDataSide[currentBookIndex].title;
                     } else {
-                        referenceTitle = this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title;
+                        referenceTitle = libraryBookListDOMside[currentBookIndex].title;
                     }
 
-                    libraryDifferences = bookDifferences.concat(libraryOwnerDifferences);
+                    totalDifferences = bookDifferences.concat(libraryOwnerDifferences);
 
-                    if (libraryDifferences.length > 0) {
-                        packageAndSendData(referenceTitle, libraryDifferences);
+                    if (totalDifferences.length > 0) {
+                        packageAndSendData(referenceTitle, totalDifferences);
                     }
 
                     currentBookIndex++;
-                    libraryDifferences = undefined;
+                    totalDifferences = undefined;
                     libraryOwnerDifferences = [];
 
                 }
@@ -81,25 +101,27 @@ class DOMstateAndLibraryList {
 
             let bookDiff = []
 
+            const bookInfoDataSide = dataLibraryBookList[currentBookIndex], bookInfoDOMSide = DOMLibraryBookList[currentBookIndex]
+
             switch (false) {
 
-                case (dataLibraryBookList[currentBookIndex].title === DOMLibraryBookList[currentBookIndex].title):
-                    bookDiff.push({ titleDif: dataLibraryBookList[currentBookIndex].title });
+                case (bookInfoDataSide.title === bookInfoDOMSide.title):
+                    bookDiff.push({ titleDif: bookInfoDataSide.title });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
                     fallthrough;
 
-                case (dataLibraryBookList[currentBookIndex].author === DOMLibraryBookList[currentBookIndex].author):
-                    bookDiff.push({ authorDif: dataLibraryBookList[currentBookIndex].author });
+                case (bookInfoDataSide.author === bookInfoDOMSide.author):
+                    bookDiff.push({ authorDif: bookInfoDataSide.author });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].author = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].author;
                     fallthrough;
 
-                case (dataLibraryBookList[currentBookIndex].pagesLeft === DOMLibraryBookList[currentBookIndex].pagesLeft):
-                    bookDiff.push({ pagesLeftDif: dataLibraryBookList[currentBookIndex].pagesLeft });
+                case (bookInfoDataSide.pagesLeft === bookInfoDOMSide.pagesLeft):
+                    bookDiff.push({ pagesLeftDif: bookInfoDataSide.pagesLeft });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].pagesLeft = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].pagesLeft;
                     fallthrough;
 
-                case (dataLibraryBookList[currentBookIndex].readYet === DOMLibraryBookList[currentBookIndex].readYet):
-                    bookDiff.push({ readYetDif: dataLibraryBookList[currentBookIndex].readYet });
+                case (bookInfoDataSide.readYet === bookInfoDOMSide.readYet):
+                    bookDiff.push({ readYetDif: bookInfoDataSide.readYet });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].readYet = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].readYet;
                     fallthrough;
 
@@ -248,17 +270,17 @@ function DOMChangeHandler(instructionsData) {
         undefined: 0
     }
 
-    for(let key in instructionsData) {
-        if(instructionsData[key] === undefined) {
+    for (let key in instructionsData) {
+        if (instructionsData[key] === undefined) {
             definedOrUndefined.undefined++;
-        } else if(instructionsData[key] !== undefined) {
+        } else if (instructionsData[key] !== undefined) {
             definedOrUndefined.defined++;
         }
     }
 
-    if(instructionsData.refTitle !== undefined && definedOrUndefined.undefined === 5) {
+    if (instructionsData.refTitle !== undefined && definedOrUndefined.undefined === 5) {
         removeBookCardFromDOM(instructionsData.refTitle);
-    } else if(definedOrUndefined.defined === 6) {
+    } else if (definedOrUndefined.defined === 6) {
         addBookCardToDOM(instructionsData);
     } else {
         updateInfoOnDOM(instructionsData);
@@ -266,9 +288,17 @@ function DOMChangeHandler(instructionsData) {
 
 }
 
-function updateInfoOnDOM() {
+const correspondingTargetClass = {
+    titleDif: 'Book-Title-Name',
+    authorDif: 'Book-Author-Name',
+    pagesLeftDif: 'Pages-Left-Value',
+    readYetDif: 'Read-Yet-Value',
+    libraryOwnerDif: 'Library-Owner-Name'
+}
 
+function updateInfoOnDOM(instructionsData) {
 
+    const identifierClass = instructionsData.refTitle
 
 }
 
@@ -278,10 +308,7 @@ function addBookCardToDOM(completeCardInfo) {
 
 }
 
-function removeBookCardFromDOM(titleReference) {
-
-    const identifierClass = titleReference.replaceAll(/ /, '_') + '_';
+function removeBookCardFromDOM(identifierClass) {
     document.querySelector(`.Book-Cell.${identifierClass}`).remove();
-
 }
 
