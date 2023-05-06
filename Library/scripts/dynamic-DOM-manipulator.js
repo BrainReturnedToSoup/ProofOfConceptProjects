@@ -34,11 +34,13 @@ class LibraryManager {
 
     compareDOMstate() {
 
+        let currentLibraryIndex = 0, currentBookIndex = 0;
+
         function compareLibraries() {
 
-            let currentLibraryIndex = 0, currentBookIndex = 0, maxLengthOfLibraryArray;
+            let maxLengthOfLibraryArray;
 
-            if (this.libraryList[currentLibraryIndex].length > this.DOMstate[currentLibraryIndex.length]) {
+            if (this.libraryList[currentLibraryIndex].length > this.DOMstate[currentLibraryIndex].length) {
                 maxLengthOfLibraryArray = this.libraryList[currentLibraryIndex].length;
             } else {
                 maxLengthOfLibraryArray = this.DOMstate[currentLibraryIndex].length;
@@ -69,7 +71,7 @@ class LibraryManager {
                 while (maxBookListLength > currentBookIndex) {
 
                     const bookDifferences = compareBooks(libraryBookListDataSide, libraryBookListDOMside);
-                    
+
                     let referenceTitle;
 
                     if (libraryBookListDataSide[currentBookIndex].title !== undefined) {
@@ -108,22 +110,22 @@ class LibraryManager {
                 case (bookInfoDataSide.title === bookInfoDOMSide.title):
                     bookDiff.push({ titleDif: bookInfoDataSide.title });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].title = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].title;
-                    fallthrough;
+                    'fallthrough';
 
                 case (bookInfoDataSide.author === bookInfoDOMSide.author):
                     bookDiff.push({ authorDif: bookInfoDataSide.author });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].author = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].author;
-                    fallthrough;
+                    'fallthrough';
 
                 case (bookInfoDataSide.pagesLeft === bookInfoDOMSide.pagesLeft):
                     bookDiff.push({ pagesLeftDif: bookInfoDataSide.pagesLeft });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].pagesLeft = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].pagesLeft;
-                    fallthrough;
+                    'fallthrough';
 
                 case (bookInfoDataSide.readYet === bookInfoDOMSide.readYet):
                     bookDiff.push({ readYetDif: bookInfoDataSide.readYet });
                     this.DOMstate[currentLibraryIndex].bookList[currentBookIndex].readYet = this.libraryList[currentLibraryIndex].bookList[currentBookIndex].readYet;
-                    fallthrough;
+                    'fallthrough';
 
             }
 
@@ -133,14 +135,16 @@ class LibraryManager {
 
         function packageAndSendData(inputRefTitle, libraryDifs) {
 
-            const refTitleObj = { refTitle: inputRefTitle.replaceAll(/ /, '_') + '_' }
+            const convertedRefTitle = { refTitle: inputRefTitle.replaceAll(/ /, '_') + '_' }
             const dataInstructions = libraryDifs.reduce((acc, curr) => {
                 return Object.assign(acc, curr);
-            }, refTitleObj)
+            }, convertedRefTitle)
 
             DOMChangeHandler(dataInstructions);
 
         }
+
+        return compareLibraries();
 
     }
 
@@ -230,11 +234,10 @@ const bookCardElements = {
 
 const mainElement = document.querySelector('main');
 
-function bookCardElementConstructor(title) {
+function bookCardElementConstructor(refTitle) {
 
-    if (title === undefined || title === null || title === '') return console.log('ERROR: Need book valid title before book card template construction');
+    if (refTitle === undefined || refTitle === null || refTitle === '') return console.log('ERROR: need valid refTitle before book card construction');
 
-    const identifierClass = title.replaceAll(/ /, '_') + '_';
     let bookCellCreated = false, bookCellElementTemplate;
 
     for (const key in bookCardElements) {
@@ -243,7 +246,7 @@ function bookCardElementConstructor(title) {
 
             bookCellElementTemplate = document.createElement(bookCardElements[key].element);
             bookCellElementTemplate.setAttribute('class', bookCardElements[key].class);
-            bookCellElementTemplate.classList.add(`${identifierClass}`);
+            bookCellElementTemplate.classList.add(`${refTitle}`);
             bookCellCreated = !bookCellCreated;
 
         } else {
@@ -252,7 +255,7 @@ function bookCardElementConstructor(title) {
 
             let childElement = document.createElement(bookCardElements[key].element);
             childElement.setAttribute('class', bookCardElements[key].class);
-            childElement.classList.add(`${identifierClass}`);
+            childElement.classList.add(`${refTitle}`);
             bookCellElementTemplate.appendChild(childElement);
 
         }
@@ -288,7 +291,7 @@ function DOMChangeHandler(instructionsData) {
 
 }
 
-const correspondingTargetClass = {
+const elementTargetClass = {
     titleDif: 'Book-Title-Name',
     authorDif: 'Book-Author-Name',
     pagesLeftDif: 'Pages-Left-Value',
@@ -298,17 +301,30 @@ const correspondingTargetClass = {
 
 function updateInfoOnDOM(instructionsData) {
 
-    const identifierClass = instructionsData.refTitle
+    const bookTargetClass = instructionsData.refTitle
+
+    for(let key in instructionsData) {
+        let targetElement = document.querySelector(`.${elementTargetClass[key]}.${bookTargetClass}`);
+        targetElement.textContent = instructionsData[key];
+    }
 
 }
 
 function addBookCardToDOM(completeCardInfo) {
 
+    let newBookCard = bookCardElementConstructor(completeCardInfo.refTitle)
+    for(let key in completeCardInfo) {
+        if(key !== 'refTitle') {
+        let targetElement = newBookCard.querySelector(`.${elementTargetClass[key]}`);
+        targetElement.textContent = completeCardInfo[key];
+        }
+    }
 
-
+    mainElement.appendChild(newBookCard);
+    
 }
 
-function removeBookCardFromDOM(identifierClass) {
-    document.querySelector(`.Book-Cell.${identifierClass}`).remove();
+function removeBookCardFromDOM(refTitle) {
+    document.querySelector(`.Book-Cell.${refTitle}`).remove();
 }
 
