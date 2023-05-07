@@ -1,4 +1,4 @@
-export class Book {
+class Book {
 
     constructor(Title, Author, PagesLeft, ReadYetBool) {
         this.title = Title;
@@ -8,8 +8,9 @@ export class Book {
     }
 
     removePagesLeft() {
-        if(this.pagesLeft < 0) return console.log(`ERROR: trying to decrease pages left to below zero`);
-        this.pagesLeft--;
+        this.pagesLeft < 0 ? 
+            console.log(`ERROR: trying to decrease pages left to below zero`) :
+            this.pagesLeft--
     }
 
     addPagesLeft() {
@@ -17,71 +18,97 @@ export class Book {
     }
 
     changeReadYet() {
-        if (typeof this.readYet !== 'boolean') return console.log(`ERROR: readYet property is not a boolean, reads ${this.readYet}`);
-        this.readYet = !this.readYet;
+        typeof this.readYet !== 'boolean' ? 
+            console.log(`ERROR: readYet property is not a boolean, reads ${this.readYet}`) :
+            this.readYet = !this.readYet
     }
 
 }
 
-export class Library {
+class allLibraries {
 
-    constructor(LibraryOwner, ...bookObj) {
-        this.booksList = [...bookObj];
-        this.libraryOwner = LibraryOwner;
+    constructor(libraryOwner, ...bookProperties) {
+        this.libraryData = new Map();
+        this.libraryData.set(libraryOwner, [new Book(...bookProperties)]);
     }
 
-    addToLibrary(...bookProperties) {
-        this.booksList.push(new Book(...bookProperties));
+    addBookToLibrary(libraryOwner, ...bookProperties) {
+        this.libraryData.has(libraryOwner) ?
+            this.libraryData.get(libraryOwner).push(new Book(...bookProperties)) :
+            console.log(`ERROR: cannot add book to library : LIBRARY NOT FOUND : `);
     }
 
-    removeFromLibrary(Title) {
+    newLibrary(libraryOwner, ...bookProperties) {
+        this.libraryData.has(libraryOwner) ?
+            console.log(`ERROR: cannot create a new library : LIBRARY ALREADY EXISTS : RECEIVED ${libraryOwner}`) :
+            this.libraryData.set(libraryOwner, [new Book(...bookProperties)]);
+    }
 
-        if (typeof Title === 'string') {
+    removeBookFromLibrary(libraryOwner, bookTitle) {
 
-            for (let i = 0; i < this.booksList.length; i++) {
+        if (this.libraryData.has(libraryOwner)) {
 
-                if (this.booksList[i].title === Title) {
-                    this.booksList.splice(i, 1);
-                    return;
+            const targetLibrary = this.libraryData.get(libraryOwner);
+            let bookDeleted = false;
+
+            for (let bookIndex in targetLibrary) {
+
+                if (bookDeleted) break;
+
+
+                for (let property in targetLibrary[bookIndex]) {
+
+                    if (targetLibrary[bookIndex][property]) {
+                        targetLibrary.splice(bookIndex, 1);
+                        bookDeleted = true;
+                        break;
+                    }
+
                 }
-                
+
             }
 
-            console.log(`ERROR: ${Title} was not found in ${this.libraryOwner}'s list of books`);
-
-        }
-
-    }
-
-    displayLibrary() {
-
-        if (this.booksList.length > 0) {
-
-            for (let book of this.booksList) {
-                console.log(book);
-            }
+            bookDeleted ?
+                console.log(`The Book ${bookTitle} was deleted`) :
+                console.log(`ERROR: cannot remove book : BOOK NOT FOUND : RECEIVED ${bookTitle}`);
 
         } else {
-            console.log(`ERROR: no books within this library`);
-        }
 
+            return console.log(`ERROR: cannot remove library : LIBRARY NOT FOUND : RECEIVED ${libraryOwner}`);
+
+        }
+    }
+
+    deleteLibrary(libraryOwner) {
+
+        this.libraryData.has(libraryOwner) ?
+            this.libraryData.delete(libraryOwner) :
+            console.log(`ERROR: cannot delete library : LIBRARY NOT FOUND : RECEIVED ${libraryOwner}`);
+    }
+
+    cLogLibrary(libraryOwner) {
+
+        this.libraryData.has(libraryOwner) ?
+            console.log(this.libraryData.get(libraryOwner)) :
+            console.log(`ERROR: could not display library : LIBRARY NOT FOUND : RECEIVED ${libraryOwner}`);
+
+    }
+
+    cLogAllLibraries() {
+        console.log(this.libraryData)
     }
 
 }
 
-// libraryObjectExample = {
-//      libraryOwner: 'Steve'
-//      bookList: [
-//          {
-//              title: 'The Hobbit',
-//              author: 'J.R.R. Tolkien',
-//              pagesLeft: 124,
-//              readYet: false
-//          },
-//          {...},
-//          {...}
-//      ]
-// }
+
+// allLibraries object example
+//   {
+//      libraryData => {
+//      owner: [{book1}, {book2}, {book3}, ...]
+//      owner2: [{book1}, {book2}, {book3}, ...]
+//      }
+//   }
+
 
 
 
