@@ -1,4 +1,4 @@
-class Book {
+export class Book {
 
     constructor(Title, Author, PagesLeft, ReadYetBool) {
         this.title = Title;
@@ -23,7 +23,7 @@ class Book {
 
 }
 
-class Library {
+export class Library {
 
     constructor(LibraryOwner, ...bookObj) {
         this.booksList = [...bookObj];

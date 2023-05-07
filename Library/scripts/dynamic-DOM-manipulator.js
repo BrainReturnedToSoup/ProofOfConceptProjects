@@ -1,7 +1,4 @@
-import './library-data-constructor' //constructor of objects that represent an individual library and individual books which are stored in the libraryList property
-
-//compare the libraryList array to the RepresentingTheDOM array in order to dynamically change the DOM on each event
-
+import { Library, Book } from './library-data-constructor' 
 
 class LibraryManager {
 
@@ -221,14 +218,14 @@ const bookCardElements = {
 
     incrementButton: {
         element: 'button',
-        class: 'Increment-Page-Value',
-        textContent: '+ Page Read'
+        class: 'Increment-Page-Left-Value',
+        textContent: '- Page Read'
     },
 
     decrementButton: {
         element: 'button',
-        class: 'Decrement-Page-Value',
-        textContent: '- Page Read'
+        class: 'Decrement-Page-Left-Value',
+        textContent: '+ Page Read'
     }
 
 }

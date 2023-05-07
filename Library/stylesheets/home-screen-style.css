@@ -261,7 +261,7 @@ main {
     width: auto;
 }
 
-.Increment-Page-Value, .Decrement-Page-Value{
+.Increment-Page-Left-Value, .Decrement-Page-Left-Value{
     height: 80%;
     width: 95%;
     display: flex;
@@ -275,30 +275,30 @@ main {
     font-weight: 700;
 }
 
-.Increment-Page-Value {
-    background-color: green;
-}
-
-.Decrement-Page-Value {
+.Increment-Page-Left-Value {
     background-color: rgb(210, 0, 0);
 }
 
-.Increment-Page-Value:hover {
+.Decrement-Page-Left-Value {
+    background-color: green;
+}
+
+.Increment-Page-Left-Value:hover {
     box-shadow: 0px 0.5px 1px 1px rgba(0, 0, 0, 0.15);
     cursor: pointer;
 }
 
-.Decrement-Page-Value:hover {
+.Decrement-Page-Left-Value:hover {
     box-shadow: 0px 0.5px 1px 1px rgba(0, 0, 0, 0.15);
     cursor: pointer;
 }
 
-.Increment-Page-Value:active {
-    background-color: rgb(0, 100, 0);
-}
-
-.Decrement-Page-Value:active {
+.Increment-Page-Left-Value:active {
     background-color: rgb(180, 0, 0);
+}
+
+.Decrement-Page-Left-Value:active {
+    background-color: rgb(0, 100, 0);
 }
 
 
