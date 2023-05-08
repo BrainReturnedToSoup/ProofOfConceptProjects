@@ -43,15 +43,16 @@ const elementClasses = {
         readYetLabel: 'Read Yet?',
         pageLeftUpButton: '- Page Read',
         pageLeftDownButton: '+ Page Read'
+    },
+
+    domRefs = {
+        mainElement: document.querySelector('main'),
+        existingOwnersDownDown: document.querySelector('#Existing-Owners')
     }
 
-mainElement = document.querySelector('main')
+function updateDOM(infoToDisplay) {
 
-
-
-function updateDOM() {
-
-    elements.main.innerHTML = '';
+    domRefs.mainElement.innerHTML = '';
 
     for (const libraryOwner of infoToDisplay.keys()) {
         createBookElements(libraryOwner, infoToDisplay.get(libraryOwner));
@@ -75,10 +76,27 @@ function createBookElements(libraryOwner, books) {
         }
 
         bookCell !== undefined ?
-            mainElement.appendChild(bookCell) :
+            domRefs.mainElement.appendChild(bookCell) :
             console.log(`ERROR: cannot append book cell to main : READS UNDEFINED`);
 
         bookCell = undefined;
+
+    }
+
+}
+
+function existingOwnersDropDownOptions(infoToDisplay) {
+
+    domRefs.existingOwnersDownDown.innerHTML = ''
+
+    for (const libraryOwner in infoToDisplay) {
+
+        const optionElement = document.createElement('option');
+
+        optionElement.setAttribute('value', `${libraryOwner}`);
+        optionElement.textContent = libraryOwner;
+
+        domRefs.existingOwnersDownDown.appendChild(optionElement);
 
     }
 
