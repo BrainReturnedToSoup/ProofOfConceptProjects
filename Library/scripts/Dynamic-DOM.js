@@ -47,7 +47,7 @@ const elementClasses = {
 
     domRefs = {
         mainElement: document.querySelector('main'),
-        existingOwnersDownDown: document.querySelector('#Existing-Owners')
+        existingOwnersDropDown: document.querySelector('#Existing-Owners')
     }
 
 function updateDOM(infoToDisplay) {
@@ -87,7 +87,7 @@ function createBookElements(libraryOwner, books) {
 
 function createOwnersDropDown(infoToDisplay) {
 
-    domRefs.existingOwnersDownDown.innerHTML = ''
+    domRefs.existingOwnersDropDown.innerHTML = ''
 
     for (const libraryOwner in infoToDisplay) {
 

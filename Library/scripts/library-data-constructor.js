@@ -27,7 +27,7 @@ class Book {
 
 }
 
-class librariesManager{
+class librariesManager {
 
     constructor() {
         this.libraryData = new Map();
