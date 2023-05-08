@@ -85,7 +85,7 @@ function createBookElements(libraryOwner, books) {
 
 }
 
-function existingOwnersDropDownOptions(infoToDisplay) {
+function createOwnersDropDown(infoToDisplay) {
 
     domRefs.existingOwnersDownDown.innerHTML = ''
 
