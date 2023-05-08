@@ -1,3 +1,5 @@
+export { librariesManager, Book }
+
 class Book {
 
     constructor(Title, Author, PagesLeft, ReadYetBool) {
@@ -25,11 +27,10 @@ class Book {
 
 }
 
-class allLibraries {
+class librariesManager{
 
-    constructor(libraryOwner, ...bookProperties) {
+    constructor() {
         this.libraryData = new Map();
-        this.libraryData.set(libraryOwner, [new Book(...bookProperties)]);
     }
 
     addBookToLibrary(libraryOwner, ...bookProperties) {
