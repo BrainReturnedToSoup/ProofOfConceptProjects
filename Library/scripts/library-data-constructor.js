@@ -3,8 +3,8 @@ class Books {
         this.titles = [title];
         this.authors = [author];
         this.totalPages = [pages];
-        this.currentPage = [currentPage];
-        this.pagesLeft = [this.totalPages - this.currentPage];
+        this.currentPages = [currentPage];
+        this.totalPagesLeft = [this.totalPages - this.currentPages];
         this.readYet = [readYet];
     }
     addBook(title, author, pages, currentPage, readYet) {
@@ -23,6 +23,17 @@ class Books {
 
     }
 }
+
+//  books = {
+//
+//  titles: [],
+//  authors: [],
+//  totalPages: [],
+//  currentPages: [],
+//  pagesLeft: [],
+//  readYet: []
+//
+//  }
 
 
 
