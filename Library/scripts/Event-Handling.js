@@ -1,8 +1,8 @@
-import { librariesManager, Book } from './library-data-constructor.js'
+import { LibrariesManager, Book } from './library-data-constructor.js'
 import { elementClasses, elementTags, templateElementTextContent, updateDOM, createBookElements } from './Dynamic-DOM.js'
 
 //should be set to a librariesManager Object, if not it will be initialized once a new library is created
-let infoToDisplayOnDOM;
+let librariesManagerObj
 
 const appRefs = {
 
@@ -25,8 +25,8 @@ const appRefs = {
 
     refElements: {
         home: document.querySelector('.Content-Wrapper'),
-        addBookForm: document.querySelector('#Add-Book-To-Existing-Library'),
-        newLibraryForm: document.querySelector('#New-Library-Creation'),
+        addBookFormId: 'Add-Book-To-Existing-Library',
+        newLibraryFormId: 'New-Library-Creation',
         allXButtons: document.querySelectorAll('.X-Button'),
         addBookFormBackground: document.querySelector('.Add-Book-PopUp-Background'),
         newLibraryFormBackground: document.querySelector('.New-Library-PopUp-Background')
@@ -51,21 +51,28 @@ const appRefs = {
                     case appRefs.bookCardButtonClasses.xButton:
                         //if the X button on a specific book card is clicked, which will delete the book
 
-                        infoToDisplayOnDOM.removeBookFromLibrary(libraryOwner, bookTitle);
+                        librariesManagerObj.removeBookFromLibrary(libraryOwner, bookTitle);
                         //removing book from infoToDisplayToDOM data structure
+
+                        eventMethods.storeLibrariesToLocal();
+                        //stores current version of data according to the libraries
 
                         updateDOM(infoToDisplayOnDOM);
                         //updating what the DOM displays, which is based on infoToDisplayToDOM data structure
                         break;
                     case appRefs.bookCardButtonClasses.pageLeftUpButton:
                         //if the book card button clicked is a increment page left button
-                        infoToDisplayOnDOM.changeBookPropertyValue(libraryOwner, bookTitle, 'pagesLeft', 'add');
+                        librariesManagerObj.changeBookPropertyValue(libraryOwner, bookTitle, 'pagesLeft', 'add');
+
+                        eventMethods.storeLibrariesToLocal();
 
                         updateDOM(infoToDisplayOnDOM);
                         break;
                     case appRefs.bookCardButtonClasses.pageLeftDownButton:
                         //if the book card button clicked is a decrement page left button
-                        infoToDisplayOnDOM.changeBookPropertyValue(libraryOwner, bookTitle, 'pagesLeft', 'sub');
+                        librariesManagerObj.changeBookPropertyValue(libraryOwner, bookTitle, 'pagesLeft', 'sub');
+
+                        eventMethods.storeLibrariesToLocal();
 
                         updateDOM(infoToDisplayOnDOM);
                         break;
@@ -85,7 +92,7 @@ const appRefs = {
                         break;
                     case appRefs.navBarButtonClasses.addBook:
                         //if the add book button is clicked on the nav bar
-                        if(infoToDisplayOnDOM.libraryData !== undefined) {
+                        if(librariesManagerObj.libraryData !== undefined) {
                         appRefs.refElements.home.style.display = 'none';
                         appRefs.refElements.addBookFormBackground.style.display = 'flex';
                         }
@@ -130,22 +137,38 @@ const appRefs = {
 
         handleSubmit: {
             newLibraryForm: function (formData) {
-                const dataTest = formData;
+
+                const formDataObj = {
+                    libraryOwner: formData.get('libraryOwner'),
+                    title: formData.get('title'),
+                    author: formData.get('author'),
+                    pagesLeft: formData.get('pagesLeft'),
+                    readYet: formData.get('readYet')
+                }
+
                 switch (true) {
-                    case infoToDisplayOnDOM instanceof librariesManager === false:
+                    case librariesManagerObj instanceof LibrariesManager === false:
                         //if the infoToDisplay variable is not initialized as a librariesManager object
+                        librariesManagerObj = new librariesManager()
+                        librariesManagerObj.newLibrary(formDataObj.libraryOwner, formDataObj.title, formDataObj.author, formDataObj.pagesLeft, formDataObj.readYet)
+
+                        eventMethods.storeLibrariesToLocal();
+
+                        updateDOM(infoToDisplayOnDOM);
                         break;
-                    case infoToDisplayOnDOM instanceof librariesManager && infoToDisplayOnDOM.libraryData instanceof Map:
+                    case librariesManagerObj instanceof LibrariesManager && librariesManagerObj.libraryData instanceof Map:
                         //if the infoToDisplay variable is initialized as a librariesManager property is equal to a Map data structure
+                        librariesManagerObj.newLibrary(formDataObj.libraryOwner, formDataObj.title, formDataObj.author, formDataObj.pagesLeft, formDataObj.readYet)
+                        updateDOM(infoToDisplayOnDOM);
                         break;
                     default:
                         //if the infoToDisplay variable fails both of the previous tests
-                        return console.log(`ERROR: infoToDisplay is not either a valid data structure or undefined : EQUAL TO ${infoToDisplayOnDOM}`);
+                        return console.log(`ERROR: infoToDisplay is not either a valid data structure or undefined : EQUAL TO ${librariesManagerObj}`);
                 }
             },
 
             addBookForm: function (formData) {
-                if (infoToDisplayOnDOM instanceof librariesManager && infoToDisplayOnDOM.libraryData instanceof Map && infoToDisplayOnDOM.libraryData.size > 0) {
+                if (librariesManagerObj instanceof LibrariesManager && librariesManagerObj.libraryData instanceof Map && librariesManagerObj.libraryData.size > 0) {
                     //if the infoToDisplay variable is an object from librariesManager and the libraryData property within such has a library within it
                 } else {
                     //if the condition above fails, or in otherwords no valid structure exists for a new book to be added to
@@ -191,14 +214,14 @@ const appRefs = {
                 appRefs.refElements.newLibraryFormBackground.style.display = '';
 
                 //defines the data received in a form submission into the variable formData
-                const formData = new FormData(event.target);
+                const formData = new FormData(event.target)        
 
                 switch (true) {
-                    case event.target.classList.contains(appRefs.refElements.addBookForm):
+                    case event.target.id === appRefs.refElements.addBookFormId:
                         //if the event target was a add book form submission
                         eventMethods.handleSubmit.addBookForm(formData);
                         break;
-                    case event.target.classList.contains(appRefs.refElements.newLibraryForm):
+                    case event.target.id === appRefs.refElements.newLibraryFormId:
                         //if the event target was a new library form submission
                         eventMethods.handleSubmit.newLibraryForm(formData);
                         break;
@@ -209,6 +232,15 @@ const appRefs = {
 
             }
 
+        },
+
+        storeLibrariesToLocal() {
+            if(localStorage.getItem('DOMdata') === undefined) {
+                localStorage.setItem('DOMdata', JSON.stringify(librariesManagerObj))
+            } else {
+                localStorage.removeItem('DOMdata')
+                localStorage.setItem('DOMdata', JSON.stringify(librariesManagerObj))
+            }
         }
 
     }

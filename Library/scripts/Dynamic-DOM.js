@@ -1,5 +1,5 @@
 const elementClasses = {
-    bookCell: 'Book-cell',
+    bookCell: 'Book-Cell',
     xButton: 'X-Button',
     libraryOwnerLabel: 'Library-Owner',
     libraryOwnerName: 'Library-Owner-Name',
@@ -43,17 +43,25 @@ const elementClasses = {
         pageLeftDownButton: '+ Page Read'
     },
 
+    dataElementIdentifier = {
+        libraryOwnerName: 'libraryOwner',
+        bookTitleName: 'title',
+        bookAuthorName: 'author',
+        pagesLeftValue: 'pagesLeft',
+        readYetValue: 'readYet'
+    },
+
     domRefs = {
         mainElement: document.querySelector('main'),
         existingOwnersDropDown: document.querySelector('#Existing-Owners')
     }
 
-function updateDOM(infoToDisplay) {
+function updateDOM() {
 
     domRefs.mainElement.innerHTML = '';
 
-    for (const libraryOwner of infoToDisplay.keys()) {
-        createBookElements(libraryOwner, infoToDisplay.get(libraryOwner));
+    for (const libraryOwner of infoToDisplay.libraryData.keys()) {
+        createBookElements(libraryOwner, infoToDisplay.libraryData.get(libraryOwner));
     }
 
 }
@@ -67,9 +75,26 @@ function createBookElements(libraryOwner, books) {
 
         for (const element in elementClasses) {
 
-            elementClasses[element] === 'Book-Cell' ?
-                bookCell = document.createElement(elementTags[element], elementClasses[element]).classList.add(bookClass) :
-                bookCell.appendChild(document.createElement(elementTags[element], elementClasses[element]).classList.add(bookClass));
+            if(elementClasses[element] === 'Book-Cell') {
+                
+                bookCell = document.createElement(elementTags[element]); 
+                bookCell.setAttribute('class', elementClasses[element]);
+                bookCell.classList.add(bookClass);
+
+            } else {
+
+                const childElement = document.createElement(elementTags[element]);
+
+                if(Object.keys(templateElementTextContent).includes(element) !== undefined ) {
+                    childElement.textContent = templateElementTextContent[element];
+                } else if(Object.keys(dataElementIdentifier).includes(element)) {
+                    childElement.textContent = book[dataElementIdentifier[element]];
+                }
+
+                childElement.setAttribute('class', elementClasses[element]);
+                childElement.classList.add(bookClass);
+                bookCell.appendChild(childElement);
+            }
 
         }
 
@@ -85,7 +110,7 @@ function createBookElements(libraryOwner, books) {
 
 function createOwnersDropDown(infoToDisplay) {
 
-    domRefs.existingOwnersDownDown.innerHTML = ''
+    domRefs.existingOwnersDropDown.innerHTML = ''
 
     for (const libraryOwner in infoToDisplay) {
 
