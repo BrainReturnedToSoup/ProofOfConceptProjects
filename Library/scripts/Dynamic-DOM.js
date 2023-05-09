@@ -1,5 +1,3 @@
-export { elementClasses, elementTags, templateElementTextContent, mainElement, updateDOM, createBookElements }
-
 const elementClasses = {
     bookCell: 'Book-cell',
     xButton: 'X-Button',
@@ -69,7 +67,7 @@ function createBookElements(libraryOwner, books) {
 
         for (const element in elementClasses) {
 
-            element === 'bookCell' ?
+            elementClasses[element] === 'Book-Cell' ?
                 bookCell = document.createElement(elementTags[element], elementClasses[element]).classList.add(bookClass) :
                 bookCell.appendChild(document.createElement(elementTags[element], elementClasses[element]).classList.add(bookClass));
 
@@ -87,7 +85,7 @@ function createBookElements(libraryOwner, books) {
 
 function createOwnersDropDown(infoToDisplay) {
 
-    domRefs.existingOwnersDropDown.innerHTML = ''
+    domRefs.existingOwnersDownDown.innerHTML = ''
 
     for (const libraryOwner in infoToDisplay) {
 
@@ -101,6 +99,8 @@ function createOwnersDropDown(infoToDisplay) {
     }
 
 }
+
+export { elementClasses, elementTags, templateElementTextContent, updateDOM, createBookElements }
 
 
 
