@@ -1,3 +1,94 @@
 .Add-Book-Container {
-    
+    box-sizing: inherit;
+
+    width: 100%;
+    height: 100%;
+
+    background-color: rgb(218, 218, 218);
+
+    border-radius: 5px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Add-Book-Container:hover {
+    background-color: lightblue;
+    cursor: pointer;
+}
+
+.Add-Book-Plus-Sign-Default, .Add-Book-Plus-Sign-Hover {
+    aspect-ratio: 1/1;
+    width: 110px;
+    height: auto;
+
+    display: block;
+}
+
+.Add-Book-Plus-Sign-Hover {
+    display: none;
+}
+
+.Add-Book-Container:hover > .Add-Book-Plus-Sign-Default {
+    display: none;
+}
+
+.Add-Book-Container:hover > .Add-Book-Plus-Sign-Hover {
+    display: block;
+}
+
+/* FORM STYLING BELOW THIS LINE */
+
+.Add-Book-Form-Container {
+    display: none;
+
+    width: 100%;
+    height: 100%;
+
+}
+
+.Add-Book-Form-Container > form {   
+    box-sizing: border-box;
+
+    width: 100%;
+    height: 100%;
+
+    padding: 15px;
+
+    background-color: rgb(218, 218, 218);
+
+    border-radius: 5px;
+
+    cursor: default;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+
+}
+
+.Input-Wrapper {
+    display: inherit;
+    justify-content: inherit;
+}
+
+.Input-Wrapper > label {
+    font-size: 0.8rem;
+}
+
+.Input-Wrapper-Radio-Container {
+    display: inherit;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.Input-Wrapper-Radio-Container > legend {
+    margin-bottom: 10px;
+}
+
+button {
+    align-self: center ;
 }

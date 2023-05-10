@@ -14,6 +14,9 @@
     <link rel="stylesheet" href="./stylesheets/Book_Card.css">
     <link rel="stylesheet" href="./stylesheets/Add_Book.css">
 
+    <script type="module" src="./scripts/Event_Handler.js" defer></script>
+    <script type="module" src="./scripts/Books_Data_Interface.js" defer ></script>
+
     <title>BookTracker</title>
 </head>
 
@@ -34,7 +37,45 @@
             </div>
         </div>
         <div class="Add-Book-Container">
+            
+            <img src="images/Add-Book-Plus-Sign-Default.svg" alt="Add_Book_Plus_Sign_Default" class="Add-Book-Plus-Sign-Default">
+            <img src="images/Add-Book-Plus-Sign-Hover.svg" alt="Add_Book_Plus_Sign_Hover" class="Add-Book-Plus-Sign-Hover">
+            
+            <div class="Add-Book-Form-Container Form">
+                <form class="Form" action="">
+                    <button class="Form" type="submit">Add Book</button>
+                    <div class="Input-Wrapper Form">
+                        <label class="Form" for="title">Title</label>
+                        <input class="Form" type="text" name="title" id="title" required>
+                    </div>
 
+                    <div class="Input-Wrapper Form">
+                        <label class="Form" for="author">Author</label>
+                        <input class="Form" type="text" name="author" id="author" required>
+                    </div>
+
+                    <div class="Input-Wrapper Form">
+                        <label class="Form" for="totalPages">Total Pages</label>
+                        <input class="Form" type="number" name="totalPages" id="totalPages" required>
+                    </div>
+
+                    <div class="Input-Wrapper Form">
+                        <label class="Form" for="currentPage">Current Page</label>
+                        <input class="Form" type="number" name="currentPage" id="currentPage" required>
+                    </div>
+
+                    <div class="Input-Wrapper-Radio-Container Form">
+                        <legend  class="Form">Read Yet?</legend>
+                        <div class="Input-Wrapper-Radio-Buttons Form">
+                            <label class="Form" for="readYet">Yes</label>
+                            <input class="Form" type="radio" name="readYet" value="yes" id="haveRead" required>
+                            <label class="Form" for="readYet">No</label>
+                            <input class="Form" type="radio" name="readYet" value="no" id="notRead" required>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
         </div>
     </main>
 </body>
