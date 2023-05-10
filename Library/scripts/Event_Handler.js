@@ -8,15 +8,56 @@ import {
 } from './DOM_Refs.js'
 
 const dataManipulation = {
-    initializeDataStructure: function () {
+
+    initializeLocalStorage: function () {
+
+        const booksDataStructure = new Books(),
+        stringifiedDataStructure = JSON.stringify(booksDataStructure);
+
+        localStorage.setItem('Books_Data', stringifiedDataStructure);
 
     },
-    updateDataStructure: function () {
+
+    updateLocalStorage: function (classMethodBooks, targetTitle) {
+        
+        let localStorageData = JSON.parse(localStorage.getItem('Books_Data'));
+
+        if (localStorageData instanceof Books) {
+            
+        } else {
+
+            throw new Error(`Cannot use methods on data, Books_Data is not an instance of the 'Books' class`)
+        }
+
+
+    },
+
+    checkLocalStorageStatus: function () {
+
+        if (localStorage.getItem('Books_Data') === null) {
+
+            this.initializeLocalStorage()
+
+        }
+
+        const localStorageData = JSON.parse(localStorage.getItem('Books_Data'));
+
+        if (localStorageData instanceof Books) {
+
+            return;
+
+        } else {
+
+            this.initializeLocalStorage()
+
+        }
 
     }
+
 },
 
     eventHandlers = {
+
         click: function (event) {
 
             const targetClassList = event.target.classList,
@@ -65,13 +106,44 @@ const dataManipulation = {
 
         bookCardClicked: function (targetClass, targetTitle) {
 
+            switch (targetClass) {
+
+                case clickableBookElementClasses.currentPageDownButton:
+
+                    dataManipulation.checkLocalStorageStatus();
+                    dataManipulation.updateLocalStorage('currentPageDown', targetTitle);
+                    break;
+
+                case clickableBookElementClasses.currentPageUpButton:
+
+                    dataManipulation.checkLocalStorageStatus();
+                    dataManipulation.updateLocalStorage('currentPageUp', targetTitle);
+                    break;
+
+                case clickableBookElementClasses.readYetToggleButton:
+
+                    dataManipulation.checkLocalStorageStatus();
+                    dataManipulation.updateLocalStorage('toggleReadYet', targetTitle);
+                    break;
+
+                case clickableBookElementClasses.deleteBookButton:
+
+                    dataManipulation.checkLocalStorageStatus();
+                    dataManipulation.updateLocalStorage('removeBook', targetTitle);
+                    break;
+
+                default:
+                    throw new Error(`Failed to match target class to a clickable book card button class`);
+
+            }
+
         },
 
         addBookButtonClicked: function () {
 
         }
 
-    },
+    }
 
 document.addEventListener('click', eventHandlers.click);
 document.addEventListener('submit', eventHandlers.submit);

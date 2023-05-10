@@ -55,4 +55,10 @@ const bookElementClasses = {
 
     }
 
-    export { bookElementClasses, addBookElementClasses, addBookElementRefs, clickableBookElementClasses, clickableAddBookElementClasses }
+export {
+    bookElementClasses,
+    addBookElementClasses,
+    addBookElementRefs,
+    clickableBookElementClasses,
+    clickableAddBookElementClasses
+}
