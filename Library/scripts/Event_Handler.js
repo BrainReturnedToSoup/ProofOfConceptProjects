@@ -12,23 +12,23 @@ const dataManipulation = {
     initializeLocalStorage: function () {
 
         const booksDataStructure = new Books(),
-        stringifiedDataStructure = JSON.stringify(booksDataStructure);
+            stringifiedDataStructure = JSON.stringify(booksDataStructure);
 
         localStorage.setItem('Books_Data', stringifiedDataStructure);
 
     },
 
     updateLocalStorage: function (classMethodBooks, targetTitle) {
-        
+
         let localStorageData = JSON.parse(localStorage.getItem('Books_Data'));
 
         if (localStorageData instanceof Books) {
-            
+
         } else {
 
-            throw new Error(`Cannot use methods on data, Books_Data is not an instance of the 'Books' class`)
-        }
+            throw new Error(`Cannot use methods on data, Books_Data is not an instance of the 'Books' class`);
 
+        }
 
     },
 
