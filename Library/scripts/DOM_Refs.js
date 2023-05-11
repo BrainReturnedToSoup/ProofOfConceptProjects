@@ -18,6 +18,35 @@ const bookElementClasses = {
 
 },
 
+    bookElementTags = {
+
+        container: 'div',
+
+        title: 'h1',
+        author: 'h2',
+        totalPages: 'h3',
+        currentPage: 'h3',
+        pagesLeft: 'h3',
+        readYet: 'h3',
+
+        buttonContainer: 'div',
+
+        currentPageDownButton: 'button',
+        currentPageUpButton: 'button',
+        readYetToggleButton: 'button',
+        deleteBookButton: 'button'
+
+    },
+
+    bookElementButtonText = {
+
+        currentPageDownButton: '- Page',
+        currentPageUpButton: '+ Page',
+        readYetToggleButton: 'Read?',
+        deleteBookButton: 'X'
+
+    },
+
     addBookElementClasses = {
 
         addBookContainer: 'Add-Book-Container',
@@ -56,9 +85,13 @@ const bookElementClasses = {
     }
 
 export {
+
     bookElementClasses,
     addBookElementClasses,
     addBookElementRefs,
     clickableBookElementClasses,
-    clickableAddBookElementClasses
+    clickableAddBookElementClasses,
+    bookElementTags,
+    bookElementButtonText
+
 }

@@ -1,11 +1,11 @@
 import { Books } from './Books_Data_Interface.js'
 import {
     bookElementClasses,
-    addBookElementClasses,
     addBookElementRefs,
     clickableBookElementClasses,
     clickableAddBookElementClasses
 } from './DOM_Refs.js'
+
 import { updateDOM } from './DOM_Renderer.js';
 
 
@@ -24,40 +24,44 @@ const dataManipulation = {
     updateLocalStorage: function (classMethodBooks, targetTitle, ...bookProperties) {
 
         let localStorageData = JSON.parse(localStorage.getItem('Books_Data')),
+            dataBooksObj,
             alteredData;
 
-        if (localStorageData instanceof Books) {
+        if (localStorageData === null) {
 
-            switch (classMethodBooks) {
-
-                case 'currentPageDown':
-                    alteredData = localStorageData.currentPageUp(targetTitle);
-                    break;
-                case 'currentPageUp':
-                    alteredData = localStorageData.currentPageDown(targetTitle);
-                    break;
-                case 'toggleReadYet':
-                    alteredData = localStorageData.toggleReadYet(targetTitle);
-                    break;
-                case 'removeBook':
-                    alteredData = localStorageData.removeBook(targetTitle);
-                    break;
-                case 'addBook':
-                    if(bookProperties !== undefined) {
-                    alteredData = localStorageData.addBook(...bookProperties);
-                    }
-                    break;
-                default:
-                    throw new Error(`Invalid method received, received '${classMethodBooks}'`);
-            }
-
-            localStorage.setItem('Books_Data', JSON.stringify(alteredData));
-
-        } else {
-
-            throw new Error(`Cannot use methods on data, Books_Data is not an instance of the 'Books' class`);
+            this.checkLocalStorageStatus();
+            this.updateLocalStorage(classMethodBooks, targetTitle, ...bookProperties);
 
         }
+
+        dataBooksObj = this.convertToBookObj(localStorageData);
+
+        switch (classMethodBooks) {
+
+            case 'currentPageDown':
+                alteredData = dataBooksObj.currentPageUp(targetTitle);
+                break;
+            case 'currentPageUp':
+                alteredData = dataBooksObj.currentPageDown(targetTitle);
+                break;
+            case 'toggleReadYet':
+                alteredData = dataBooksObj.toggleReadYet(targetTitle);
+                break;
+            case 'removeBook':
+                alteredData = dataBooksObj.removeBook(targetTitle);
+                break;
+            case 'addBook':
+
+                if (bookProperties !== undefined) {
+                    alteredData = dataBooksObj.addBook(...bookProperties);
+                }
+
+                break;
+            default:
+                throw new Error(`Invalid method received, received '${classMethodBooks}'`);
+        }
+
+        localStorage.setItem('Books_Data', JSON.stringify(alteredData));
 
     },
 
@@ -67,19 +71,26 @@ const dataManipulation = {
 
             this.initializeLocalStorage();
 
-        }
-
-        const localStorageData = JSON.parse(localStorage.getItem('Books_Data'));
-
-        if (localStorageData instanceof Books) {
+        } else {
 
             return;
 
-        } else {
-
-            this.initializeLocalStorage();
-
         }
+
+    },
+
+    convertToBookObj(objectJSON) {
+
+        const bookObj = new Books();
+
+        bookObj.titles = objectJSON.titles;
+        bookObj.authors = objectJSON.authors;
+        bookObj.totalPages = objectJSON.totalPages;
+        bookObj.currentPages = objectJSON.currentPages;
+        bookObj.totalPagesLeft = objectJSON.totalPagesLeft;
+        bookObj.readYet = objectJSON.readYet;
+
+        return bookObj;
 
     }
 
@@ -145,11 +156,11 @@ const dataManipulation = {
 
             } else {
 
-            dataManipulation.updateLocalStorage('addBook', null, inputTitle, inputAuthor, inputTotalPages, inputCurrentPage, inputReadYet);
+                dataManipulation.updateLocalStorage('addBook', null, inputTitle, inputAuthor, inputTotalPages, inputCurrentPage, inputReadYet);
 
             }
 
-        }   
+        }
 
     },
 
@@ -167,24 +178,28 @@ const dataManipulation = {
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('currentPageDown', targetTitle);
+                    updateDOM();
                     break;
 
                 case clickableBookElementClasses.currentPageUpButton:
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('currentPageUp', targetTitle);
+                    updateDOM();
                     break;
 
                 case clickableBookElementClasses.readYetToggleButton:
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('toggleReadYet', targetTitle);
+                    updateDOM();
                     break;
 
                 case clickableBookElementClasses.deleteBookButton:
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('removeBook', targetTitle);
+                    updateDOM();
                     break;
 
                 default:
