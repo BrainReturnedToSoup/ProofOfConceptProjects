@@ -2,80 +2,72 @@ import { bookElementClasses, bookElementTags, bookElementButtonText } from "./DO
 
 const mainElementRef = document.querySelector('main');
 
-function updateDOM() {
+function updateDOM(data) {
 
     mainElementRef.innerHTML = '';
 
-    const dataToRenderString = localStorage.get('Books_Data');
+        dataToRender = JSON.parse(dataToRenderString),
+        titles = dataToRender.titles;
 
-    if (dataToRenderString === null) {
+    if (typeof dataToRender === 'object') {
 
-        throw new Error(`Failed to render data, 'Books_Data' was not found`);
+        const allBookCardsArray = createBookCards(dataToRender);
+
+        allBookCardsArray.forEach(bookCard => {
+            mainElementRef.appendChild(bookCard);
+        });
 
     } else {
 
-        const dataToRender = JSON.parse(dataToRenderString);
-
-        if (dataToRender instanceof Books) {
-
-            const allBookCardsArray = createBookCards(dataToRender);
-
-            allBookCardsArray.forEach(bookCard => {
-                mainElementRef.appendChild(bookCard);
-            });
-
-        } else {
-
-            throw new Error(`Failed to render data, 'Books_Data' is not the correct data structure`);
-
-        }
+        throw new Error(`Failed to render data, 'Books_Data' is not the correct data structure`);
 
     }
 
 }
 
+
 function createBookCards(dataToRender) {
 
     const bookCardsArray = [],
         titles = dataToRender.titles;
-    
+
 
     for (const index in titles) {
 
         let container,
-        buttonContainer
+            buttonContainer
 
         for (const element in bookElementTags) {
-    
-                if(element === 'container') {
 
-                    container = document.createElement(bookElementTags[element]);
-                    container.classList.add(bookElementClasses[element]);
+            if (element === 'container') {
 
-                } else if(element === 'buttonContainer') {
+                container = document.createElement(bookElementTags[element]);
+                container.classList.add(bookElementClasses[element]);
 
-                    buttonContainer = document.createElement(bookElementTags[element]);
-                    buttonContainer.classList.add(bookElementClasses[element]);
+            } else if (element === 'buttonContainer') {
 
-                } else if(bookElementTags[element] === 'button') {
+                buttonContainer = document.createElement(bookElementTags[element]);
+                buttonContainer.classList.add(bookElementClasses[element]);
 
-                    const currentButtonElement = document.createElement(bookElementTags[element]);
+            } else if (bookElementTags[element] === 'button') {
 
-                    currentButtonElement.classList.add(bookElementClasses[element]);
-                    currentButtonElement.textContent = bookElementButtonText[element];
+                const currentButtonElement = document.createElement(bookElementTags[element]);
 
-                    buttonContainer.appendChild(currentButtonElement);
+                currentButtonElement.classList.add(bookElementClasses[element]);
+                currentButtonElement.textContent = bookElementButtonText[element];
 
-                } else {
+                buttonContainer.appendChild(currentButtonElement);
 
-                    const currentElement = document.createElement(bookElementTags[element]);
+            } else {
 
-                    currentElement.classList.add(bookElementClasses[element]);
-                    currentElement.textContent = dataToRender[element][index];
+                const currentElement = document.createElement(bookElementTags[element]);
 
-                    container.appendChild(currentElement);
+                currentElement.classList.add(bookElementClasses[element]);
+                currentElement.textContent = dataToRender[element][index];
 
-                }
+                container.appendChild(currentElement);
+
+            }
 
         }
 
@@ -88,4 +80,12 @@ function createBookCards(dataToRender) {
 
 }
 
-export { updateDOM }
+document.addEventListener('storage', event => {
+
+    if(event.key === 'Books_Data') {
+
+        
+
+    }
+
+})

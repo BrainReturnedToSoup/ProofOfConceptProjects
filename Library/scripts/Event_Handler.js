@@ -6,10 +6,6 @@ import {
     clickableAddBookElementClasses
 } from './DOM_Refs.js'
 
-import { updateDOM } from './DOM_Renderer.js';
-
-
-
 const dataManipulation = {
 
     initializeLocalStorage: function () {
@@ -24,36 +20,28 @@ const dataManipulation = {
     updateLocalStorage: function (classMethodBooks, targetTitle, ...bookProperties) {
 
         let localStorageData = JSON.parse(localStorage.getItem('Books_Data')),
-            dataBooksObj,
-            alteredData;
-
-        if (localStorageData === null) {
-
-            this.checkLocalStorageStatus();
-            this.updateLocalStorage(classMethodBooks, targetTitle, ...bookProperties);
-
-        }
+            dataBooksObj;
 
         dataBooksObj = this.convertToBookObj(localStorageData);
 
         switch (classMethodBooks) {
 
             case 'currentPageDown':
-                alteredData = dataBooksObj.currentPageUp(targetTitle);
+                dataBooksObj.currentPageUp(targetTitle);
                 break;
             case 'currentPageUp':
-                alteredData = dataBooksObj.currentPageDown(targetTitle);
+                dataBooksObj.currentPageDown(targetTitle);
                 break;
             case 'toggleReadYet':
-                alteredData = dataBooksObj.toggleReadYet(targetTitle);
+                dataBooksObj.toggleReadYet(targetTitle);
                 break;
             case 'removeBook':
-                alteredData = dataBooksObj.removeBook(targetTitle);
+                dataBooksObj.removeBook(targetTitle);
                 break;
             case 'addBook':
 
                 if (bookProperties !== undefined) {
-                    alteredData = dataBooksObj.addBook(...bookProperties);
+                    dataBooksObj.addBook(...bookProperties);
                 }
 
                 break;
@@ -61,19 +49,13 @@ const dataManipulation = {
                 throw new Error(`Invalid method received, received '${classMethodBooks}'`);
         }
 
-        localStorage.setItem('Books_Data', JSON.stringify(alteredData));
-
     },
 
     checkLocalStorageStatus: function () {
 
-        if (localStorage.getItem('Books_Data') === null) {
+        if (JSON.parse(localStorage.getItem('Books_Data')) === null) {
 
             this.initializeLocalStorage();
-
-        } else {
-
-            return;
 
         }
 
@@ -81,24 +63,21 @@ const dataManipulation = {
 
     convertToBookObj(objectJSON) {
 
-        const bookObj = new Books();
+        const bookObj = new Books(),
+            { titles, authors, totalPages, currentPages, totalPagesLeft, readYet } = objectJSON;
 
-        bookObj.titles = objectJSON.titles;
-        bookObj.authors = objectJSON.authors;
-        bookObj.totalPages = objectJSON.totalPages;
-        bookObj.currentPages = objectJSON.currentPages;
-        bookObj.totalPagesLeft = objectJSON.totalPagesLeft;
-        bookObj.readYet = objectJSON.readYet;
+        bookObj.titles = titles;
+        bookObj.authors = authors;
+        bookObj.totalPages = totalPages;
+        bookObj.currentPages = currentPages;
+        bookObj.totalPagesLeft = totalPagesLeft;
+        bookObj.readYet = readYet;
 
         return bookObj;
 
     }
 
 },
-
-
-
-
 
     eventHandlers = {
 
@@ -142,6 +121,7 @@ const dataManipulation = {
 
         submit: function (event) {
 
+
             const formData = new FormData(event.target),
                 inputTitle = formData.get('title'),
                 inputAuthor = formData.get('author'),
@@ -156,17 +136,16 @@ const dataManipulation = {
 
             } else {
 
+                dataManipulation.checkLocalStorageStatus();
                 dataManipulation.updateLocalStorage('addBook', null, inputTitle, inputAuthor, inputTotalPages, inputCurrentPage, inputReadYet);
+
+                event.preventDefault();
 
             }
 
         }
 
     },
-
-
-
-
 
     clickEventMethods = {
 
@@ -178,28 +157,28 @@ const dataManipulation = {
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('currentPageDown', targetTitle);
-                    updateDOM();
+
                     break;
 
                 case clickableBookElementClasses.currentPageUpButton:
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('currentPageUp', targetTitle);
-                    updateDOM();
+
                     break;
 
                 case clickableBookElementClasses.readYetToggleButton:
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('toggleReadYet', targetTitle);
-                    updateDOM();
+
                     break;
 
                 case clickableBookElementClasses.deleteBookButton:
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('removeBook', targetTitle);
-                    updateDOM();
+
                     break;
 
                 default:
@@ -209,11 +188,9 @@ const dataManipulation = {
 
         },
 
-        addBookButtonClicked: function () {
-
-        }
-
     }
+
+dataManipulation.checkLocalStorageStatus();
 
 document.addEventListener('click', eventHandlers.click);
 document.addEventListener('submit', eventHandlers.submit);
