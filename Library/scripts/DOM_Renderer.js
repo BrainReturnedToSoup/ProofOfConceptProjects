@@ -1,0 +1,5 @@
+function updateDOM () {
+
+}
+
+export { updateDOM }

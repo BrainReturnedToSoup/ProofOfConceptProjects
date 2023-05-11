@@ -6,6 +6,9 @@ import {
     clickableBookElementClasses,
     clickableAddBookElementClasses
 } from './DOM_Refs.js'
+import { updateDOM } from './DOM_Renderer.js';
+
+
 
 const dataManipulation = {
 
@@ -18,11 +21,37 @@ const dataManipulation = {
 
     },
 
-    updateLocalStorage: function (classMethodBooks, targetTitle) {
+    updateLocalStorage: function (classMethodBooks, targetTitle, ...bookProperties) {
 
-        let localStorageData = JSON.parse(localStorage.getItem('Books_Data'));
+        let localStorageData = JSON.parse(localStorage.getItem('Books_Data')),
+            alteredData;
 
         if (localStorageData instanceof Books) {
+
+            switch (classMethodBooks) {
+
+                case 'currentPageDown':
+                    alteredData = localStorageData.currentPageUp(targetTitle);
+                    break;
+                case 'currentPageUp':
+                    alteredData = localStorageData.currentPageDown(targetTitle);
+                    break;
+                case 'toggleReadYet':
+                    alteredData = localStorageData.toggleReadYet(targetTitle);
+                    break;
+                case 'removeBook':
+                    alteredData = localStorageData.removeBook(targetTitle);
+                    break;
+                case 'addBook':
+                    if(bookProperties !== undefined) {
+                    alteredData = localStorageData.addBook(...bookProperties);
+                    }
+                    break;
+                default:
+                    throw new Error(`Invalid method received, received '${classMethodBooks}'`);
+            }
+
+            localStorage.setItem('Books_Data', JSON.stringify(alteredData));
 
         } else {
 
@@ -36,7 +65,7 @@ const dataManipulation = {
 
         if (localStorage.getItem('Books_Data') === null) {
 
-            this.initializeLocalStorage()
+            this.initializeLocalStorage();
 
         }
 
@@ -48,13 +77,17 @@ const dataManipulation = {
 
         } else {
 
-            this.initializeLocalStorage()
+            this.initializeLocalStorage();
 
         }
 
     }
 
 },
+
+
+
+
 
     eventHandlers = {
 
@@ -98,9 +131,31 @@ const dataManipulation = {
 
         submit: function (event) {
 
-        }
+            const formData = new FormData(event.target),
+                inputTitle = formData.get('title'),
+                inputAuthor = formData.get('author'),
+                inputTotalPages = formData.get('totalPages'),
+                inputCurrentPage = formData.get('currentPage'),
+                inputReadYet = formData.get('readYet'),
+                pagesLeft = inputTotalPages - inputCurrentPage;
+
+            if (pagesLeft < 0) {
+
+                throw new Error(`current page value cannot be greater than total pages value`);
+
+            } else {
+
+            dataManipulation.updateLocalStorage('addBook', null, inputTitle, inputAuthor, inputTotalPages, inputCurrentPage, inputReadYet);
+
+            }
+
+        }   
 
     },
+
+
+
+
 
     clickEventMethods = {
 
