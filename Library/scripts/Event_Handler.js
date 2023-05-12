@@ -5,6 +5,7 @@ import {
     clickableBookElementClasses,
     clickableAddBookElementClasses
 } from './DOM_Refs.js'
+import { updateDOM } from './DOM_Renderer.js'
 
 const dataManipulation = {
 
@@ -20,7 +21,8 @@ const dataManipulation = {
     updateLocalStorage: function (classMethodBooks, targetTitle, ...bookProperties) {
 
         let localStorageData = JSON.parse(localStorage.getItem('Books_Data')),
-            dataBooksObj;
+            dataBooksObj,
+            dataBooksObjClone
 
         dataBooksObj = this.convertToBookObj(localStorageData);
 
@@ -47,7 +49,13 @@ const dataManipulation = {
                 break;
             default:
                 throw new Error(`Invalid method received, received '${classMethodBooks}'`);
-        }
+        }   
+
+        dataBooksObjClone = dataBooksObj;
+
+        localStorage.removeItem('Books_Data')
+
+        localStorage.setItem('Books_Data', JSON.stringify(dataBooksObjClone));
 
     },
 
@@ -64,13 +72,13 @@ const dataManipulation = {
     convertToBookObj(objectJSON) {
 
         const bookObj = new Books(),
-            { titles, authors, totalPages, currentPages, totalPagesLeft, readYet } = objectJSON;
+            { title, author, totalPages, currentPage, pagesLeft, readYet } = objectJSON;
 
-        bookObj.titles = titles;
-        bookObj.authors = authors;
+        bookObj.title = title;
+        bookObj.author = author;
         bookObj.totalPages = totalPages;
-        bookObj.currentPages = currentPages;
-        bookObj.totalPagesLeft = totalPagesLeft;
+        bookObj.currentPage = currentPage;
+        bookObj.pagesLeft = pagesLeft;
         bookObj.readYet = readYet;
 
         return bookObj;
@@ -90,12 +98,13 @@ const dataManipulation = {
                 CBECvalues = Object.values(clickableBookElementClasses),
                 CABECvalues = Object.values(clickableAddBookElementClasses);
 
-            let targetTitle;
-
             switch (true) {
+                
                 case CBECvalues.includes(targetClass):
 
-                    targetTitle = event.target.parentElement.parentElement.querySelector(bookElementClasses.title).textContent;
+                    const targetTitleElement = event.target.parentNode.parentNode.getElementsByClassName(bookElementClasses.title)[0],
+                    targetTitle = targetTitleElement.textContent;
+
                     clickEventMethods.bookCardClicked(targetClass, targetTitle);
 
                     break;
@@ -138,6 +147,7 @@ const dataManipulation = {
 
                 dataManipulation.checkLocalStorageStatus();
                 dataManipulation.updateLocalStorage('addBook', null, inputTitle, inputAuthor, inputTotalPages, inputCurrentPage, inputReadYet);
+                updateDOM();
 
                 event.preventDefault();
 
@@ -157,6 +167,7 @@ const dataManipulation = {
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('currentPageDown', targetTitle);
+                    updateDOM();
 
                     break;
 
@@ -164,6 +175,7 @@ const dataManipulation = {
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('currentPageUp', targetTitle);
+                    updateDOM();
 
                     break;
 
@@ -171,6 +183,7 @@ const dataManipulation = {
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('toggleReadYet', targetTitle);
+                    updateDOM();
 
                     break;
 
@@ -178,6 +191,7 @@ const dataManipulation = {
 
                     dataManipulation.checkLocalStorageStatus();
                     dataManipulation.updateLocalStorage('removeBook', targetTitle);
+                    updateDOM();
 
                     break;
 

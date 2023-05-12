@@ -1,21 +1,32 @@
-import { bookElementClasses, bookElementTags, bookElementButtonText } from "./DOM_Refs.js";
+import {
+    bookElementClasses,
+    bookElementTags,
+    bookElementButtonText
+} from "./DOM_Refs.js";
 
 const mainElementRef = document.querySelector('main');
 
-function updateDOM(data) {
+let addBookButtonTemplate;
 
-    mainElementRef.innerHTML = '';
+function updateDOM() {
 
-        dataToRender = JSON.parse(dataToRenderString),
-        titles = dataToRender.titles;
+    for(let i = mainElementRef.children.length - 1; i > 0; i--) {
+
+        mainElementRef.removeChild(mainElementRef.children[i]);
+        
+    }
+
+
+    const dataToRender = JSON.parse(localStorage.getItem('Books_Data'))
 
     if (typeof dataToRender === 'object') {
 
-        const allBookCardsArray = createBookCards(dataToRender);
+        const allBookCardsArray = createBookCards(dataToRender)
 
         allBookCardsArray.forEach(bookCard => {
             mainElementRef.appendChild(bookCard);
         });
+
 
     } else {
 
@@ -25,11 +36,10 @@ function updateDOM(data) {
 
 }
 
-
 function createBookCards(dataToRender) {
 
     const bookCardsArray = [],
-        titles = dataToRender.titles;
+        titles = dataToRender.title;
 
 
     for (const index in titles) {
@@ -80,12 +90,9 @@ function createBookCards(dataToRender) {
 
 }
 
-document.addEventListener('storage', event => {
+updateDOM();
 
-    if(event.key === 'Books_Data') {
+export { updateDOM }
 
-        
 
-    }
 
-})

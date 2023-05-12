@@ -1,27 +1,27 @@
 class Books {
     
     constructor() {
-        this.titles = [];
-        this.authors = [];
+        this.title = [];
+        this.author = [];
         this.totalPages = [];
-        this.currentPages = [];
-        this.totalPagesLeft = [];
+        this.currentPage = [];
+        this.pagesLeft = [];
         this.readYet = [];
     }
 
     addBook(title, author, pages, currentPage, readYet) {
 
-        if(this.titles.includes(title)) {
+        if(this.title.includes(title)) {
     
             throw new Error(`Cannot add new book, book with this title already exists`)
     
         } else {
     
-            this.titles.push(title);
-            this.authors.push(author);
+            this.title.push(title);
+            this.author.push(author);
             this.totalPages.push(pages);
-            this.currentPages.push(currentPage);
-            this.totalPagesLeft.push(pages - currentPage);
+            this.currentPage.push(currentPage);
+            this.pagesLeft.push(pages - currentPage);
             this.readYet.push(readYet);
     
         }
@@ -30,15 +30,15 @@ class Books {
     
     removeBook(title) {
     
-        for(let index = 0; index < this.titles.length; index++) {
+        for(let index = 0; index < this.title.length; index++) {
     
-            if(this.titles[index] === title) {
+            if(this.title[index] === title) {
     
-                this.titles.splice(index, 1);
-                this.authors.splice(index, 1);
+                this.title.splice(index, 1);
+                this.author.splice(index, 1);
                 this.totalPages.splice(index, 1);
-                this.currentPages.splice(index, 1);
-                this.totalPagesLeft.splice(index, 1);
+                this.currentPage.splice(index, 1);
+                this.pagesLeft.splice(index, 1);
                 this.readYet.splice(index, 1);
     
             }
@@ -49,11 +49,12 @@ class Books {
     
     currentPageUp(title) {
     
-        for(let index = 0; index < this.titles.length; index++) {
+        for(let index = 0; index < this.title.length; index++) {
     
-            if(this.titles[index] === title) {
+            if(this.title[index] === title) {
     
-                this.currentPages[index]++
+                this.currentPage[index]--;
+                this.pagesLeft[index]++;
     
             }
             
@@ -63,11 +64,12 @@ class Books {
     
     currentPageDown(title) {
     
-        for(let index = 0; index < this.titles.length; index++) {
+        for(let index = 0; index < this.title.length; index++) {
     
-            if(this.titles[index] === title) {
+            if(this.title[index] === title) {
     
-                this.currentPages[index]--
+                this.currentPage[index]++;
+                this.pagesLeft[index]--;
     
             }
             
@@ -77,9 +79,9 @@ class Books {
     
     toggleReadYet(title) {
     
-        for(let index = 0; index < this.titles.length; index++) {
+        for(let index = 0; index < this.title.length; index++) {
     
-            if(this.titles[index] === title) {
+            if(this.title[index] === title) {
     
                 if(this.readYet[index] === 'I have not read this book') {
     

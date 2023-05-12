@@ -53,8 +53,147 @@ const bookElementClasses = {
         defaultPlusSign: 'Add-Book-Plus-Sign-Default',
         hoverPlusSign: 'Add-Book-Plus-Sign-Hover',
 
-        addBookFormContainer: 'Add-Book-Form-Container'
+        addBookFormContainer: 'Add-Book-Form-Container',
 
+        addBookForm: '',
+
+        addBookSubmitButton: '',
+
+        titleInputContainer: 'Input-Wrapper',
+        titleInputLabel: '',
+        titleInputForm: '',
+
+        authorInputContainer: 'Input-Wrapper',
+        authorInputLabel: '',
+        authorInputForm: '',
+
+        totalPagesInputContainer: 'Input-Wrapper',
+        totalPagesInputLabel: '',
+        totalPagesInputForm: '',
+
+        currentPageInputContainer: 'Input-Wrapper',
+        currentPageInputLabel: '',
+        currentPageInputForm: '',
+
+        radioSelectionContainer: 'Input-Wrapper-Radio-Container',
+        radioSelectionLegend: '',
+
+        radioButtonsContainer: 'Input-Wrapper-Radio-Buttons',
+        radioButtonLabelYes: '',
+        radioButtonFormYes: '',
+        radioButtonLabelNo: '',
+        radioButtonFormNo: ''
+
+    },
+
+    addBookElementTags = {
+
+        addBookContainer: 'div',
+        defaultPlusSign: 'img',
+        hoverPlusSign: 'img',
+
+        addBookFormContainer: 'div',
+
+        addBookForm: 'form',
+
+        addBookSubmitButton: 'button',
+
+        titleInputContainer: 'div',
+        titleInputLabel: 'label',
+        titleInputForm: 'input',
+
+        authorInputContainer: 'div',
+        authorInputLabel: 'label',
+        authorInputForm: 'input',
+
+        totalPagesInputContainer: 'div',
+        totalPagesInputLabel: 'label',
+        totalPagesInputForm: 'input',
+
+        currentPageInputContainer: 'div',
+        currentPageInputLabel: 'label',
+        currentPageInputForm: 'input',
+
+        radioSelectionContainer: 'div',
+        radioSelectionLegend: 'legend',
+
+        radioButtonsContainer: 'div',
+        radioButtonLabelYes: 'label',
+        radioButtonFormYes: 'input',
+        radioButtonLabelNo: 'label',
+        radioButtonFormNo: 'input'
+    },
+
+    addBookForAttribute = {
+
+        titleInputLabel : 'title',
+        authorInputLabel: 'author',
+        totalPagesInputLabel: 'totalPages',
+        currentPageInputLabel: 'currentPage',
+
+        radioButtonLabelYes: 'readYet',
+        radioButtonLabelNo: 'readYet'
+
+    },
+
+    addBookTypeAttribute = {
+
+        addBookSubmitButton: 'submit',
+
+        titleInputForm: 'text',
+        authorInputForm: 'text',
+        totalPagesInputForm: 'number',
+        currentPageInputForm: 'number',
+
+        radioButtonFormYes: 'radio',
+        radioButtonFormNo: 'radio'
+
+    },
+
+    addBookNameAttribute = {
+
+        titleInputForm: 'title',
+        authorInputForm: 'author',
+        totalPagesInputForm: 'totalPages',
+        currentPageInputForm: 'currentPage',
+
+        radioButtonFormYes: 'readYet',
+        radioButtonFormNo: 'readYet'
+    },
+
+    addBookValueAttribute = {
+
+        radioButtonFormYes: 'I have read this book',
+        radioButtonFormNo: 'I have not read this book'
+
+    },
+
+    addBookIDAttribute = {
+
+        titleInputForm: 'title',
+        authorInputForm: 'author',
+        totalPagesInputForm: 'totalPages',
+        currentPageInputForm: 'currentPage',
+
+        radioButtonFormYes: 'haveRead',
+        radioButtonFormNo: 'haveRead'
+
+    },
+
+    addBookTextContent = {
+
+        addBookSubmitButton: 'Add Book',
+
+        titleInputLabel: 'Title',
+        authorInputLabel: 'Author',
+        totalPagesInputLabel: 'Total Pages',
+        currentPageInputLabel: 'Current Page',
+
+        radioSelectionLegend: 'Read Yet?',
+
+        radioButtonLabelYes: 'Yes',
+        radioButtonLabelNo: 'No'
+        
     },
 
     addBookElementRefs = {
@@ -84,10 +223,20 @@ const bookElementClasses = {
 
     }
 
+
+
+
 export {
 
     bookElementClasses,
     addBookElementClasses,
+    addBookElementTags,
+    addBookForAttribute,
+    addBookTypeAttribute,
+    addBookNameAttribute,
+    addBookValueAttribute,
+    addBookIDAttribute,
+    addBookTextContent,
     addBookElementRefs,
     clickableBookElementClasses,
     clickableAddBookElementClasses,
