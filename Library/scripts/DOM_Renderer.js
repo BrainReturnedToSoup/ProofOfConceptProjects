@@ -1,21 +1,19 @@
 import {
     bookElementClasses,
     bookElementTags,
-    bookElementButtonText
+    bookElementButtonText,
+    bookElementTemplateText
 } from "./DOM_Refs.js";
 
 const mainElementRef = document.querySelector('main');
 
-let addBookButtonTemplate;
-
 function updateDOM() {
 
-    for(let i = mainElementRef.children.length - 1; i > 0; i--) {
+    for (let i = mainElementRef.children.length - 1; i > 0; i--) {
 
         mainElementRef.removeChild(mainElementRef.children[i]);
-        
-    }
 
+    }
 
     const dataToRender = JSON.parse(localStorage.getItem('Books_Data'))
 
@@ -26,7 +24,6 @@ function updateDOM() {
         allBookCardsArray.forEach(bookCard => {
             mainElementRef.appendChild(bookCard);
         });
-
 
     } else {
 
@@ -72,8 +69,17 @@ function createBookCards(dataToRender) {
 
                 const currentElement = document.createElement(bookElementTags[element]);
 
+                if (Object.keys(bookElementTemplateText).includes(element)) {
+
+                    currentElement.textContent = `${bookElementTemplateText[element]} ${dataToRender[element][index]}`;
+
+                } else {
+
+                    currentElement.textContent = dataToRender[element][index];
+
+                }
+
                 currentElement.classList.add(bookElementClasses[element]);
-                currentElement.textContent = dataToRender[element][index];
 
                 container.appendChild(currentElement);
 

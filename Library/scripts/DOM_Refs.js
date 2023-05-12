@@ -47,6 +47,15 @@ const bookElementClasses = {
 
     },
 
+    bookElementTemplateText = {
+
+        author: 'By:',
+        totalPages: 'Total Pages:',
+        currentPage: 'Current Page:',
+        pagesLeft: 'Pages Left:'
+
+    },
+
     addBookElementClasses = {
 
         addBookContainer: 'Add-Book-Container',
@@ -241,6 +250,7 @@ export {
     clickableBookElementClasses,
     clickableAddBookElementClasses,
     bookElementTags,
-    bookElementButtonText
+    bookElementButtonText,
+    bookElementTemplateText
 
 }

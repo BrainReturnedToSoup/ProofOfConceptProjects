@@ -49,7 +49,7 @@ const dataManipulation = {
                 break;
             default:
                 throw new Error(`Invalid method received, received '${classMethodBooks}'`);
-        }   
+        }
 
         dataBooksObjClone = dataBooksObj;
 
@@ -99,11 +99,11 @@ const dataManipulation = {
                 CABECvalues = Object.values(clickableAddBookElementClasses);
 
             switch (true) {
-                
+
                 case CBECvalues.includes(targetClass):
 
                     const targetTitleElement = event.target.parentNode.parentNode.getElementsByClassName(bookElementClasses.title)[0],
-                    targetTitle = targetTitleElement.textContent;
+                        targetTitle = targetTitleElement.textContent;
 
                     clickEventMethods.bookCardClicked(targetClass, targetTitle);
 
@@ -150,6 +150,11 @@ const dataManipulation = {
                 updateDOM();
 
                 event.preventDefault();
+
+                addBookElementRefs.defaultPlusSignElement.style.display = '';
+                addBookElementRefs.hoverPlusSignElement.style.display = '';
+
+                addBookElementRefs.addBookFormContainerElement.style.display = '';
 
             }
 
