@@ -51,8 +51,8 @@ class Books {
     
         for(let index = 0; index < this.title.length; index++) {
     
-            if(this.title[index] === title) {
-    
+            if(this.title[index] === title && this.currentPage[index] > 0) {
+                
                 this.currentPage[index]--;
                 this.pagesLeft[index]++;
     
@@ -66,7 +66,7 @@ class Books {
     
         for(let index = 0; index < this.title.length; index++) {
     
-            if(this.title[index] === title) {
+            if(this.title[index] === title && this.pagesLeft[index] > 0) {
     
                 this.currentPage[index]++;
                 this.pagesLeft[index]--;
