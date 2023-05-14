@@ -17,7 +17,7 @@ function updateDOM() {
 
     const dataToRender = JSON.parse(localStorage.getItem('Books_Data'))
 
-    if (typeof dataToRender === 'object') {
+    if (typeof dataToRender === 'object' && dataToRender !== null) {
 
         const allBookCardsArray = createBookCards(dataToRender)
 
@@ -27,7 +27,7 @@ function updateDOM() {
 
     } else {
 
-        throw new Error(`Failed to render data, 'Books_Data' is not the correct data structure`);
+        return;
 
     }
 
