@@ -142,7 +142,7 @@ body {
   width: 100vw;
   height: 100vh;
 
-  background-color: rgb(236, 236, 236);
+  background-color: rgb(152, 223, 255);
 }
 
 .TicTacToe-Container {
@@ -203,3 +203,5 @@ body {
     width: 90%;
     height: 85%;
 }
+
+
