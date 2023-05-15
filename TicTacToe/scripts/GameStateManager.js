@@ -7,15 +7,14 @@ class TicTacToeState {
     ];
     this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   }
+  #checkState() {}
+
+  #resetState() {}
 
   #computerPickCell() {}
 
   #determineWinner() {}
 
-  #resetState() {}
-
   #storeOnLocal() {}
-
-  #checkState() {}
   cellPicked() {}
 }
