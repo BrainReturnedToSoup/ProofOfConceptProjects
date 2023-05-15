@@ -137,7 +137,7 @@ body {
 
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
 
   width: 100vw;
   height: 100vh;
@@ -149,7 +149,7 @@ body {
   box-sizing: border-box;
 
   padding: 2px;
-  
+
   background-color: black;
 
   aspect-ratio: 1/1;
@@ -172,6 +172,10 @@ body {
   align-items: center;
 
   background-color: white;
+
+  width: 100%;
+  height: 100%;
+
 }
 
 .Cell-0 {
@@ -188,4 +192,14 @@ body {
 
 .Cell-8 {
   border-bottom-right-radius: var(--containerBorderRad);
+}
+
+.X-Symbol {
+    width: 85%;
+    height: 85%;
+}
+
+.O-Symbol {
+    width: 90%;
+    height: 85%;
 }
