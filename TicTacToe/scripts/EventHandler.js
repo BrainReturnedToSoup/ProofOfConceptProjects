@@ -18,13 +18,7 @@ function clickHandler(event) {
 }
 
 const UIButtonMethods = {
-    'Start-Game': function() {
-
-    },
-    'Restart-Game': function() {
-
-    },
-    'Toggle-Symbol': function() {
-        
-    }
-}
+  "Start-Game": function () {},
+  "Restart-Game": function () {},
+  "Toggle-Symbol": function () {},
+};
