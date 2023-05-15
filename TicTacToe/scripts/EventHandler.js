@@ -22,3 +22,4 @@ const UIButtonMethods = {
   "Restart-Game": function () {},
   "Toggle-Symbol": function () {},
 };
+
