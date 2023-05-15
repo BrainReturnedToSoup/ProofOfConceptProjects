@@ -1,6 +1,7 @@
-const bodyElement = document.querySelector("body");
+const bodyElement = document.querySelector("body"),
+  //Query for body element ref
 
-const ticTacToeContainer = bodyElement.children[0],
+  ticTacToeContainer = bodyElement.children[0],
   //TicTacToe-Container
 
   ticTacToeCells = ticTacToeContainer.children,
@@ -8,8 +9,8 @@ const ticTacToeContainer = bodyElement.children[0],
 
   individualCellList = {};
 
-  //Cell-0: refToCellWithClassEqualToKey
-
+//Cell-0: refToCellWithClassEqualToKey
+//This loop populates individualCellList with these key/value pairs
 for (let i = 0; i < ticTacToeCells.length; i++) {
   individualCellList[`Cell-${i}`] = ticTacToeCells[i];
 }

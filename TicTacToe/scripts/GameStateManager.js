@@ -8,13 +8,14 @@ class TicTacToeState {
     this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   }
 
-  computerPickCell() {}
+  #computerPickCell() {}
 
+  #determineWinner() {}
+
+  #resetState() {}
+
+  #storeOnLocal() {}
+
+  #checkState() {}
   cellPicked() {}
-
-  checkState() {}
-
-  determineWinner() {}
-
-  resetState() {}
 }
