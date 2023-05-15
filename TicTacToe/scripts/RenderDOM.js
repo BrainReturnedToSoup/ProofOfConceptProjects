@@ -1,1 +1,2 @@
-const gameRenderer = (() => {})();
+const gameRenderer = (() => {})(),
+UIrenderer = (() => {})();
