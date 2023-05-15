@@ -21,8 +21,17 @@ const ticTacToeHeader = bodyElement.children[0],
   ticTacToeTitleContainer = ticTacToeHeader.children[0],
   //TicTacToe-Title-Container
 
-  ticTacToeUI = ticTacToeHeader.children[1];
-//TicTacToe-UI
+  ticTacToeUI = ticTacToeHeader.children[1],
+  //TicTacToe-UI
+
+  ticTacToeUIButtons = ticTacToeUI.firstChild.children,
+  //UI-Button list
+
+  individualUIButtonList = {
+    "Start-Game": ticTacToeUIButtons[0],
+    "Restart-Game": ticTacToeUIButtons[1],
+    "Toggle-Symbol": ticTacToeUIButtons[2],
+  };
 
 export {
   bodyElement,
@@ -32,4 +41,5 @@ export {
   ticTacToeHeader,
   ticTacToeTitleContainer,
   ticTacToeUI,
+  individualUIButtonList,
 };

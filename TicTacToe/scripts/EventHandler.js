@@ -1,19 +1,30 @@
-import { individualCellList } from "./RefsDOM";
+import { individualCellList, individualUIButtonList } from "./RefsDOM";
 
 document.addEventListener("click", clickHandler);
 
 function clickHandler(event) {
   const classList = event.target.classList,
-    documentIdentity = classList[0],
-    cellIdentity = classList[1],
+    elementIdentity = classList[1],
     cellListKeys = Object.keys(individualCellList),
-    refDOMCounterpart = individualCellList[cellIdentity];
+    UIButtonListKeys = Object.keys(individualUIButtonList);
   switch (true) {
-    case cellListKeys.includes(cellIdentity) &&
-      event.target === refDOMCounterpart:
+    case cellListKeys.includes(elementIdentity):
       break;
-    case refDOMCounterpart === undefined:
+    case UIButtonListKeys.includes(elementIdentity):
       break;
     default:
+      return;
   }
+}
+
+const UIButtonMethods = {
+    'Start-Game': function() {
+
+    },
+    'Restart-Game': function() {
+
+    },
+    'Toggle-Symbol': function() {
+        
+    }
 }

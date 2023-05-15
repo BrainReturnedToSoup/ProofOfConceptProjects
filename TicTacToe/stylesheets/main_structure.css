@@ -175,7 +175,6 @@ body {
 
   width: 100%;
   height: 100%;
-
 }
 
 .Cell-0 {
@@ -195,13 +194,15 @@ body {
 }
 
 .X-Symbol {
-    width: 85%;
-    height: 85%;
+  display: none;
+
+  width: 85%;
+  height: 85%;
 }
 
 .O-Symbol {
-    width: 90%;
-    height: 85%;
+  display: none;
+
+  width: 90%;
+  height: 85%;
 }
-
-
