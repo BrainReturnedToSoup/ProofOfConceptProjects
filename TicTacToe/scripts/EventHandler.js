@@ -7,11 +7,13 @@ function clickHandler(event) {
     documentIdentity = classList[0],
     cellIdentity = classList[1],
     cellListKeys = Object.keys(individualCellList),
-    refDOMCounterpart = individualCellList[cellIdentity]
+    refDOMCounterpart = individualCellList[cellIdentity];
   switch (true) {
-    case cellListKeys.includes(cellIdentity) && event.target === refDOMCounterpart:
-    
-    break;
+    case cellListKeys.includes(cellIdentity) &&
+      event.target === refDOMCounterpart:
+      break;
+    case refDOMCounterpart === undefined:
+      break;
     default:
   }
 }
