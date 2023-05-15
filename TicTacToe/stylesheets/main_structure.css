@@ -128,8 +128,11 @@ table {
   border-spacing: 0;
 }
 
-body {
+:root {
+    --containerBorderRad: 10px;
+}
 
+body {
   display: flex;
 
   flex-direction: column;
@@ -138,20 +141,25 @@ body {
 
   width: 100vw;
   height: 100vh;
+
+  background-color: rgb(236, 236, 236);
 }
 
 .TicTacToe-Container {
-  background-color: red;
+  background-color: black;
 
   aspect-ratio: 1/1;
   height: 70vh;
   width: auto;
 
-  border-radius: 10px;
+  border-radius: var(--containerBorderRad);
 
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
+
+  gap: 6px;
+
 }
 
 .TicTacToe-Cell {
@@ -159,5 +167,24 @@ body {
 
     justify-content: center;
     align-items: center;
-    
+
+    background-color: white;
+
+}
+
+
+.Cell-0 {
+    border-top-left-radius: var(--containerBorderRad);
+}
+
+.Cell-2 {
+    border-top-right-radius: var(--containerBorderRad);
+}
+
+.Cell-6 {
+    border-bottom-left-radius: var(--containerBorderRad);
+}
+
+.Cell-8 {
+    border-bottom-right-radius: var(--containerBorderRad);
 }

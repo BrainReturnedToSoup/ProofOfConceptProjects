@@ -9,8 +9,8 @@ const bodyElement = document.querySelector("body"),
 
   individualCellList = {};
 
-//Cell-0: refToCellWithClassEqualToKey
-//This loop populates individualCellList with these key/value pairs
+//Cell-0: refToCellWithClassEqualToKey...
+//This loop populates individualCellList with these key/value pairs representing each clickable cell
 for (let i = 0; i < ticTacToeCells.length; i++) {
   individualCellList[`Cell-${i}`] = ticTacToeCells[i];
 }
