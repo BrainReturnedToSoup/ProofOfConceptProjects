@@ -7,13 +7,14 @@ export class TicTacToeState {
     ];
     this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
     this.gameExecuting = false;
+    this.playerSymbol = "X";
   }
-  
+
   #checkState() {}
 
   #resetState() {}
 
-  #computerPickCell() { 
+  #computerPickCell() {
     //use minimax algo to make unbeatable bot
   }
 
@@ -21,8 +22,13 @@ export class TicTacToeState {
 
   #storeOnLocal() {}
 
-  cellPicked() {}
+  togglePlayerSymbol() {}
 
+  endGame() {}
+
+  startGame() {}
+
+  cellPicked() {}
 }
 
 export const ticTacToeGameState = new TicTacToeState();

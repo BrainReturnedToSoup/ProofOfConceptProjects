@@ -1,5 +1,5 @@
 import { individualCellList, individualUIButtonList } from "./RefsDOM";
-import { ticTacToeGameState, TicTacToeState } from "./GameStateManager";
+import { ticTacToeGameState } from "./GameStateManager";
 
 function clickHandler(event) {
   const classList = event.target.classList,
@@ -7,12 +7,11 @@ function clickHandler(event) {
     cellListKeys = Object.keys(individualCellList),
     UIButtonListKeys = Object.keys(individualUIButtonList);
   switch (true) {
-    case ticTacToeGameState instanceof TicTacToeState === false:
-      //logic for ticTacToeGameState not being correct value
     case cellListKeys.includes(elementIdentity):
+      cellClicked(event.target);
       break;
     case UIButtonListKeys.includes(elementIdentity):
-        UIButtonMethods[elementIdentity]();
+      UIButtonMethods[elementIdentity]();
       break;
     default:
       return;
@@ -20,9 +19,20 @@ function clickHandler(event) {
 }
 
 const UIButtonMethods = {
-  "Start-Game": function () {},
-  "Restart-Game": function () {},
-  "Toggle-Symbol": function () {},
+  "Start-Game": function () {
+    ticTacToeGameState.startGame();
+  },
+  "Restart-Game": function () {
+    ticTacToeGameState.endGame();
+    ticTacToeGameState.startGame();
+  },
+  "Toggle-Symbol": function () {
+    ticTacToeGameState.togglePlayerSymbol();
+  },
 };
+
+function cellClicked(cellElement) {
+  
+}
 
 document.addEventListener("click", clickHandler);
