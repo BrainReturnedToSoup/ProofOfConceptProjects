@@ -1,4 +1,4 @@
-class TicTacToeState {
+export class TicTacToeState {
   constructor() {
     this.currentState = [
       ["-", "-", "-"],
@@ -6,15 +6,16 @@ class TicTacToeState {
       ["-", "-", "-"],
     ];
     this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    this.gameExecuting = false;
   }
   
   #checkState() {}
 
   #resetState() {}
 
-  #computerPickCell() {}
-
-  #miniMaxAlgo() {}
+  #computerPickCell() { 
+    //use minimax algo to make unbeatable bot
+  }
 
   #determineWinner() {}
 
@@ -23,3 +24,5 @@ class TicTacToeState {
   cellPicked() {}
 
 }
+
+export const ticTacToeGameState = new TicTacToeState();
