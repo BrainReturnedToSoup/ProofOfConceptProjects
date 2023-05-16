@@ -8,7 +8,7 @@ function clickHandler(event) {
     UIButtonListKeys = Object.keys(individualUIButtonList);
   switch (true) {
     case cellListKeys.includes(elementIdentity):
-      cellClicked(event.target);
+      cellClicked(elementIdentity);
       break;
     case UIButtonListKeys.includes(elementIdentity):
       UIButtonMethods[elementIdentity]();
@@ -31,8 +31,9 @@ const UIButtonMethods = {
   },
 };
 
-function cellClicked(cellElement) {
-  
+function cellClicked(cellClass) {
+  const cellNum = cellClass.split('').pop();
+  ticTacToeGameState.cellPicked(cellNum);
 }
 
 document.addEventListener("click", clickHandler);

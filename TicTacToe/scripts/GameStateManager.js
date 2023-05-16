@@ -1,6 +1,7 @@
-export class TicTacToeState {
+class TicTacToeState {
   constructor() {
     this.gameExecuting = false;
+    this.startFirst = "Player";
     this.playerSymbol = "X";
     this.computerSymbol = "O";
     this.computersTurn = false;
@@ -12,42 +13,25 @@ export class TicTacToeState {
     this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   }
 
-  #stateMethods = {
-    Check_Execution: function () {},
-    Check_PlayerSymbol: function () {},
-    Check_ComputerSymbol: function () {},
-    Check_Turn: function () {},
-    Check_CurrentState: function () {},
-    Check_AvailableCells: function () {},
-  };
-
-  #checkState(instructions) {
-    //instructions should be an array containing atleast one of these types of strings
-    if (Array.isArray(instructions)) {
-      instructions.forEach((stateMethodKey) =>
-        this.#stateMethods[stateMethodKey]()
-      );
+  #changeCurrentState(cellNum, symbol) {
+    let currentCell = 0,
+      changeMade = false;
+    for (let i = 0; i < this.currentState.length; i++) {
+      if (changeMade) break;
+      for (let j = 0; j < this.currentState[i].length; j++) {
+        if (changeMade) break;
+        else if (cellNum === currentCell) {
+          this.currentState[i][j] = symbol;
+          changeMade = true;
+        }
+        currentCell++;
+      }
     }
   }
 
-  #checkStateInstructions = {
-    checkAllStates: [
-      "Check_Execution",
-      "Check_PlayerSymbol",
-      "Check_ComputerSymbol",
-      "Check_Turn",
-      "Check_CurrentState",
-      "Check_AvailableCells",
-    ],
-    checkTurn: [
-      "Check_Execution",
-      "Check_ComputersTurn",
-      "Check_AvailableCells",
-    ],
-  };
-
   #resetState() {
     this.gameExecuting = false;
+    this.startFirst = "Player";
     this.playerSymbol = "X";
     this.computerSymbol = "O";
     this.computersTurn = false;
@@ -57,25 +41,19 @@ export class TicTacToeState {
       ["-", "-", "-"],
     ];
     this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  }
+
+  #checkCurrentState() {
+    const [row1, row2, row3] = this.currentState;
   }
 
   #computerPickCell() {
     //use minimax algo to make unbeatable bot
+
+    this.#checkCurrentState();
   }
 
-  #determineWinner() {}
-
-  #storeOnLocal(winner) {
-    switch (winner) {
-      case "Player":
-        break;
-      case "Computer":
-        break;
-      default:
-    }
-  }
-
-  togglePlayerSymbol() {
+  definePlayerSymbol() {
     if (this.gameExecuting === false) {
       switch (this.playerSymbol) {
         case "X":
@@ -93,22 +71,25 @@ export class TicTacToeState {
     }
   }
 
-  endGame() {
-    if (this.gameExecuting === true) {
+  cellPicked(cellNum) {
+    if (
+      this.gameExecuting &&
+      !this.computersTurn &&
+      this.availableCells.includes(cellNum)
+      //checks if game is running, if its the player's turn, and that the clicked cell is an available cell
+    ) {
+      //logic for when a cell is picked that meets all of these requirements
     }
+    this.#checkCurrentState();
   }
 
+  resetGame() {}
   startGame() {
-    if (this.gameExecuting === false) {
-    }
-  }
-
-  cellPicked() {
-    if (this.gameExecuting === true) {
-    }
+    this.gameExecuting = true;
+    this.#checkCurrentState();
   }
 }
 
-localStorage.setItem("Scores", JSON.stringify([0, 0]));
+const ticTacToeGameState = new TicTacToeState();
 
-export const ticTacToeGameState = new TicTacToeState();
+export { ticTacToeGameState, TicTacToeState };
