@@ -1,5 +1,5 @@
-import { individualCellList, individualUIButtonList } from "./RefsDOM";
-import { ticTacToeGameState } from "./GameStateManager";
+import { individualCellList, individualUIButtonList } from "./RefsDOM.js";
+import { ticTacToeGameState } from "./GameStateManager.js";
 
 function clickHandler(event) {
   const classList = event.target.classList,
