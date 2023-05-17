@@ -29,7 +29,7 @@ const ticTacToeHeader = bodyElement.children[0],
 
   individualUIButtonList = {
     "Start-Game": ticTacToeUIButtons[0],
-    "Restart-Game": ticTacToeUIButtons[1],
+    "Reset-Game": ticTacToeUIButtons[1],
     "Toggle-Symbol": ticTacToeUIButtons[2],
   };
 

@@ -22,9 +22,8 @@ const UIButtonMethods = {
   "Start-Game": function () {
     ticTacToeGameState.startGame();
   },
-  "Restart-Game": function () {
-    ticTacToeGameState.endGame();
-    ticTacToeGameState.startGame();
+  "Reset-Game": function () {
+    ticTacToeGameState.resetGame();
   },
   "Toggle-Symbol": function () {
     ticTacToeGameState.togglePlayerSymbol();

@@ -148,8 +148,6 @@ body {
 .TicTacToe-Container {
   box-sizing: border-box;
 
-  padding: 2px;
-
   background-color: black;
 
   aspect-ratio: 1/1;

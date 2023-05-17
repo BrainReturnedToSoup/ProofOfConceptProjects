@@ -55,7 +55,7 @@
 }
 
 .Start-Game,
-.Restart-Game,
+.Reset-Game,
 .Toggle-Symbol {
   width: 30%;
   height: 70%;
@@ -71,7 +71,7 @@
   cursor: pointer;
 }
 
-.Restart-Game:hover {
+.Reset-Game:hover {
   background-color: skyblue;
   color: white;
 
