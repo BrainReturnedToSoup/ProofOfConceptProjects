@@ -91,7 +91,6 @@ class TicTacToeState {
         //If there are no winners as well as no available cells left to pick, its a draw
         this.#onGameOver("Draw");
       }
-
     },
 
     change: (cellNum, symbol) => {
@@ -135,31 +134,41 @@ class TicTacToeState {
     },
   };
 
-  #onGameOver() {}
-
+  #onGameOver(decision) {
+    this.gameExecuting = false;
+    this.gameResult = decision;
+  }
+  #miniMaxAlgo() {
+    //not miniMax, but a placeholder to make sure that the script works
+    const chosenCell = Math.floor(Math.random() * this.availableCells.length - 1)
+    return chosenCell;
+  }
   #computerPickCell() {
-    //use minimax algo to make unbeatable bot
+    if (this.computersTurn && this.gameExecuting) {
+      const chosenCell = this.#miniMaxAlgo();
+      //computer chooses a cell
 
-    this.#currentStateMethods.check();
-    //checks for win after change is made
+      this.#currentStateMethods.change(chosenCell, this.computerSymbol);
+      //make the change to the state using the chosen cell
+
+      this.#currentStateMethods.check();
+      //checks for win after change is made
+
+      this.computersTurn = !this.computersTurn;
+      //changes computer's turn to false
+    }
   }
 
   definePlayerSymbol() {
     //works as a toggle method for defining what the symbols are
     //for the player and the computer
     if (this.gameExecuting === false) {
-      switch (this.playerSymbol) {
-        case "X":
-          this.playerSymbol = "O";
-          this.computerSymbol = "X";
-          break;
-        case "O":
-          this.playerSymbol = "X";
-          this.computerSymbol = "O";
-          break;
-        default:
-          this.playerSymbol = "X";
-          this.computerSymbol = "O";
+      if (this.playerSymbol === "X") {
+        this.playerSymbol = "O";
+        this.computerSymbol = "X";
+      } else {
+        this.playerSymbol = "X";
+        this.computerSymbol = "O";
       }
     }
   }
@@ -173,9 +182,16 @@ class TicTacToeState {
       //checks if game is running, if its the player's turn, that the clicked cell is an available cell, as well as the game not being over
     ) {
       //logic for when a cell is picked and passed the previous conditional
+      this.#currentStateMethods.change(cellNum, this.playerSymbol);
+      this.#currentStateMethods.check();
+      //Checks for win or draw after change is made
+      this.computersTurn = !this.computersTurn;
     }
-    this.#currentStateMethods.check();
-    //Checks for win after change is made
+
+    //if the check passes, the computer will do its turn if it's their turn
+    if (this.computersTurn) {
+      this.#computerPickCell();
+    }
   }
 
   resetGame() {
@@ -184,6 +200,13 @@ class TicTacToeState {
   startGame() {
     if (this.gameExecuting === false) {
       this.gameExecuting = true;
+
+      //"X" always gets to go first
+      if (this.computerSymbol === "X") {
+        this.computersTurn = true;
+        this.#computerPickCell();
+      }
+
       //starts the game if the game isn't currently running
     }
   }

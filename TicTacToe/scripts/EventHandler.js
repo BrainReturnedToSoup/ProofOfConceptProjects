@@ -31,7 +31,7 @@ const UIButtonMethods = {
 };
 
 function cellClicked(cellClass) {
-  const cellNum = cellClass.split('').pop();
+  const cellNum = cellClass.split("").pop();
   ticTacToeGameState.cellPicked(cellNum);
 }
 
