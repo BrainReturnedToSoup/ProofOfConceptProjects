@@ -57,16 +57,19 @@ class TicTacToeState {
     },
   };
 
-  #currenStateMethods = {
+  #currentStateMethods = {
     check: () => {
       const winCondition = ["XXX", "OOO"],
         isRowWin = this.#checkMethods.rows(winCondition),
         isColumnWin = this.#checkMethods.columns(winCondition),
         isCrossWin = this.#checkMethods.cross(winCondition),
         areCellsLeft = this.availableCells.length > 0;
+      //is__Win should be equal to an array that either looks like this [ true, 'winning symbol']
+      //or this [ false ]
 
       let winnerSymbol;
-
+      // will take the winning row and return the corresponding symbol
+      //if the array contains true, which means that symbol won
       switch (true) {
         case isRowWin.includes(true):
           winnerSymbol = isRowWin[1];
@@ -75,23 +78,30 @@ class TicTacToeState {
           winnerSymbol = isColumnWin[1];
           break;
         case isCrossWin.includes(true):
-          winnerSymbol = isColumnWin[2];
-          break;
-        case areCellsLeft:
-          winnerSymbol = "Draw";
+          winnerSymbol = isCrossWin[1];
           break;
         default:
           return;
       }
 
       if (winnerSymbol !== undefined) {
+        //winnerSymbol will not be defined if there is a winner
         this.#onGameOver(winnerSymbol);
+      } else if (this.availableCells.length === 0) {
+        //If there are no winners as well as no available cells left to pick, its a draw
+        this.#onGameOver("Draw");
       }
+
     },
 
     change: (cellNum, symbol) => {
       let currentCell = 0,
         changeMade = false;
+
+      //makes change to the current state property,
+      //which the symbol input will replace the corresponding cell spot
+      //in the matrix. If the change is made, the loop will break out of
+      //itself early
       for (let i = 0; i < this.currentState.length; i++) {
         if (changeMade) break;
         for (let j = 0; j < this.currentState[i].length; j++) {
@@ -103,9 +113,15 @@ class TicTacToeState {
           currentCell++;
         }
       }
+      //if the change has been implemented to the current state,
+      //the corresponding cell will be removed from the available cells array
+      if (changeMade === true) {
+        this.availableCells.splice(cellNum, 1);
+      }
     },
 
     reset: () => {
+      //resets all properties on the game state object, besides the player and computer symbols
       this.gameExecuting = false;
       this.startFirst = "Player";
       this.computersTurn = false;
@@ -115,7 +131,7 @@ class TicTacToeState {
         ["-", "-", "-"],
       ];
       this.availableCells = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-      this.gameResult = undefined
+      this.gameResult = undefined;
     },
   };
 
@@ -124,11 +140,13 @@ class TicTacToeState {
   #computerPickCell() {
     //use minimax algo to make unbeatable bot
 
-    this.#currenStateMethods.check();
+    this.#currentStateMethods.check();
     //checks for win after change is made
   }
 
   definePlayerSymbol() {
+    //works as a toggle method for defining what the symbols are
+    //for the player and the computer
     if (this.gameExecuting === false) {
       switch (this.playerSymbol) {
         case "X":
@@ -154,14 +172,14 @@ class TicTacToeState {
       this.gameResult === undefined
       //checks if game is running, if its the player's turn, that the clicked cell is an available cell, as well as the game not being over
     ) {
-      //logic for when a cell is picked that meets all of these requirements
+      //logic for when a cell is picked and passed the previous conditional
     }
-    this.#currenStateMethods.check();
+    this.#currentStateMethods.check();
     //Checks for win after change is made
   }
 
   resetGame() {
-    this.#currenStateMethods.reset();
+    this.#currentStateMethods.reset();
   }
   startGame() {
     if (this.gameExecuting === false) {
