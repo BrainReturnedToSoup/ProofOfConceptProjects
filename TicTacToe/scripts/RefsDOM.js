@@ -24,7 +24,7 @@ const ticTacToeHeader = bodyElement.children[0],
   ticTacToeUI = ticTacToeHeader.children[1],
   //TicTacToe-UI
 
-  ticTacToeUIButtons = ticTacToeUI.firstChild.children,
+  ticTacToeUIButtons = ticTacToeUI.firstElementChild.children,
   //UI-Button list
 
   individualUIButtonList = {

@@ -140,7 +140,9 @@ class TicTacToeState {
   }
   #miniMaxAlgo() {
     //not miniMax, but a placeholder to make sure that the script works
-    const chosenCell = Math.floor(Math.random() * this.availableCells.length - 1)
+    const chosenCell = Math.floor(
+      Math.random() * this.availableCells.length - 1
+    );
     return chosenCell;
   }
   #computerPickCell() {
@@ -212,6 +214,4 @@ class TicTacToeState {
   }
 }
 
-const ticTacToeGameState = new TicTacToeState();
-
-export { ticTacToeGameState, TicTacToeState };
+export { TicTacToeState };

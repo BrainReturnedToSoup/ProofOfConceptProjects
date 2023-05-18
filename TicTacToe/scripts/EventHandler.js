@@ -1,5 +1,9 @@
 import { individualCellList, individualUIButtonList } from "./RefsDOM.js";
-import { ticTacToeGameState } from "./GameStateManager.js";
+import { TicTacToeState } from "./GameStateManager.js";
+import { gameRenderer } from "./RenderDOM.js";
+
+const newGameState = new TicTacToeState();
+window.gameState = newGameState;
 
 function clickHandler(event) {
   const classList = event.target.classList,
@@ -9,30 +13,34 @@ function clickHandler(event) {
   switch (true) {
     case cellListKeys.includes(elementIdentity):
       cellClicked(elementIdentity);
+      gameRenderer(window.gameState);
       break;
     case UIButtonListKeys.includes(elementIdentity):
       UIButtonMethods[elementIdentity]();
+      gameRenderer(window.gameState);
       break;
     default:
       return;
   }
+
 }
 
 const UIButtonMethods = {
   "Start-Game": function () {
-    ticTacToeGameState.startGame();
+    window.gameState.startGame();
   },
   "Reset-Game": function () {
-    ticTacToeGameState.resetGame();
+    window.gameState.resetGame();
   },
   "Toggle-Symbol": function () {
-    ticTacToeGameState.togglePlayerSymbol();
+    window.gameState.togglePlayerSymbol();
   },
 };
 
 function cellClicked(cellClass) {
   const cellNum = cellClass.split("").pop();
-  ticTacToeGameState.cellPicked(cellNum);
+  window.gameState.cellPicked(cellNum);
 }
 
 document.addEventListener("click", clickHandler);
+
