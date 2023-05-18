@@ -27,11 +27,9 @@ const gameRenderer = (gameStateObj) => {
   }
 },
 UIrenderer = (symbol) => {
+  //essentially responsible of rendering the symbol toggle button upon it's value changing
   const playerSymbolButton = individualUIButtonList['Toggle-Symbol'];
   playerSymbolButton.textContent = `Player : ${symbol}`
-};
-gameOverRenderer = (decision) => {
-
 }
 
 export { gameRenderer, UIrenderer };

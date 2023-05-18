@@ -70,13 +70,13 @@ class TicTacToeState {
       // will take the winning row and return the corresponding symbol
       //if the array contains true, which means that symbol won
       switch (true) {
-        case isRowWin.includes(true):
+        case isRowWin[0]:
           winnerSymbol = isRowWin[1];
           break;
-        case isColumnWin.includes(true):
+        case isColumnWin[0]:
           winnerSymbol = isColumnWin[1];
           break;
-        case isCrossWin.includes(true):
+        case isCrossWin[0]:
           winnerSymbol = isCrossWin[1];
           break;
       }
