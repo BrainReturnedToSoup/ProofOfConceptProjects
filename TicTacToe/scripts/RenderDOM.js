@@ -1,4 +1,4 @@
-import { individualCellList } from "./RefsDOM.js";
+import { individualCellList, individualUIButtonList } from "./RefsDOM.js";
 const gameRenderer = (gameStateObj) => {
   //renders what is shown on the tic tac toe board by referencing the
   //matrix and replicating such to the DOM
@@ -26,6 +26,12 @@ const gameRenderer = (gameStateObj) => {
     }
   }
 },
-UIrenderer = () => {};
+UIrenderer = (symbol) => {
+  const playerSymbolButton = individualUIButtonList['Toggle-Symbol'];
+  playerSymbolButton.textContent = `Player : ${symbol}`
+};
+gameOverRenderer = (decision) => {
+
+}
 
 export { gameRenderer, UIrenderer };

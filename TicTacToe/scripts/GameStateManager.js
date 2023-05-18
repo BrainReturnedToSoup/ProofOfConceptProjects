@@ -165,7 +165,7 @@ class TicTacToeState {
   definePlayerSymbol() {
     //works as a toggle method for defining what the symbols are
     //for the player and the computer
-    if (this.gameExecuting === false) {
+    if (this.gameExecuting === false && this.gameResult === undefined) {
       if (this.playerSymbol === "X") {
         this.playerSymbol = "O";
         this.computerSymbol = "X";

@@ -1,6 +1,6 @@
 import { individualCellList, individualUIButtonList } from "./RefsDOM.js";
 import { TicTacToeState } from "./GameStateManager.js";
-import { gameRenderer } from "./RenderDOM.js";
+import { gameRenderer, UIrenderer } from "./RenderDOM.js";
 
 const newGameState = new TicTacToeState();
 window.gameState = newGameState;
@@ -33,7 +33,8 @@ const UIButtonMethods = {
     window.gameState.resetGame();
   },
   "Toggle-Symbol": function () {
-    window.gameState.togglePlayerSymbol();
+    window.gameState.definePlayerSymbol();
+    UIrenderer(window.gameState.playerSymbol)
   },
 };
 
