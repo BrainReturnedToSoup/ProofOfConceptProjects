@@ -16,15 +16,14 @@ class TicTacToeState {
 
   #checkMethods = {
     rows: (winCondition) => {
+      let testResult = [false]
       this.currentState.forEach((array) => {
-        const row = array.reduce((acc, curr) => {
-          return acc + curr;
-        });
+        const row = array.join('');
         if (winCondition.includes(row)) {
-          return [true, row[0]];
+          testResult = [true, array[0]];
         }
       });
-      return [false];
+      return testResult;
     },
 
     columns: (winCondition) => {
@@ -80,14 +79,12 @@ class TicTacToeState {
         case isCrossWin.includes(true):
           winnerSymbol = isCrossWin[1];
           break;
-        default:
-          return;
       }
 
       if (winnerSymbol !== undefined) {
         //winnerSymbol will not be defined if there is a winner
         this.#onGameOver(winnerSymbol);
-      } else if (this.availableCells.length === 0) {
+      } else if (areCellsLeft === false) {
         //If there are no winners as well as no available cells left to pick, its a draw
         this.#onGameOver("Draw");
       }
@@ -115,7 +112,9 @@ class TicTacToeState {
       //if the change has been implemented to the current state,
       //the corresponding cell will be removed from the available cells array
       if (changeMade === true) {
-        this.availableCells.splice(cellNum, 1);
+        this.availableCells = this.availableCells.filter(
+          (element) => element !== cellNum
+        );
       }
     },
 
@@ -140,12 +139,14 @@ class TicTacToeState {
   }
   #miniMaxAlgo() {
     //not miniMax, but a placeholder to make sure that the script works
-    const chosenCell = Math.floor(
-      Math.random() * this.availableCells.length - 1
-    );
+    const chosenCellIndex = Math.floor(
+        Math.random() * this.availableCells.length
+      ),
+      chosenCell = this.availableCells[chosenCellIndex];
     return chosenCell;
   }
-  #computerPickCell() {
+
+  computerPickCell() {
     if (this.computersTurn && this.gameExecuting) {
       const chosenCell = this.#miniMaxAlgo();
       //computer chooses a cell
@@ -178,7 +179,7 @@ class TicTacToeState {
   cellPicked(cellNum) {
     if (
       this.gameExecuting &&
-      !this.computersTurn &&
+      this.computersTurn === false &&
       this.availableCells.includes(cellNum) &&
       this.gameResult === undefined
       //checks if game is running, if its the player's turn, that the clicked cell is an available cell, as well as the game not being over
@@ -188,11 +189,6 @@ class TicTacToeState {
       this.#currentStateMethods.check();
       //Checks for win or draw after change is made
       this.computersTurn = !this.computersTurn;
-    }
-
-    //if the check passes, the computer will do its turn if it's their turn
-    if (this.computersTurn) {
-      this.#computerPickCell();
     }
   }
 
@@ -206,7 +202,7 @@ class TicTacToeState {
       //"X" always gets to go first
       if (this.computerSymbol === "X") {
         this.computersTurn = true;
-        this.#computerPickCell();
+        this.computerPickCell();
       }
 
       //starts the game if the game isn't currently running

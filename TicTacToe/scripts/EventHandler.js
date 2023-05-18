@@ -13,7 +13,8 @@ function clickHandler(event) {
   switch (true) {
     case cellListKeys.includes(elementIdentity):
       cellClicked(elementIdentity);
-      gameRenderer(window.gameState);
+      const computerThinkingTime = delayTime(1000, 2500);
+      setTimeout(computerTurn, computerThinkingTime);
       break;
     case UIButtonListKeys.includes(elementIdentity):
       UIButtonMethods[elementIdentity]();
@@ -22,7 +23,6 @@ function clickHandler(event) {
     default:
       return;
   }
-
 }
 
 const UIButtonMethods = {
@@ -38,9 +38,21 @@ const UIButtonMethods = {
 };
 
 function cellClicked(cellClass) {
-  const cellNum = cellClass.split("").pop();
+  const cellNum = Number(cellClass.split("").pop());
   window.gameState.cellPicked(cellNum);
+  gameRenderer(window.gameState);
 }
 
-document.addEventListener("click", clickHandler);
+function computerTurn() {
+  window.gameState.computerPickCell();
+  gameRenderer(window.gameState);
+}
 
+function delayTime(min, max) {
+  const random = Math.random(),
+    range = max - min,
+    scaled = random * range,
+    delay = Math.floor(scaled) + min;
+  return delay;
+}
+document.addEventListener("click", clickHandler);
