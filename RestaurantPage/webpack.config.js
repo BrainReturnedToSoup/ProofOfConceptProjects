@@ -1,6 +1,6 @@
 const path = require("path"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
-  { CleanWebpackPlugin } = require("clean-webpack-plugin")
+  { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
   mode: "development",
@@ -18,6 +18,10 @@ module.exports = {
   devtool: "source-map",
   module: {
     rules: [
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
       {
         test: /\.(scss|sass)$/i,
         use: ["style-loader", "css-loader", "sass-loader"],
@@ -42,8 +46,8 @@ module.exports = {
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
         "./dist",
-        path.resolve(__dirname, './dist'),
-      ]
+        path.resolve(__dirname, "./dist"),
+      ],
     }),
   ],
 };
