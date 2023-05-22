@@ -1,0 +1,60 @@
+nav {
+  width: inherit;
+  height: 135px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.Nav-Buttons,
+.Nav-Trim {
+  display: inherit;
+  justify-content: center;
+  align-items: center;
+
+  height: 50%;
+  width: 100%;
+
+  background-color: lightgrey;
+}
+
+.Nav-Trim {
+  background-color: green;
+}
+
+.Left-Container,
+.Right-Container {
+  box-sizing: border-box;
+  height: 100%;
+  width: 40%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  height: 100%;
+
+  border: none;
+
+  padding-inline: 15px;
+
+  background-color: lightgrey;
+}
+
+button:hover {
+  background-color: lightblue;
+
+  cursor: pointer;
+}
+
+.Center-Logo {
+  box-sizing: border-box;
+  height: 100%;
+  width: 20%;
+}
+
+.Nav-Trim {
+  background-color: rgb(198, 158, 72);
+}

@@ -47,6 +47,13 @@ table {
 	border-spacing: 0;
 }
 
-div {
-    color: red;
+body {
+	width: 100 vw;
+	display: flex;
+	flex-direction: column;
+}
+
+#content {
+	width: inherit;
+	flex-grow: 1;
 }
