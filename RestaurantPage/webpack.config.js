@@ -1,13 +1,19 @@
 const path = require("path"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
-  { CleanWebpackPlugin } = require("clean-webpack-plugin");
+  { CleanWebpackPlugin } = require("clean-webpack-plugin")
 
 module.exports = {
   mode: "development",
   entry: "./src/index.js",
   output: {
-    filename: "[name].bundle.js",
-    path: path.resolve(__dirname, "dist"),
+    filename: "[contenthash].bundle.js",
+    path: path.resolve(__dirname, "./dist"),
+    publicPath: "/",
+  },
+  devServer: {
+    port: 8080,
+    hot: true,
+    open: true,
   },
   devtool: "source-map",
   module: {
@@ -31,14 +37,13 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, "dist/index.html"),
+      template: path.resolve(__dirname, "./src/index.html"),
     }),
     new CleanWebpackPlugin({
       cleanOnceBeforeBuildPatterns: [
-        "dist",
-        "build",
-        path.resolve(__dirname, "dist"),
-      ],
+        "./dist",
+        path.resolve(__dirname, './dist'),
+      ]
     }),
   ],
 };
