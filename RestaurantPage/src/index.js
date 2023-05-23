@@ -1,5 +1,10 @@
-import './MainStyle.css'
-import './NavStyle.css'
+import "./MainStyle.css";
+import "./NavStyle.css";
+import { Navbar, MainContent } from "./AppComponents";
 
-console.log('This is webpack working!')
-console.log('Making sure the hash for the build file changes with new content added')
+function renderPage() {
+  Navbar._init();
+  MainContent._init();
+}
+
+renderPage();
