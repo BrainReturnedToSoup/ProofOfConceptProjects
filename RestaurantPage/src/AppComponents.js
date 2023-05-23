@@ -27,12 +27,12 @@ class Navbar {
     const navElement = document.createElement("nav");
     navElement.innerHTML = this.#navbarTemplate;
     this.#addEventListener(navElement);
-    this.#DOMcache.bodyElement.innerHTML = navElement;
+    this.#DOMcache.bodyElement.appendChild(navElement);
   }
   #addEventListener(targetElement) {
     targetElement.addEventListener("click", (e) => {});
   }
-  static _init() {
+  _init() {
     if (this.#DOMcache.bodyElement.getElementsByTagName("nav").length === 0) {
       this.#render();
     }
@@ -61,12 +61,11 @@ class MainContent {
   #addEventListener(targetElement) {
     targetElement.addEventListener("click", () => {});
   }
-  static _init() {
-    if (!this.#DOMCache.bodyElement.getElementById("content")) {
+  _init() {
+    if (!this.#DOMCache.bodyElement.querySelector('#content')) {
       this.#render();
     }
   }
 }
 
-
-export { Navbar, MainContent}
+export { Navbar, MainContent };

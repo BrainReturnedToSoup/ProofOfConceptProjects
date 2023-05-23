@@ -3,8 +3,11 @@ import "./NavStyle.css";
 import { Navbar, MainContent } from "./AppComponents";
 
 function renderPage() {
-  Navbar._init();
-  MainContent._init();
+  const navBar = new Navbar(),
+    mainContent = new MainContent();
+
+    navBar._init();
+    mainContent._init();
 }
 
 renderPage();
