@@ -15,7 +15,7 @@ nav {
   height: 50%;
   width: 100%;
 
-  background-color: lightgrey;
+  background-color: white;
 }
 
 .Nav-Trim {
@@ -40,11 +40,17 @@ button {
 
   padding-inline: 15px;
 
-  background-color: lightgrey;
+  background-color: white;
+
+  color: rgb(68, 68, 68);
+
+  font-weight: 700;
 }
 
 button:hover {
-  background-color: lightblue;
+  background-color: rgb(139, 199, 219);
+
+  color: white;
 
   cursor: pointer;
 }
@@ -53,6 +59,12 @@ button:hover {
   box-sizing: border-box;
   height: 100%;
   width: 20%;
+
+  font-family: "Yellowtail", cursive;
+
+  font-size: 2.7rem;
+
+  color: rgb(198, 158, 72);
 }
 
 .Nav-Trim {
