@@ -60,4 +60,10 @@ body {
 #content {
 	width: inherit;
 	flex-grow: 1;
+
+	height: 450px;
+
+	background-image: url(./images/steak-background-image.jpg);
+	background-size: cover;
+	background-position: center;
 }

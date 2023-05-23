@@ -1,3 +1,4 @@
+
 nav {
   width: inherit;
   height: 135px;
@@ -69,4 +70,22 @@ button:hover {
 
 .Nav-Trim {
   background-color: rgb(198, 158, 72);
+
+  flex-direction: column;
+}
+
+.Nav-Trim > h3 {
+  font-size: 0.7rem;
+  font-weight: 600;
+
+  color: rgb(68, 68, 68);
+
+  margin-bottom: 10px;
+}
+
+.Nav-Trim > h4 {
+  font-size: 0.7rem;
+  font-weight: 400;
+
+  color: white;
 }
