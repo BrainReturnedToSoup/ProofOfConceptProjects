@@ -1,0 +1,6 @@
+nav {
+    height: 100%;
+    width: clamp(150px, 22.5%, 22.5%);
+
+    background-color: whitesmoke;
+}

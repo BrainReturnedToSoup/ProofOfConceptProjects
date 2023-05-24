@@ -1,3 +1,7 @@
-console.log("webpack works!")
+import "./styles/css-reset.css"
+import "./styles/structure-style.css"
+import "./styles/navbar-style.css"
 
-document.querySelector('body').innerText = 'does this work?';
+function App(classInstance) {
+    
+}
