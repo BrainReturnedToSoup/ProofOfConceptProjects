@@ -1,17 +1,18 @@
-import "../styles/tasks-style.css"
+import "../styles/tasks-style.css";
 export class Tasks {
   #Appstate = {
+    selectedButton: "inbox",
     todoInfo: {
       projects: {
-        todoText: 'date'
+        todoText: "date",
       },
       regular: {
-        todoText: 'date'
+        todoText: "date",
       },
     },
   };
   #DOMcache = {
-    bodyElement: document.querySelector("body"),
+    bodyElement: document.body,
   };
   #DOMtemplates = {
     cardContainer: `
@@ -21,8 +22,31 @@ export class Tasks {
     todoCard: `
     `,
   };
-  #render() {
-
+  #renderContainer() {
+    const range = document.createRange(),
+      cardContainerElement = range.createContextualFragment(
+        this.#DOMtemplates.cardContainer
+      );
+    this.#DOMcache.contentElement.append(cardContainerElement);
+    this.#DOMcache.cardContainerElement = cardContainerElement;
   }
-  interface_init() {}
+  #renderCards() {}
+  #grabDependencies() {
+    this.#DOMcache.contentElement =
+      this.#DOMcache.bodyElement.querySelector(".content");
+    this.#DOMcache.navbarElement =
+      this.#DOMcache.contentElement.querySelector("nav");
+  }
+  interface_init() {
+    if (!this.#DOMcache.contentElement || !this.#DOMcache.navbarElement) {
+      this.#grabDependencies();
+    }
+    if (this.#DOMcache.contentElement && this.#DOMcache.navbarElement) {
+      this.#renderContainer();
+    }
+    if (this.#DOMcache.cardContainerElement) {
+      this.#renderCards();
+    }
+  }
+  interface_manage_appstate() {}
 }

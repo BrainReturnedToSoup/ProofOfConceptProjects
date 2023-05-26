@@ -30,7 +30,7 @@ export class SideNavBar {
       </div>
     </nav>
     `;
-  #grabParent() {
+  #grabDependencies() {
     this.#DOMcache.contentElement = document.body.querySelector(".content");
   }
   #render() {
@@ -42,7 +42,7 @@ export class SideNavBar {
   }
 
   interface_init() {
-    this.#grabParent();
+    this.#grabDependencies();
 
     const { contentElement } = this.#DOMcache;
     if (contentElement && !contentElement.querySelector("nav")) {
