@@ -1,37 +1,50 @@
+import "../styles/structure-style.css";
 import appLogo from "../images-icons-logos/to-do-list-logo.svg";
 
-class PageStructure {
-  #DOMcache = {
-    bodyElement: document.querySelector("body"),
+export class PageStructure {
+  #Appstate = {
+    todoInfo: {
+      projects: {
+        todoText: "date",
+      },
+      regular: {
+        todoText: "date",
+      },
+    },
   };
-
-  #headerTemplateDOM = `
+  #DOMcache = {
+    bodyElement: document.body,
+  };
+  #DOMtemplates = {
+    header: `
         <div class="header-container">
         <img src="${appLogo}" alt="App-Logo">
+        <h1>Todo List</h1>
         </div>
-    `;
+    `,
 
-  #contentTemplateDOM = `
+    content: `
         <div class="content">
-        <nav>
-
-        </nav>
-        <div class="todo-cards">
 
         </div>
-        </div>
-    `;
+    `,
 
-  #footerTemplateDOM = `
-        <div class="footer-container">footer container</div>
-    `;
+    footer: `
+        <div class="footer-container">© Copyright 2023 Nikkolas Minton</div>
+    `,
+  };
 
   #render() {
-    const { bodyElement } = this.#DOMcache;
-    bodyElement.innerHTML =
-      this.#headerTemplateDOM +
-      this.#contentTemplateDOM +
-      this.#footerTemplateDOM;
+    const { bodyElement } = this.#DOMcache,
+      range = document.createRange();
+
+    for (let templateName in this.#DOMtemplates) {
+      const currentFrag = range.createContextualFragment(
+        this.#DOMtemplates[templateName]
+      );
+
+      bodyElement.append(currentFrag);
+    }
   }
 
   interface_init() {
@@ -40,7 +53,7 @@ class PageStructure {
       !document.querySelector(".content") ||
       !document.querySelector(".footer-container")
     ) {
-        this.#render();
+      this.#render();
     }
   }
 }

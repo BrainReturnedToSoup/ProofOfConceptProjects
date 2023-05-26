@@ -1,6 +1,154 @@
 nav {
-    height: 100%;
-    width: clamp(150px, 22.5%, 22.5%);
+  height: 100%;
+  width: clamp(150px, 22.5%, 22.5%);
 
-    background-color: whitesmoke;
+  background-color: whitesmoke;
+
+  display: flex;
+  flex-direction: column;
+
+  padding-top: 20px;
+  padding-inline: 10px;
+}
+
+nav > ul {
+  display: inherit;
+  flex-direction: inherit;
+
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+}
+
+nav > ul > li {
+  height: 35px;
+  width: 90%;
+
+  margin-top: 5px;
+  padding-left: 20px;
+
+  font-size: 1.1rem;
+  font-weight: 400;
+
+  border-radius: 4px;
+
+  display: inherit;
+
+  justify-content: start;
+  align-items: center;
+}
+
+nav > ul > li:hover {
+  background-color: rgb(211, 211, 211);
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+nav > ul > li:active {
+  background-color: rgb(178, 178, 178);
+}
+
+nav > h3 {
+  margin-top: 30px;
+  margin-left: 15px;
+  margin-bottom: 10px;
+
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.Projects-List {
+  width: 100%;
+
+  display: grid;
+
+  grid-auto-columns: 1fr;
+  grid-auto-rows: 35px;
+
+  row-gap: 5px;
+
+  height: 120px;
+  max-height: 120px;
+
+  overflow-y: auto;
+}
+
+.Projects-List-Project-Button {
+  height: 35px;
+  width: 80%;
+
+  margin-top: 5px;
+  padding-left: 20px;
+
+  font-size: 1.1rem;
+  font-weight: 400;
+
+  border-radius: 4px;
+
+  display: flex;
+  align-items: center;
+}
+
+.Projects-List-Project-Button:hover {
+  background-color: rgb(211, 211, 211);
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.Projects-List-Project-Button:active {
+  background-color: rgb(178, 178, 178);
+}
+
+.Add-Project-Container {
+  width: 100%;
+  height: 110px;
+
+  margin-top: 10px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+}
+
+.Add-Project-Button {
+  height: 35px;
+  width: 80%;
+
+  margin-top: 5px;
+
+  font-size: 1.1rem;
+  font-weight: 400;
+
+  border-radius: 4px;
+
+  background-color: rgb(211, 211, 211);
+
+  font-weight: 500;
+
+  display: inherit;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.Add-Project-Button:hover {
+  font-weight: 600;
+
+  background-color: rgb(193, 193, 193);
+
+  cursor: pointer;
+}
+
+.Add-Project-Container > form {
+    display: none;
+
+    width: 100%;
+    height: 100%;
+
+    border-radius: 5px;
 }
