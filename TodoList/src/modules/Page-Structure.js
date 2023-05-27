@@ -12,7 +12,6 @@ export class PageStructure {
       },
     },
   };
-  #priorAppState = {};
   #DOMcache = {
     bodyElement: document.body,
   };
@@ -56,5 +55,8 @@ export class PageStructure {
     ) {
       this.#render();
     }
+  }
+  interface_sync_appstate(newAppState) {
+    this.#currentAppState = newAppState;
   }
 }

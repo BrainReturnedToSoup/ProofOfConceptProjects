@@ -10,7 +10,6 @@ export class Tasks {
       },
     },
   };
-  #priorAppState = {};
   #DOMcache = {
     bodyElement: document.body,
   };
@@ -30,7 +29,9 @@ export class Tasks {
     this.#DOMcache.contentElement.append(cardContainerElement);
     this.#DOMcache.cardContainerElement = cardContainerElement;
   }
-  #renderCards() {}
+  #renderCards() {
+    const { cardContainerElement } = this.#DOMcache;
+  }
   #grabDependencies() {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".content");
@@ -48,5 +49,8 @@ export class Tasks {
       this.#renderCards();
     }
   }
-  interface_manage_appstate() {}
+  interface_sync_appstate(newAppState) {
+    this.#currentAppState = newAppState;
+    this.#renderCards();
+  }
 }
