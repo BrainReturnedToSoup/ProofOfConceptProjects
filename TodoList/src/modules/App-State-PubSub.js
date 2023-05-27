@@ -1,6 +1,6 @@
 function AppStatePublisher() {
   const subscribers = {
-    "subscriber module": "app state method for specific module",
+    "subscriber module": "app state sync method for specific module",
   };
   function subscribe(module, appStateMethod) {
     subscribers[module] = appStateMethod;

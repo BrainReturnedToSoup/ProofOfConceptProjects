@@ -35,6 +35,7 @@ export class SideNavBar {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".content");
   }
+  
   #selectedButtonStyling() {
     const { selectedOption } = this.#currentAppState,
       navButtons = Array.from(
@@ -60,7 +61,7 @@ export class SideNavBar {
         this.#selectedButtonStyling_Nav(navButtons[2]);
         break;
       case typeof selectedOption === "object" && selectedOption["project"]:
-        this.#selectedButtonStyling_Project(selectedOption);
+        this.#selectedButtonStyling_Project(selectedOption, projectButtons);
         break;
       default:
         throw new Error(
@@ -69,13 +70,37 @@ export class SideNavBar {
     }
   }
   #selectedButtonStyling_Nav(targetButton) {
-
+    targetButton.style["font-weight"] = "700";
   }
-  #selectedButtonStyling_Project(projectObject) {}
+  #selectedButtonStyling_Project(projectObject, projectButtons) {
+    const { project } = projectObject;
+    for (let button of projectButtons) {
+      if (button.textContent === project) {
+        button.style["font-weight"] = "700";
+        break;
+      }
+    }
+  }
+  #eventListenerLogic(event) {
+    if (event.target.tagName === "li") {
+      this.#currentAppState.selectedOption = event.target.textContent;
+    } else if (
+      event.target.classList.includes("Projects-List-Project-Button")
+    ) {
+      this.#currentAppState.selectedOption = {
+        project: event.target.textContent,
+      };
+    }
+    this.#selectedButtonStyling();
+  }
   #render() {
     const { contentElement } = this.#DOMcache,
       range = document.createRange(),
-      navBarElement = range.createContextualFragment(this.#DOMtemplate);
+      navBarElement = range.createContextualFragment(this.#DOMtemplate),
+      navElement = navBarElement.querySelector("nav");
+
+    navElement.addEventListener("click", this.#eventListenerLogic);
+
     this.#DOMcache.navBarElement = navBarElement;
 
     contentElement.append(navBarElement);
