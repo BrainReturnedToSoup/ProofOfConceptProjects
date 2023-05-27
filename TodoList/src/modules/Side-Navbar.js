@@ -1,7 +1,7 @@
 import "../styles/navbar-style.css";
 
 export class SideNavBar {
-  #Appstate = {
+  #currentAppState = {
     todoInfo: {
       projects: {
         todoText: "date",
@@ -11,6 +11,7 @@ export class SideNavBar {
       },
     },
   };
+  #priorAppState = {};
   #DOMcache = {
     bodyElement: document.body,
   };

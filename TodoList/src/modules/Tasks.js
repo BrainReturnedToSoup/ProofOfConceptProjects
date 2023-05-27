@@ -1,7 +1,6 @@
 import "../styles/tasks-style.css";
 export class Tasks {
-  #Appstate = {
-    selectedButton: "inbox",
+  #currentAppState = {
     todoInfo: {
       projects: {
         todoText: "date",
@@ -11,6 +10,7 @@ export class Tasks {
       },
     },
   };
+  #priorAppState = {};
   #DOMcache = {
     bodyElement: document.body,
   };

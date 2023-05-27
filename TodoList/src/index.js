@@ -6,7 +6,7 @@ import { Tasks } from "./modules/Tasks.js";
 const classInstance = {
   PageStructure: new PageStructure(),
   SideNavBar: new SideNavBar(),
-  //Tasks: new Tasks,
+  Tasks: new Tasks(),
 };
 
 const renderHierarchyConfig = {

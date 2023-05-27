@@ -2,7 +2,7 @@ import "../styles/structure-style.css";
 import appLogo from "../images-icons-logos/to-do-list-logo.svg";
 
 export class PageStructure {
-  #Appstate = {
+  #currentAppState = {
     todoInfo: {
       projects: {
         todoText: "date",
@@ -12,6 +12,7 @@ export class PageStructure {
       },
     },
   };
+  #priorAppState = {};
   #DOMcache = {
     bodyElement: document.body,
   };
