@@ -2,7 +2,7 @@ import "../styles/navbar-style.css";
 
 export class SideNavBar {
   #currentAppState = {
-    selectedOption: { project: "project name" },
+    selectedOption: "Inbox",
     todoInfo: {
       projects: {
         todoText: "date",
@@ -85,7 +85,7 @@ export class SideNavBar {
     if (event.target.tagName === "li") {
       this.#currentAppState.selectedOption = event.target.textContent;
     } else if (
-      event.target.classList.includes("Projects-List-Project-Button")
+      Array.from(event.target.classList).includes("Projects-List-Project-Button")
     ) {
       this.#currentAppState.selectedOption = {
         project: event.target.textContent,
@@ -101,7 +101,7 @@ export class SideNavBar {
 
     navElement.addEventListener("click", this.#eventListenerLogic);
 
-    this.#DOMcache.navBarElement = navBarElement;
+    this.#DOMcache.navBarElement = navElement;
 
     contentElement.append(navBarElement);
   }

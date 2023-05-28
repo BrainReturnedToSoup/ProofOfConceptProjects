@@ -1,6 +1,7 @@
 import "../styles/tasks-style.css";
 export class Tasks {
   #currentAppState = {
+    selectedOption: "Inbox",
     todoInfo: {
       projects: {
         todoText: "date",
@@ -15,10 +16,12 @@ export class Tasks {
   };
   #DOMtemplates = {
     cardContainer: `
-    <div class="todo-cards">
+    <div class="todo-card-container">
+      <h1 class="Current-Selection">Header for to do cards</h1>
     </div>
     `,
     todoCard: `
+
     `,
   };
   #renderContainer() {

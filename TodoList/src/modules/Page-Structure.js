@@ -3,6 +3,7 @@ import appLogo from "../images-icons-logos/to-do-list-logo.svg";
 
 export class PageStructure {
   #currentAppState = {
+    selectedOption: "Inbox",
     todoInfo: {
       projects: {
         todoText: "date",

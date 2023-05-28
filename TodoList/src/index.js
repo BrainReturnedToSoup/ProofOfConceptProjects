@@ -22,3 +22,4 @@ const AppRender = () => {
 
 classInstance.PageStructure.interface_init();
 classInstance.SideNavBar.interface_init();
+classInstance.Tasks.interface_init();
