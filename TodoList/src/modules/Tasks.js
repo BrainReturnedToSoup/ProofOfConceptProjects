@@ -18,6 +18,7 @@ export class Tasks {
     cardContainer: `
     <div class="todo-card-container">
       <h1 class="Current-Selection">Header for to do cards</h1>
+      <div class="todo-card-list"></div>
     </div>
     `,
     todoCard: `

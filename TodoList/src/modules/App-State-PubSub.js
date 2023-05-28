@@ -9,8 +9,8 @@ function AppStatePublisher() {
     delete subscribers[targetModule];
   }
   function publish(appStateData) {
-    for(let appStatemethod of subscribers) {
-        appStatemethod(appStateData)
+    for (let appStatemethod of subscribers) {
+      appStatemethod(appStateData);
     }
   }
   function interface_publisher(command, data) {

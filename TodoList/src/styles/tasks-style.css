@@ -1,6 +1,30 @@
 .todo-card-container {
+  box-sizing: border-box;
+
   flex-grow: 1;
   height: 100%;
 
-  background-color: red;
+  padding-inline: 40px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.Current-Selection {
+  width: 100%;
+  height: 70px;
+
+  display: inherit;
+
+  align-items: center;
+
+  font-size: 1.9rem;
+  font-weight: 500;
+
+  color: rgb(33, 33, 33);
+}
+
+.todo-card-list {
+  flex-grow: 1;
+  
 }

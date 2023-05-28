@@ -24,6 +24,12 @@ export class SideNavBar {
       </ul>
       <h3>Projects</h3>
       <div class="Projects-List">
+        <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 2</div>
+        <div class="Projects-List-Project-Button">Project 3</div>
+        <div class="Projects-List-Project-Button">Project 4</div>
+        <div class="Projects-List-Project-Button">Project 5</div>
+        <div class="Projects-List-Project-Button">Project 6</div>
       </div>
       <div class="Add-Project-Container">
           <div class="Add-Project-Button">Add Project</div>
@@ -35,7 +41,7 @@ export class SideNavBar {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".content");
   }
-  
+
   #selectedButtonStyling() {
     const { selectedOption } = this.#currentAppState,
       navButtons = Array.from(
@@ -43,7 +49,7 @@ export class SideNavBar {
       ),
       projectButtons = Array.from(
         this.#DOMcache.navBarElement.querySelectorAll(
-          ".Project-List-Project-Button"
+          ".Projects-List-Project-Button"
         )
       );
 
@@ -60,7 +66,8 @@ export class SideNavBar {
       case selectedOption === "This Week":
         this.#selectedButtonStyling_Nav(navButtons[2]);
         break;
-      case typeof selectedOption === "object" && selectedOption["project"]:
+      case selectedOption instanceof Object &&
+        selectedOption.hasOwnProperty("project"):
         this.#selectedButtonStyling_Project(selectedOption, projectButtons);
         break;
       default:
@@ -82,10 +89,12 @@ export class SideNavBar {
     }
   }
   #eventListenerLogic(event) {
-    if (event.target.tagName === "li") {
+    if (event.target.tagName === "LI") {
       this.#currentAppState.selectedOption = event.target.textContent;
     } else if (
-      Array.from(event.target.classList).includes("Projects-List-Project-Button")
+      Array.from(event.target.classList).includes(
+        "Projects-List-Project-Button"
+      )
     ) {
       this.#currentAppState.selectedOption = {
         project: event.target.textContent,
@@ -99,7 +108,9 @@ export class SideNavBar {
       navBarElement = range.createContextualFragment(this.#DOMtemplate),
       navElement = navBarElement.querySelector("nav");
 
-    navElement.addEventListener("click", this.#eventListenerLogic);
+    navElement.addEventListener("click", (e) => {
+      this.#eventListenerLogic(e);
+    });
 
     this.#DOMcache.navBarElement = navElement;
 
