@@ -39,7 +39,7 @@ export class SideNavBar {
     `;
   #grabDependencies() {
     this.#DOMcache.contentElement =
-      this.#DOMcache.bodyElement.querySelector(".content");
+      this.#DOMcache.bodyElement.querySelector(".Content");
   }
 
   #selectedButtonStyling() {

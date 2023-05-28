@@ -18,20 +18,20 @@ export class PageStructure {
   };
   #DOMtemplates = {
     header: `
-        <div class="header-container">
+        <div class="Header-Container">
         <img src="${appLogo}" alt="App-Logo">
         <h1>Todo List</h1>
         </div>
     `,
 
     content: `
-        <div class="content">
+        <div class="Content">
 
         </div>
     `,
 
     footer: `
-        <div class="footer-container">© Copyright 2023 Nikkolas Minton</div>
+        <div class="Footer-Container">© Copyright 2023 Nikkolas Minton</div>
     `,
   };
 
@@ -50,9 +50,9 @@ export class PageStructure {
 
   interface_init() {
     if (
-      !document.querySelector(".header-container") ||
-      !document.querySelector(".content") ||
-      !document.querySelector(".footer-container")
+      !document.querySelector(".Header-Container") ||
+      !document.querySelector(".Content") ||
+      !document.querySelector(".Footer-Container")
     ) {
       this.#render();
     }

@@ -16,9 +16,19 @@ export class Tasks {
   };
   #DOMtemplates = {
     cardContainer: `
-    <div class="todo-card-container">
+    <div class="Todo-Card-Container">
       <h1 class="Current-Selection">Header for to do cards</h1>
-      <div class="todo-card-list"></div>
+      <div class="Todo-Card-List">
+        <div class="Todo-Card">1</div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+        <div class="Todo-Card"></div>
+      </div>
     </div>
     `,
     todoCard: `
@@ -38,7 +48,7 @@ export class Tasks {
   }
   #grabDependencies() {
     this.#DOMcache.contentElement =
-      this.#DOMcache.bodyElement.querySelector(".content");
+      this.#DOMcache.bodyElement.querySelector(".Content");
     this.#DOMcache.navbarElement =
       this.#DOMcache.contentElement.querySelector("nav");
   }

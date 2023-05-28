@@ -10,7 +10,7 @@ body {
   flex-direction: column;
 }
 
-.header-container {
+.Header-Container {
   width: 100%;
   height: 20%;
 
@@ -25,13 +25,13 @@ body {
   box-sizing: border-box;
 }
 
-.header-container > img {
+.Header-Container > img {
   aspect-ratio: 1/1;
   height: 70%;
   width: auto;
 }
 
-.header-container > h1 {
+.Header-Container > h1 {
   font-size: 48px;
   font-weight: 600;
 
@@ -40,7 +40,7 @@ body {
   color: whitesmoke;
 }
 
-.footer-container {
+.Footer-Container {
   width: 100%;
   height: 5%;
 
@@ -57,7 +57,7 @@ body {
   font-size: 0.7rem;
 }
 
-.content {
+.Content {
   width: 100%;
   height: 75%;
 
