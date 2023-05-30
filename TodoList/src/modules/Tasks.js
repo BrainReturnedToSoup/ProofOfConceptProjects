@@ -5,10 +5,18 @@ export class Tasks {
     selectedOption: "Inbox",
     todoInfo: {
       projects: {
-        todoText: "date",
+        projectName: {
+          todoText: {
+            date: "date",
+            done: "false",
+          },
+        },
       },
       regular: {
-        todoText: "date",
+        todoText: {
+          date: "date",
+          done: "false",
+        },
       },
     },
   };
