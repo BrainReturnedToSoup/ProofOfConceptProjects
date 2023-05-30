@@ -12,6 +12,7 @@
   height: 90px;
 
   margin-left: 60px;
+  margin-top: 25px;
 
   display: inherit;
 
@@ -42,7 +43,59 @@
 }
 
 .Todo-Card {
-  background-color: red;
-
   border-radius: 3px;
+
+  display: flex;
+
+  align-items: center;
+
+  background-color: white;
+}
+
+.Todo-Card:hover > .Todo-Card-Right-Container > .Delete-Card {
+  display: block;
+}
+
+.Todo-Card-Left-Container {
+  height: 100%;
+
+  flex-grow: 1;
+
+  display: inherit;
+
+  align-items: center;
+}
+
+.Todo-Card-Right-Container {
+  aspect-ratio: 1/1;
+
+  height: 100%;
+  width: auto;
+
+  display: inherit;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.Delete-Card {
+  display: none;
+
+  justify-self: end;
+
+  aspect-ratio: 1/1;
+
+  height: 25px;
+  width: auto;
+
+  background-size: cover;
+  background-position: center;
+
+  background-image: url("../images-icons-logos/delete-card.svg");
+}
+
+.Delete-Card:hover {
+  background-image: url("../images-icons-logos/delete-card-highlight.svg");
+
+  cursor: pointer;
 }

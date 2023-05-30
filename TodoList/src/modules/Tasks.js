@@ -1,4 +1,7 @@
 import "../styles/tasks-style.css";
+import deleteButton from "../images-icons-logos/delete-card.svg";
+import deleteButtonHighlight from '../images-icons-logos/delete-card-highlight.svg';
+
 export class Tasks {
   #currentAppState = {
     selectedOption: "Inbox",
@@ -19,32 +22,47 @@ export class Tasks {
     <div class="Todo-Card-Container">
       <h1 class="Current-Selection">Header for to do cards</h1>
       <div class="Todo-Card-List">
-        <div class="Todo-Card">1</div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
-        <div class="Todo-Card"></div>
       </div>
     </div>
     `,
     todoCard: `
-
+    <div class="Todo-Card">
+      <div class="Todo-Card-Left-Container">rendered</div>
+      <div class="Todo-Card-Right-Container">
+        <div class="Delete-Card"></div>
+      </div>
+    </div>
     `,
   };
   #renderContainer() {
     const range = document.createRange(),
-      cardContainerElement = range.createContextualFragment(
+      cardContainerFrag = range.createContextualFragment(
         this.#DOMtemplates.cardContainer
+      ),
+      cardContainerElement = cardContainerFrag.querySelector(
+        ".Todo-Card-Container"
       );
-    this.#DOMcache.contentElement.append(cardContainerElement);
+    cardContainerElement.addEventListener("click", (e) =>
+      this.#eventListenerLogicClick(e)
+    );
     this.#DOMcache.cardContainerElement = cardContainerElement;
+    this.#DOMcache.contentElement.append(cardContainerFrag);
   }
   #renderCards() {
-    const { cardContainerElement } = this.#DOMcache;
+    const { cardContainerElement } = this.#DOMcache,
+      todoCardListElement =
+        cardContainerElement.querySelector(".Todo-Card-List"),
+      range = document.createRange(),
+      todoCardElement = range.createContextualFragment(
+        this.#DOMtemplates.todoCard
+      );
+    todoCardListElement.append(todoCardElement);
+  }
+  #eventListenerLogicClick(event) {
+    const targetClassList = Array.from(event.target.classList);
+    if (targetClassList.includes("Delete-Button")) {
+      //delete corresponding todo card
+    }
   }
   #grabDependencies() {
     this.#DOMcache.contentElement =
