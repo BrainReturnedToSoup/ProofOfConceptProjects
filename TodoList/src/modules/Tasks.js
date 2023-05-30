@@ -1,6 +1,4 @@
 import "../styles/tasks-style.css";
-import deleteButton from "../images-icons-logos/delete-card.svg";
-import deleteButtonHighlight from '../images-icons-logos/delete-card-highlight.svg';
 
 export class Tasks {
   #currentAppState = {
@@ -20,7 +18,7 @@ export class Tasks {
   #DOMtemplates = {
     cardContainer: `
     <div class="Todo-Card-Container">
-      <h1 class="Current-Selection">Header for to do cards</h1>
+      <h1 class="Current-Selection"></h1>
       <div class="Todo-Card-List">
       </div>
     </div>
@@ -41,12 +39,32 @@ export class Tasks {
       ),
       cardContainerElement = cardContainerFrag.querySelector(
         ".Todo-Card-Container"
-      );
+      ),
+      cardContainerHeaderElement =
+        cardContainerElement.querySelector(".Current-Selection");
+    this.#DOMcache.cardContainerHeaderElement = cardContainerHeaderElement;
+
+    this.#renderSelectedHeader();
+
     cardContainerElement.addEventListener("click", (e) =>
-      this.#eventListenerLogicClick(e)
+      this.#eventListenerLogic(e)
     );
     this.#DOMcache.cardContainerElement = cardContainerElement;
     this.#DOMcache.contentElement.append(cardContainerFrag);
+  }
+  #renderSelectedHeader() {
+    if (typeof this.#currentAppState.selectedOption === "string") {
+      this.#DOMcache.cardContainerHeaderElement.textContent =
+        this.#currentAppState.selectedOption;
+    } else if (
+      this.#currentAppState.selectedOption instanceof Object &&
+      this.#currentAppState.selectedOption["project"]
+    ) {
+      this.#DOMcache.cardContainerHeaderElement.textContent =
+        this.#currentAppState.selectedOption["project"];
+    } else {
+      this.#DOMcache.cardContainerHeaderElement.textContent = "null";
+    }
   }
   #renderCards() {
     const { cardContainerElement } = this.#DOMcache,
@@ -58,7 +76,7 @@ export class Tasks {
       );
     todoCardListElement.append(todoCardElement);
   }
-  #eventListenerLogicClick(event) {
+  #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
     if (targetClassList.includes("Delete-Button")) {
       //delete corresponding todo card
