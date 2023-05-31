@@ -97,11 +97,6 @@ export class Tasks {
           `ERROR: selected option value invalid, received ${selectedOption}`
         );
     }
-    //      range = document.createRange(),
-    //      todoCardElement = range.createContextualFragment(
-    //       this.#DOMtemplates.todoCard
-    //     );
-    //   todoCardListElement.append(todoCardElement);
   }
 
   #renderNormalCards() {}
@@ -132,6 +127,8 @@ export class Tasks {
   }
   interface_sync_appstate(newAppState) {
     this.#currentAppState = newAppState;
+
+    this.#renderSelectedHeader();
     this.#renderCards();
   }
 }
