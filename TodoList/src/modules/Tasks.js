@@ -75,14 +75,18 @@ export class Tasks {
     }
   }
   #renderCards() {
-    const { cardContainerElement } = this.#DOMcache,
-      todoCardListElement =
-        cardContainerElement.querySelector(".Todo-Card-List"),
-      range = document.createRange(),
-      todoCardElement = range.createContextualFragment(
-        this.#DOMtemplates.todoCard
-      );
-    todoCardListElement.append(todoCardElement);
+    const { cardContainerElement } = this.#DOMcache;
+    if (!this.#DOMcache.todoCardListElement) {
+      const todoCardListElement =
+        cardContainerElement.querySelector(".Todo-Card-List");
+        this.#DOMcache.todoCardListElement = todoCardListElement;
+    }
+
+    //      range = document.createRange(),
+    //      todoCardElement = range.createContextualFragment(
+    //       this.#DOMtemplates.todoCard
+    //     );
+    //   todoCardListElement.append(todoCardElement);
   }
   #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
