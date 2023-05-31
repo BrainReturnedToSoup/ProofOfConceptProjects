@@ -75,19 +75,38 @@ export class Tasks {
     }
   }
   #renderCards() {
-    const { cardContainerElement } = this.#DOMcache;
+    const { cardContainerElement } = this.#DOMcache,
+      { selectedOption } = this.#currentAppState;
+
     if (!this.#DOMcache.todoCardListElement) {
       const todoCardListElement =
         cardContainerElement.querySelector(".Todo-Card-List");
-        this.#DOMcache.todoCardListElement = todoCardListElement;
+      this.#DOMcache.todoCardListElement = todoCardListElement;
     }
 
+    switch (true) {
+      case typeof selectedOption === "string":
+        this.#renderNormalCards();
+        break;
+      case selectedOption instanceof Object &&
+        selectedOption.hasOwnProperty("project"):
+        this.#renderProjectCards();
+        break;
+      default:
+        throw new Error(
+          `ERROR: selected option value invalid, received ${selectedOption}`
+        );
+    }
     //      range = document.createRange(),
     //      todoCardElement = range.createContextualFragment(
     //       this.#DOMtemplates.todoCard
     //     );
     //   todoCardListElement.append(todoCardElement);
   }
+
+  #renderNormalCards() {}
+  #renderProjectCards() {}
+
   #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
     if (targetClassList.includes("Delete-Button")) {
