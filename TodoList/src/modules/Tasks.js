@@ -100,8 +100,14 @@ export class Tasks {
   }
 
   #renderNormalCards(selectedOption) {
+    const allProjects = this.#currentAppState.todoInfo.projects,
+      regularTodoCards = this.#currentAppState.todoInfo.regular;
+
     if (Object.keys(this.#todoCardFilterMethods).includes(selectedOption)) {
-      const selectedTodoCards = this.#todoCardFilterMethods[selectedOption]();
+      const selectedTodoCards = this.#todoCardFilterMethods[selectedOption]([
+        regularTodoCards,
+        allProjects,
+      ]);
       this.#todoCardBuilder(selectedTodoCards);
     } else {
       throw new Error(
@@ -118,13 +124,32 @@ export class Tasks {
   }
 
   #todoCardFilterMethods = {
-    Inbox: (todoCardsRefArr) => {},
-    Today: (todoCardsRefArr) => {},
-    "This Week": (todoCardsRefArr) => {},
-    Project: (specificProject) => {},
+    Inbox: (todoCardsRefArr) => {
+      const selectedTodoCards = [];
+      //add filtering here and add it to the arr
+      return selectedTodoCards;
+    },
+    Today: (todoCardsRefArr) => {
+      const selectedTodoCards = [];
+      //add filtering here and add it to the arr
+      return selectedTodoCards;
+    },
+    "This Week": (todoCardsRefArr) => {
+      const selectedTodoCards = [];
+      //add filtering here and add it to the arr
+      return selectedTodoCards;
+    },
+    Project: (specificProject) => {
+      const selectedTodoCards = [];
+      //add filtering here and add it to the arr
+      return selectedTodoCards;
+    },
   };
 
-  #todoCardBuilder(selectedTodoCards) {}
+  #todoCardBuilder(selectedTodoCardsArr) {
+    for (let todoCard of selectedTodoCardsArr) {
+    }
+  }
 
   #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
