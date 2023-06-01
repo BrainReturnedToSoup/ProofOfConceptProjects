@@ -111,7 +111,7 @@ export class Tasks {
       this.#todoCardBuilder(selectedTodoCards);
     } else {
       throw new Error(
-        `ERROR: Invalied selected option, received ${selectedOption}`
+        `ERROR: Invalid selected option, received ${selectedOption}`
       );
     }
   }
@@ -140,17 +140,29 @@ export class Tasks {
     },
     Today: (todoCardsRefArr) => {
       const selectedTodoCards = [],
-        [regularTodoCards, allProjects] = todoCardsRefArr;
+        [regularTodoCards, allProjects] = todoCardsRefArr,
+        currentDate = new Date();
 
       for (let todoCard in regularTodoCards) {
-        if ("conditional for todo within the timeframe of today") {
-          selectedTodoCards.push({ todoCard: regularTodoCards[todoCard] });
+        const currentTimeDiff = this.#dateDifferenceInDays(
+          currentDate,
+          todoCard["date"]
+        );
+
+        if (currentTimeDiff < 1) {
+          selectedTodoCards.push({
+            [`${todoCard}`]: regularTodoCards[todoCard],
+          });
         }
       }
       for (let project in allProjects) {
         for (let todoCard in project) {
-          if ("conditional for todo within the timeframe of today") {
-            selectedTodoCards.push({ todoCard: project[todoCard] });
+          const currentTimeDiff = this.#dateDifferenceInDays(
+            currentDate,
+            todoCard["date"]
+          );
+          if (currentTimeDiff < 1) {
+            selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
           }
         }
       }
@@ -158,17 +170,26 @@ export class Tasks {
     },
     "This Week": (todoCardsRefArr) => {
       const selectedTodoCards = [],
-        [regularTodoCards, allProjects] = todoCardsRefArr;
+        [regularTodoCards, allProjects] = todoCardsRefArr,
+        currentDate = new Date();
 
       for (let todoCard in regularTodoCards) {
-        if ("conditional for todo within the timeframe of the week") {
-          selectedTodoCards.push({ todoCard: project[todoCard] });
+        const currentTimeDiff = this.#dateDifferenceInDays(
+          currentDate,
+          todoCard["date"]
+        );
+        if (currentTimeDiff < 7) {
+          selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
         }
       }
       for (let project in allProjects) {
         for (let todoCard in project) {
-          if ("conditional for todo within the timeframe of the week") {
-            selectedTodoCards.push({ todoCard: project[todoCard] });
+          const currentTimeDiff = this.#dateDifferenceInDays(
+            currentDate,
+            todoCard["date"]
+          );
+          if (currentTimeDiff < 7) {
+            selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
           }
         }
       }
@@ -176,14 +197,28 @@ export class Tasks {
     },
     Project: (specificProject) => {
       const selectedTodoCards = [];
-      //add filtering here and add it to the arr
+      let projectFound = false;
+
+      for (let project in this.#currentAppState.todoInfo.projects) {
+        if (project === specificProject) {
+          for (let todoCard in project) {
+            selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
+          }
+        }
+        if (projectFound) break;
+      }
 
       return selectedTodoCards;
     },
   };
-
+  #dateDifferenceInDays(referenceDate, todoCardDate) {
+    return (
+      (referenceDate.getTime() - todoCardDate.getTime()) / (24 * 60 * 60 * 1000)
+    );
+  }
   #todoCardBuilder(selectedTodoCardsArr) {
     for (let todoCard of selectedTodoCardsArr) {
+      //build and append all todo cards that exist within the array received
     }
   }
 
