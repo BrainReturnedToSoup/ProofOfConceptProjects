@@ -3,7 +3,7 @@ import "../styles/navbar-style.css";
 export class SideNavBar {
   #currentAppState = {
     selectedOption: "Inbox",
-        todoInfo: {
+    todoInfo: {
       projects: {
         projectName: {
           todoText: {

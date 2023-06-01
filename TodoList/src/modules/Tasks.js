@@ -86,7 +86,7 @@ export class Tasks {
 
     switch (true) {
       case typeof selectedOption === "string":
-        this.#renderNormalCards();
+        this.#renderNormalCards(selectedOption);
         break;
       case selectedOption instanceof Object &&
         selectedOption.hasOwnProperty("project"):
@@ -99,15 +99,44 @@ export class Tasks {
     }
   }
 
-  #renderNormalCards() {}
-  #renderProjectCards() {}
+  #renderNormalCards(selectedOption) {
+    if (Object.keys(this.#todoCardFilterMethods).includes(selectedOption)) {
+      const selectedTodoCards = this.#todoCardFilterMethods[selectedOption]();
+      this.#todoCardBuilder(selectedTodoCards);
+    } else {
+      throw new Error(
+        `ERROR: Invalied selected option, received ${selectedOption}`
+      );
+    }
+  }
+
+  #renderProjectCards() {
+    const specificProject = this.#currentAppState.selectedOption["project"],
+      selectedTodoCards =
+        this.#todoCardFilterMethods["Project"](specificProject);
+    this.#todoCardBuilder(selectedTodoCards);
+  }
+
+  #todoCardFilterMethods = {
+    Inbox: (todoCardsRefArr) => {},
+    Today: (todoCardsRefArr) => {},
+    "This Week": (todoCardsRefArr) => {},
+    Project: (specificProject) => {},
+  };
+
+  #todoCardBuilder(selectedTodoCards) {}
 
   #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
     if (targetClassList.includes("Delete-Button")) {
-      //delete corresponding todo card
+      //delete corresponding todo card in the app state datastructure,
+      //initialize the rendering of the todo card state,
+      //emit the state change to all other modules so they can render based on the new state
     }
   }
+
+  #emitStateChange() {}
+
   #grabDependencies() {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".Content");
