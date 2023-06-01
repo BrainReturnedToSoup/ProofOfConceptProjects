@@ -125,23 +125,59 @@ export class Tasks {
 
   #todoCardFilterMethods = {
     Inbox: (todoCardsRefArr) => {
-      const selectedTodoCards = [];
-      //add filtering here and add it to the arr
+      const selectedTodoCards = [],
+        [regularTodoCards, allProjects] = todoCardsRefArr;
+
+      for (let todoCard in regularTodoCards) {
+        selectedTodoCards.push({ todoCard: regularTodoCards[todoCard] });
+      }
+      for (let project in allProjects) {
+        for (let todoCard in project) {
+          selectedTodoCards.push({ todoCard: project[todoCard] });
+        }
+      }
       return selectedTodoCards;
     },
     Today: (todoCardsRefArr) => {
-      const selectedTodoCards = [];
-      //add filtering here and add it to the arr
+      const selectedTodoCards = [],
+        [regularTodoCards, allProjects] = todoCardsRefArr;
+
+      for (let todoCard in regularTodoCards) {
+        if ("conditional for todo within the timeframe of today") {
+          selectedTodoCards.push({ todoCard: regularTodoCards[todoCard] });
+        }
+      }
+      for (let project in allProjects) {
+        for (let todoCard in project) {
+          if ("conditional for todo within the timeframe of today") {
+            selectedTodoCards.push({ todoCard: project[todoCard] });
+          }
+        }
+      }
       return selectedTodoCards;
     },
     "This Week": (todoCardsRefArr) => {
-      const selectedTodoCards = [];
-      //add filtering here and add it to the arr
+      const selectedTodoCards = [],
+        [regularTodoCards, allProjects] = todoCardsRefArr;
+
+      for (let todoCard in regularTodoCards) {
+        if ("conditional for todo within the timeframe of the week") {
+          selectedTodoCards.push({ todoCard: project[todoCard] });
+        }
+      }
+      for (let project in allProjects) {
+        for (let todoCard in project) {
+          if ("conditional for todo within the timeframe of the week") {
+            selectedTodoCards.push({ todoCard: project[todoCard] });
+          }
+        }
+      }
       return selectedTodoCards;
     },
     Project: (specificProject) => {
       const selectedTodoCards = [];
       //add filtering here and add it to the arr
+
       return selectedTodoCards;
     },
   };
@@ -160,7 +196,9 @@ export class Tasks {
     }
   }
 
-  #emitStateChange() {}
+  #emitStateChange() {
+    // emit the state of this module to the publisher
+  }
 
   #grabDependencies() {
     this.#DOMcache.contentElement =
