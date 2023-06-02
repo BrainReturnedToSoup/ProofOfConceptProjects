@@ -33,6 +33,12 @@ export class SideNavBar {
       <h3>Projects</h3>
       <div class="Projects-List">
         <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 1</div>
+        
       </div>
       <div class="Add-Project-Container">
           <div class="Add-Project-Button">Add Project</div>

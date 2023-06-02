@@ -129,11 +129,13 @@ export class Tasks {
         [regularTodoCards, allProjects] = todoCardsRefArr;
 
       for (let todoCard in regularTodoCards) {
-        selectedTodoCards.push({ todoCard: regularTodoCards[todoCard] });
+        selectedTodoCards.push({ [`${todoCard}`]: regularTodoCards[todoCard] });
       }
       for (let project in allProjects) {
-        for (let todoCard in project) {
-          selectedTodoCards.push({ todoCard: project[todoCard] });
+        for (let todoCard in allProjects[project]) {
+          selectedTodoCards.push({
+            [`${todoCard}`]: allProjects[project][todoCard],
+          });
         }
       }
       return selectedTodoCards;
@@ -156,13 +158,13 @@ export class Tasks {
         }
       }
       for (let project in allProjects) {
-        for (let todoCard in project) {
+        for (let todoCard in allProjects[project]) {
           const currentTimeDiff = this.#dateDifferenceInDays(
             currentDate,
             todoCard["date"]
           );
           if (currentTimeDiff < 1) {
-            selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
+            selectedTodoCards.push({ [`${todoCard}`]: allProjects[project][todoCard] });
           }
         }
       }
@@ -183,13 +185,13 @@ export class Tasks {
         }
       }
       for (let project in allProjects) {
-        for (let todoCard in project) {
+        for (let todoCard in allProjects[project]) {
           const currentTimeDiff = this.#dateDifferenceInDays(
             currentDate,
             todoCard["date"]
           );
           if (currentTimeDiff < 7) {
-            selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
+            selectedTodoCards.push({ [`${todoCard}`]: allProjects[project][todoCard] });
           }
         }
       }
@@ -201,8 +203,8 @@ export class Tasks {
 
       for (let project in this.#currentAppState.todoInfo.projects) {
         if (project === specificProject) {
-          for (let todoCard in project) {
-            selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
+          for (let todoCard in this.#currentAppState.todoInfo.projects[project]) {
+            selectedTodoCards.push({ [`${todoCard}`]: this.#currentAppState.todoInfo.projects[project][todoCard] });
           }
         }
         if (projectFound) break;
@@ -218,7 +220,18 @@ export class Tasks {
   }
   #todoCardBuilder(selectedTodoCardsArr) {
     for (let todoCard of selectedTodoCardsArr) {
-      //build and append all todo cards that exist within the array received
+      const range = document.createRange(),
+        todoCardFrag = range.createContextualFragment(
+          this.#DOMtemplates.todoCard
+        ),
+        todoCardText = Object.keys(todoCard)[0],
+        todoCardDate = todoCard[todoCardText].date,
+        todoCardDone = todoCard[todoCardText].done,
+        textContainer = todoCardFrag.querySelector(".Todo-Card-Left-Container");
+
+      textContainer.textContent = todoCardText;
+
+      this.#DOMcache.todoCardListElement.append(todoCardFrag);
     }
   }
 
