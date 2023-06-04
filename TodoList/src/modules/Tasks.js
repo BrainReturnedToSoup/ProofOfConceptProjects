@@ -246,14 +246,18 @@ export class Tasks {
 
   #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
-    if (targetClassList.includes("Delete-Button")) {
-      this.#deleteTodoCard(event.target.textContent);
-      this.#DOMcache.todoCardListElement.innerHTML = ''
+    if (targetClassList.includes("Delete-Card")) {
+      const todoCard = event.target.parentNode.parentNode,
+        textContainer = todoCard.querySelector(".Todo-Card-Left-Container"),
+        textContent = textContainer.textContent;
+
+      this.#deleteTodoCard(textContent);
+      this.#DOMcache.todoCardListElement.innerHTML = "";
       this.#renderCards();
       this.#emitStateChange();
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
       this.#toggleDoneStatus(event.target.textContent);
-      this.#DOMcache.todoCardListElement.innerHTML = ''
+      this.#DOMcache.todoCardListElement.innerHTML = "";
       this.#renderCards();
       this.#emitStateChange();
     }
@@ -292,10 +296,13 @@ export class Tasks {
 
   #deleteTodoCard(todoCardText) {
     if (typeof this.#currentAppState.selectedOption === "string") {
-      const { regular } = this.#currentAppState.todoInfo,
-        targetTodoCard = regular[todoCardText];
+      const { regular, projects } = this.#currentAppState.todoInfo,
+        targetTodoCardReg = regular[todoCardText],
+        targetTodoCardProj = regular[todoCardText];
 
-      if (targetTodoCard !== undefined) {
+      if (targetTodoCardReg !== undefined) {
+        delete regular[todoCardText];
+      } else if (targetTodoCardProj !== undefined) {
         delete regular[todoCardText];
       } else {
         throw new Error("ERROR: target card not found in app state");
