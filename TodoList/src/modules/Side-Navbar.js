@@ -23,7 +23,8 @@ export class SideNavBar {
   #DOMcache = {
     bodyElement: document.body,
   };
-  #DOMtemplate = `
+  #DOMtemplates = {
+    mainStructure: `
     <nav>
       <ul>
         <li>Inbox</li>
@@ -31,21 +32,18 @@ export class SideNavBar {
         <li>This Week</li>
       </ul>
       <h3>Projects</h3>
-      <div class="Projects-List">
-        <div class="Projects-List-Project-Button">Project 1</div>
-        <div class="Projects-List-Project-Button">Project 2</div>
-        <div class="Projects-List-Project-Button">Project 3</div>
-        <div class="Projects-List-Project-Button">Project 4</div>
-        <div class="Projects-List-Project-Button">Project 5</div>
-        <div class="Projects-List-Project-Button">Project 1</div>
-        
+      <div class="Projects-List"> 
       </div>
       <div class="Add-Project-Container">
           <div class="Add-Project-Button">Add Project</div>
           <form></form>
       </div>
     </nav>
-    `;
+    `,
+    projectButton: `
+    <div class="Projects-List-Project-Button">Project 1</div>
+    `,
+  };
   #grabDependencies() {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".Content");
@@ -113,13 +111,13 @@ export class SideNavBar {
     }
   }
 
-  #submitEventListenerLogic(event) {
-
-  }
+  #submitEventListenerLogic(event) {}
   #render() {
     const { contentElement } = this.#DOMcache,
       range = document.createRange(),
-      navBarElement = range.createContextualFragment(this.#DOMtemplate),
+      navBarElement = range.createContextualFragment(
+        this.#DOMtemplates.mainStructure
+      ),
       navElement = navBarElement.querySelector("nav");
 
     navElement.addEventListener("click", (e) => {
