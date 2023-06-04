@@ -6,7 +6,7 @@ export class Tasks {
     todoInfo: {
       projects: {
         projectName: {
-          todoText: {
+          todoTextProject: {
             date: "date",
             done: false,
           },
@@ -297,13 +297,16 @@ export class Tasks {
   #deleteTodoCard(todoCardText) {
     if (typeof this.#currentAppState.selectedOption === "string") {
       const { regular, projects } = this.#currentAppState.todoInfo,
-        targetTodoCardReg = regular[todoCardText],
-        targetTodoCardProj = regular[todoCardText];
+      targetProject = this.#currentAppState.selectedOption["project"],
+        targetTodoCardReg = regular?.[todoCardText];
+//        targetTodoCardProj = projects?.[targetProject]?.[todoCardText];
+// snippet above wont work if the selected option is a string, need to find a way to locate the corresponding 
+//todo card by iterating
 
       if (targetTodoCardReg !== undefined) {
         delete regular[todoCardText];
       } else if (targetTodoCardProj !== undefined) {
-        delete regular[todoCardText];
+        delete projects[targetProject][todoCardText];
       } else {
         throw new Error("ERROR: target card not found in app state");
       }
