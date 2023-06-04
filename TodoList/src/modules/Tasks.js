@@ -248,13 +248,16 @@ export class Tasks {
     const targetClassList = Array.from(event.target.classList);
     if (targetClassList.includes("Delete-Button")) {
       this.#deleteTodoCard(event.target.textContent);
+      this.#DOMcache.todoCardListElement.innerHTML = ''
+      this.#renderCards();
+      this.#emitStateChange();
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
       this.#toggleDoneStatus(event.target.textContent);
-      //toggle specific todo card as finished
-      //change the styling to that of a completed todo card
+      this.#DOMcache.todoCardListElement.innerHTML = ''
+      this.#renderCards();
+      this.#emitStateChange();
     }
-    this.#renderCards();
-    this.#emitStateChange();
+    //clear the necessary containers
     //initialize the rendering of the todo card state,
     //emit the state change to all other modules so they can render based on the new state
   }
@@ -278,7 +281,8 @@ export class Tasks {
         targetTodoCard = projects[targetProject][todoCardText];
 
       if (targetTodoCard !== undefined) {
-        projects[targetProject][todoCardText].done = !projects[targetProject][todoCardText].done;
+        projects[targetProject][todoCardText].done =
+          !projects[targetProject][todoCardText].done;
       } else {
         throw new Error("ERROR: target card not found in app state");
       }

@@ -33,10 +33,10 @@ export class SideNavBar {
       <h3>Projects</h3>
       <div class="Projects-List">
         <div class="Projects-List-Project-Button">Project 1</div>
-        <div class="Projects-List-Project-Button">Project 1</div>
-        <div class="Projects-List-Project-Button">Project 1</div>
-        <div class="Projects-List-Project-Button">Project 1</div>
-        <div class="Projects-List-Project-Button">Project 1</div>
+        <div class="Projects-List-Project-Button">Project 2</div>
+        <div class="Projects-List-Project-Button">Project 3</div>
+        <div class="Projects-List-Project-Button">Project 4</div>
+        <div class="Projects-List-Project-Button">Project 5</div>
         <div class="Projects-List-Project-Button">Project 1</div>
         
       </div>
@@ -97,9 +97,10 @@ export class SideNavBar {
       }
     }
   }
-  #eventListenerLogic(event) {
+  #clickEventListenerLogic(event) {
     if (event.target.tagName === "LI") {
       this.#currentAppState.selectedOption = event.target.textContent;
+      this.#selectedButtonStyling();
     } else if (
       Array.from(event.target.classList).includes(
         "Projects-List-Project-Button"
@@ -108,8 +109,12 @@ export class SideNavBar {
       this.#currentAppState.selectedOption = {
         project: event.target.textContent,
       };
+      this.#selectedButtonStyling();
     }
-    this.#selectedButtonStyling();
+  }
+
+  #submitEventListenerLogic(event) {
+
   }
   #render() {
     const { contentElement } = this.#DOMcache,
@@ -118,7 +123,7 @@ export class SideNavBar {
       navElement = navBarElement.querySelector("nav");
 
     navElement.addEventListener("click", (e) => {
-      this.#eventListenerLogic(e);
+      this.#clickEventListenerLogic(e);
     });
 
     this.#DOMcache.navBarElement = navElement;
