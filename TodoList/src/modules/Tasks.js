@@ -8,14 +8,14 @@ export class Tasks {
         projectName: {
           todoText: {
             date: "date",
-            done: "false",
+            done: false,
           },
         },
       },
       regular: {
         todoText: {
           date: "date",
-          done: "false",
+          done: false,
         },
       },
     },
@@ -164,7 +164,9 @@ export class Tasks {
             todoCard["date"]
           );
           if (currentTimeDiff < 1) {
-            selectedTodoCards.push({ [`${todoCard}`]: allProjects[project][todoCard] });
+            selectedTodoCards.push({
+              [`${todoCard}`]: allProjects[project][todoCard],
+            });
           }
         }
       }
@@ -191,7 +193,9 @@ export class Tasks {
             todoCard["date"]
           );
           if (currentTimeDiff < 7) {
-            selectedTodoCards.push({ [`${todoCard}`]: allProjects[project][todoCard] });
+            selectedTodoCards.push({
+              [`${todoCard}`]: allProjects[project][todoCard],
+            });
           }
         }
       }
@@ -203,8 +207,13 @@ export class Tasks {
 
       for (let project in this.#currentAppState.todoInfo.projects) {
         if (project === specificProject) {
-          for (let todoCard in this.#currentAppState.todoInfo.projects[project]) {
-            selectedTodoCards.push({ [`${todoCard}`]: this.#currentAppState.todoInfo.projects[project][todoCard] });
+          for (let todoCard in this.#currentAppState.todoInfo.projects[
+            project
+          ]) {
+            selectedTodoCards.push({
+              [`${todoCard}`]:
+                this.#currentAppState.todoInfo.projects[project][todoCard],
+            });
           }
         }
         if (projectFound) break;
@@ -238,14 +247,76 @@ export class Tasks {
   #eventListenerLogic(event) {
     const targetClassList = Array.from(event.target.classList);
     if (targetClassList.includes("Delete-Button")) {
-      //delete corresponding todo card in the app state datastructure,
-      //initialize the rendering of the todo card state,
-      //emit the state change to all other modules so they can render based on the new state
+      this.#deleteTodoCard(event.target.textContent);
+    } else if (targetClassList.includes("Todo-Card-Left-Container")) {
+      this.#toggleDoneStatus(event.target.textContent);
+      //toggle specific todo card as finished
+      //change the styling to that of a completed todo card
+    }
+    this.#renderCards();
+    this.#emitStateChange();
+    //initialize the rendering of the todo card state,
+    //emit the state change to all other modules so they can render based on the new state
+  }
+  #toggleDoneStatus(todoCardText) {
+    if (typeof this.#currentAppState.selectedOption === "string") {
+      const { regular } = this.#currentAppState.todoInfo,
+        targetTodoCard = regular[todoCardText];
+
+      if (targetTodoCard !== undefined) {
+        regular[todoCardText].done = !regular[todoCardText].done;
+      } else {
+        throw new Error("ERROR: target card not found in app state");
+      }
+      //will check for the property in the regular property of the app state, and if it exists toggle the done value
+    } else if (
+      this.#currentAppState.selectedOption instanceof Object &&
+      this.#currentAppState.selectedOption.hasOwnProperty("project")
+    ) {
+      const targetProject = this.#currentAppState.selectedOption["project"],
+        { projects } = this.#currentAppState.todoInfo,
+        targetTodoCard = projects[targetProject][todoCardText];
+
+      if (targetTodoCard !== undefined) {
+        projects[targetProject][todoCardText].done = !projects[targetProject][todoCardText].done;
+      } else {
+        throw new Error("ERROR: target card not found in app state");
+      }
+      //will check for the property in the projects property of the app state, and if it exists toggle the done value
+    }
+  }
+
+  #deleteTodoCard(todoCardText) {
+    if (typeof this.#currentAppState.selectedOption === "string") {
+      const { regular } = this.#currentAppState.todoInfo,
+        targetTodoCard = regular[todoCardText];
+
+      if (targetTodoCard !== undefined) {
+        delete regular[todoCardText];
+      } else {
+        throw new Error("ERROR: target card not found in app state");
+      }
+      //will check for the property in the regular property of the app state, and if it exists delete it
+    } else if (
+      this.#currentAppState.selectedOption instanceof Object &&
+      this.#currentAppState.selectedOption.hasOwnProperty("project")
+    ) {
+      const targetProject = this.#currentAppState.selectedOption["project"],
+        { projects } = this.#currentAppState.todoInfo,
+        targetTodoCard = projects[targetProject][todoCardText];
+
+      if (targetTodoCard !== undefined) {
+        delete projects[targetProject][todoCardText];
+      } else {
+        throw new Error("ERROR: target card not found in app state");
+      }
+      //will check for the property in the projects property of the app state, and if it exists delete it
     }
   }
 
   #emitStateChange() {
-    // emit the state of this module to the publisher
+    //emit the change in appstate to the publisher so that it can relay the change to
+    //the other modules
   }
 
   #grabDependencies() {
