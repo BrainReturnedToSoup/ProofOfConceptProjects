@@ -125,9 +125,13 @@ export class Tasks {
 
   #todoCardFilterMethods = {
     Inbox: (todoCardsRefArr) => {},
+    //filtering for all existing cards
     Today: (todoCardsRefArr) => {},
+    //filtering for cards that fall within the created today category
     "This Week": (todoCardsRefArr) => {},
+    //filtering for cards that fall within the created today category
     Project: (specificProject) => {},
+    //filtering for cards that fall within the created today category
     mainFilter: (condition) => {},
   };
 
@@ -161,29 +165,42 @@ export class Tasks {
         textContainer = todoCard.querySelector(".Todo-Card-Left-Container"),
         textContent = textContainer.textContent;
 
-      //DELETE SPECIFIC TODO CARD GOES HERE
+      this.#todoCardFunctionality.deleteTodoCard(textContent);
       this.#DOMcache.todoCardListElement.innerHTML = "";
       this.#renderCards();
       this.#emitStateChange();
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
-      //TOGGLE DONE FUNCTION GOES HERE
+      this.#todoCardFunctionality.toggleDoneStatus(textContent);
       this.#DOMcache.todoCardListElement.innerHTML = "";
       this.#renderCards();
       this.#emitStateChange();
     }
+    //find the todo card text within the clicked card
+    //make change to data structure
     //clear the necessary containers
-    //initialize the rendering of the todo card state,
+    //initialize the rendering of the todo card state thats based off of the current data structure,
+    //includes rendering the header of the todo cards
     //emit the state change to all other modules so they can render based on the new state
   }
 
   #todoCardFunctionality = {
-    toggleDoneStatus: () => {},
+    toggleDoneStatus: function (todoCardText) {
+      const targetCardPath = this.findTodoCardPath(todoCardText);
+      if (targetCardPath !== null) {
+        targetCardPath.done = !targetCardPath.done;
+      }
+    },
 
-    deleteTodoCard: () => {},
+    deleteTodoCard: function (todoCardText) {
+      const targetCardPath = this.findTodoCardPath(todoCardText);
+      if (targetCardPath !== null) {
+        delete eval(targetCardPath);
+      }
+    },
 
-    findTodoCard: (condition) => {
+    findTodoCardPath: (condition) => {
       const { projects, regular } = this.#currentAppState.todoInfo,
-      pathString = 'this.#currentAppState.todoInfo';
+        pathString = "this.#currentAppState.todoInfo";
       let cardFound = false;
 
       for (let project in projects) {
@@ -191,7 +208,7 @@ export class Tasks {
         for (let todoCard in projects[project]) {
           if (cardFound) break;
           if (todoCard === condition) {
-            pathString += `.projects[${project}][${todoCard}]`
+            pathString += `.projects[${project}][${todoCard}]`;
             cardFound = !cardFound;
           }
         }
@@ -200,14 +217,16 @@ export class Tasks {
         for (let todoCard in regular) {
           if (cardFound) break;
           if (todoCard === condition) {
-              pathString += `.regular[${todoCard}]`
+            pathString += `.regular[${todoCard}]`;
             cardFound = !cardFound;
           }
         }
       }
 
-      if(cardFound && pathString !== 'this.#currentAppState.todoInfo') {
+      if (cardFound && pathString !== "this.#currentAppState.todoInfo") {
         return pathString;
+      } else {
+        return null;
       }
     },
   };
