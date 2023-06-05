@@ -124,109 +124,19 @@ export class Tasks {
   }
 
   #todoCardFilterMethods = {
-    Inbox: (todoCardsRefArr) => {
-      const selectedTodoCards = [],
-        [regularTodoCards, allProjects] = todoCardsRefArr;
-
-      for (let todoCard in regularTodoCards) {
-        selectedTodoCards.push({ [`${todoCard}`]: regularTodoCards[todoCard] });
-      }
-      for (let project in allProjects) {
-        for (let todoCard in allProjects[project]) {
-          selectedTodoCards.push({
-            [`${todoCard}`]: allProjects[project][todoCard],
-          });
-        }
-      }
-      return selectedTodoCards;
-    },
-    Today: (todoCardsRefArr) => {
-      const selectedTodoCards = [],
-        [regularTodoCards, allProjects] = todoCardsRefArr,
-        currentDate = new Date();
-
-      for (let todoCard in regularTodoCards) {
-        const currentTimeDiff = this.#dateDifferenceInDays(
-          currentDate,
-          todoCard["date"]
-        );
-
-        if (currentTimeDiff < 1) {
-          selectedTodoCards.push({
-            [`${todoCard}`]: regularTodoCards[todoCard],
-          });
-        }
-      }
-      for (let project in allProjects) {
-        for (let todoCard in allProjects[project]) {
-          const currentTimeDiff = this.#dateDifferenceInDays(
-            currentDate,
-            todoCard["date"]
-          );
-          if (currentTimeDiff < 1) {
-            selectedTodoCards.push({
-              [`${todoCard}`]: allProjects[project][todoCard],
-            });
-          }
-        }
-      }
-      return selectedTodoCards;
-    },
-    "This Week": (todoCardsRefArr) => {
-      const selectedTodoCards = [],
-        [regularTodoCards, allProjects] = todoCardsRefArr,
-        currentDate = new Date();
-
-      for (let todoCard in regularTodoCards) {
-        const currentTimeDiff = this.#dateDifferenceInDays(
-          currentDate,
-          todoCard["date"]
-        );
-        if (currentTimeDiff < 7) {
-          selectedTodoCards.push({ [`${todoCard}`]: project[todoCard] });
-        }
-      }
-      for (let project in allProjects) {
-        for (let todoCard in allProjects[project]) {
-          const currentTimeDiff = this.#dateDifferenceInDays(
-            currentDate,
-            todoCard["date"]
-          );
-          if (currentTimeDiff < 7) {
-            selectedTodoCards.push({
-              [`${todoCard}`]: allProjects[project][todoCard],
-            });
-          }
-        }
-      }
-      return selectedTodoCards;
-    },
-    Project: (specificProject) => {
-      const selectedTodoCards = [];
-      let projectFound = false;
-
-      for (let project in this.#currentAppState.todoInfo.projects) {
-        if (project === specificProject) {
-          for (let todoCard in this.#currentAppState.todoInfo.projects[
-            project
-          ]) {
-            selectedTodoCards.push({
-              [`${todoCard}`]:
-                this.#currentAppState.todoInfo.projects[project][todoCard],
-            });
-          }
-        }
-        if (projectFound) break;
-      }
-
-      return selectedTodoCards;
-    },
+    Inbox: (todoCardsRefArr) => {},
+    Today: (todoCardsRefArr) => {},
+    "This Week": (todoCardsRefArr) => {},
+    Project: (specificProject) => {},
+    mainFilter: (condition) => {},
   };
+
   #dateDifferenceInDays(referenceDate, todoCardDate) {
     return (
       (referenceDate.getTime() - todoCardDate.getTime()) / (24 * 60 * 60 * 1000)
     );
   }
+
   #todoCardBuilder(selectedTodoCardsArr) {
     for (let todoCard of selectedTodoCardsArr) {
       const range = document.createRange(),
@@ -251,12 +161,12 @@ export class Tasks {
         textContainer = todoCard.querySelector(".Todo-Card-Left-Container"),
         textContent = textContainer.textContent;
 
-      this.#deleteTodoCard(textContent);
+      //DELETE SPECIFIC TODO CARD GOES HERE
       this.#DOMcache.todoCardListElement.innerHTML = "";
       this.#renderCards();
       this.#emitStateChange();
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
-      this.#toggleDoneStatus(event.target.textContent);
+      //TOGGLE DONE FUNCTION GOES HERE
       this.#DOMcache.todoCardListElement.innerHTML = "";
       this.#renderCards();
       this.#emitStateChange();
@@ -266,76 +176,13 @@ export class Tasks {
     //emit the state change to all other modules so they can render based on the new state
   }
 
-  #toggleDoneStatus(todoCardText) {
-    if (typeof this.#currentAppState.selectedOption === "string") {
-      const appStatePath = this.#findTodoCard("All", todoCardText);
-    } else if (
-      this.#currentAppState.selectedOption instanceof Object &&
-      this.#currentAppState.selectedOption.hasOwnProperty("project")
-    ) {
-      const appStatePath = this.#findTodoCard("ProjectsOnly", todoCardText);
-    }
-  }
+  #todoCardFunctionality = {
+    toggleDoneStatus: () => {},
 
-  #deleteTodoCard(todoCardText) {
-    if (typeof this.#currentAppState.selectedOption === "string") {
-      const appStatePath = this.#findTodoCard(
-        "Delete",
-        "AllCards",
-        todoCardText
-      );
-    } else if (
-      this.#currentAppState.selectedOption instanceof Object &&
-      this.#currentAppState.selectedOption.hasOwnProperty("project")
-    ) {
-      const appStatePath = this.#findTodoCard(
-        "Delete",
-        "ProjectsOnly",
-        todoCardText
-      );
-    }
-  }
+    deleteTodoCard: () => {},
 
-  #findTodoCard(rule, scope, todoCardText) {
-    const { projects, regular } = this.#currentAppState.todoInfo;
-    if (scope === "AllCards") {
-      for (let todoCard in regular) {
-        if (todoCard === todoCardText) {
-          if (rule === "Delete") {
-            delete this.#currentAppState[regular][todoCard];
-          } else if (rule === "ToggleDone") {
-            this.#currentAppState[regular][todoCard] =
-              !this.#currentAppState[regular][todoCard];
-          }
-        }
-      }
-      for (let project in projects) {
-        for (let todoCard in project) {
-          if (todoCard === todoCardText) {
-            if (rule === "Delete") {
-              delete this.#currentAppState[projects][project][todoCard];
-            } else if (rule === "ToggleDone") {
-              this.#currentAppState[projects][project][todoCard].done  =
-                !this.#currentAppState[projects][project][todoCard].done ;
-            }
-          }
-        }
-      }
-    } else if (scope === "ProjectsOnly") {
-      for (let project in projects) {
-        for (let todoCard in project) {
-          if (todoCard === todoCardText) {
-            if (rule === "Delete") {
-              delete this.#currentAppState[projects][project][todoCard];
-            } else if (rule === "ToggleDone") {
-              this.#currentAppState[projects][project][todoCard].done =
-                !this.#currentAppState[projects][project][todoCard].done ;
-            }
-          }
-        }
-      }
-    }
-  }
+    findTodoCard: () => {},
+  };
 
   #emitStateChange() {
     //emit the change in appstate to the publisher so that it can relay the change to
