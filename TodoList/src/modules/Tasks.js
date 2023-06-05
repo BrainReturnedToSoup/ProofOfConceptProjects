@@ -265,66 +265,75 @@ export class Tasks {
     //initialize the rendering of the todo card state,
     //emit the state change to all other modules so they can render based on the new state
   }
+
   #toggleDoneStatus(todoCardText) {
     if (typeof this.#currentAppState.selectedOption === "string") {
-      const { regular } = this.#currentAppState.todoInfo,
-        targetTodoCard = regular[todoCardText];
-
-      if (targetTodoCard !== undefined) {
-        regular[todoCardText].done = !regular[todoCardText].done;
-      } else {
-        throw new Error("ERROR: target card not found in app state");
-      }
-      //will check for the property in the regular property of the app state, and if it exists toggle the done value
+      const appStatePath = this.#findTodoCard("All", todoCardText);
     } else if (
       this.#currentAppState.selectedOption instanceof Object &&
       this.#currentAppState.selectedOption.hasOwnProperty("project")
     ) {
-      const targetProject = this.#currentAppState.selectedOption["project"],
-        { projects } = this.#currentAppState.todoInfo,
-        targetTodoCard = projects[targetProject][todoCardText];
-
-      if (targetTodoCard !== undefined) {
-        projects[targetProject][todoCardText].done =
-          !projects[targetProject][todoCardText].done;
-      } else {
-        throw new Error("ERROR: target card not found in app state");
-      }
-      //will check for the property in the projects property of the app state, and if it exists toggle the done value
+      const appStatePath = this.#findTodoCard("ProjectsOnly", todoCardText);
     }
   }
 
   #deleteTodoCard(todoCardText) {
     if (typeof this.#currentAppState.selectedOption === "string") {
-      const { regular, projects } = this.#currentAppState.todoInfo,
-      targetProject = this.#currentAppState.selectedOption["project"],
-        targetTodoCardReg = regular?.[todoCardText];
-//        targetTodoCardProj = projects?.[targetProject]?.[todoCardText];
-// snippet above wont work if the selected option is a string, need to find a way to locate the corresponding 
-//todo card by iterating
-
-      if (targetTodoCardReg !== undefined) {
-        delete regular[todoCardText];
-      } else if (targetTodoCardProj !== undefined) {
-        delete projects[targetProject][todoCardText];
-      } else {
-        throw new Error("ERROR: target card not found in app state");
-      }
-      //will check for the property in the regular property of the app state, and if it exists delete it
+      const appStatePath = this.#findTodoCard(
+        "Delete",
+        "AllCards",
+        todoCardText
+      );
     } else if (
       this.#currentAppState.selectedOption instanceof Object &&
       this.#currentAppState.selectedOption.hasOwnProperty("project")
     ) {
-      const targetProject = this.#currentAppState.selectedOption["project"],
-        { projects } = this.#currentAppState.todoInfo,
-        targetTodoCard = projects[targetProject][todoCardText];
+      const appStatePath = this.#findTodoCard(
+        "Delete",
+        "ProjectsOnly",
+        todoCardText
+      );
+    }
+  }
 
-      if (targetTodoCard !== undefined) {
-        delete projects[targetProject][todoCardText];
-      } else {
-        throw new Error("ERROR: target card not found in app state");
+  #findTodoCard(rule, scope, todoCardText) {
+    const { projects, regular } = this.#currentAppState.todoInfo;
+    if (scope === "AllCards") {
+      for (let todoCard in regular) {
+        if (todoCard === todoCardText) {
+          if (rule === "Delete") {
+            delete this.#currentAppState[regular][todoCard];
+          } else if (rule === "ToggleDone") {
+            this.#currentAppState[regular][todoCard] =
+              !this.#currentAppState[regular][todoCard];
+          }
+        }
       }
-      //will check for the property in the projects property of the app state, and if it exists delete it
+      for (let project in projects) {
+        for (let todoCard in project) {
+          if (todoCard === todoCardText) {
+            if (rule === "Delete") {
+              delete this.#currentAppState[projects][project][todoCard];
+            } else if (rule === "ToggleDone") {
+              this.#currentAppState[projects][project][todoCard].done  =
+                !this.#currentAppState[projects][project][todoCard].done ;
+            }
+          }
+        }
+      }
+    } else if (scope === "ProjectsOnly") {
+      for (let project in projects) {
+        for (let todoCard in project) {
+          if (todoCard === todoCardText) {
+            if (rule === "Delete") {
+              delete this.#currentAppState[projects][project][todoCard];
+            } else if (rule === "ToggleDone") {
+              this.#currentAppState[projects][project][todoCard].done =
+                !this.#currentAppState[projects][project][todoCard].done ;
+            }
+          }
+        }
+      }
     }
   }
 
