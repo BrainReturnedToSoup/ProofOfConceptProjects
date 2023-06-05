@@ -181,7 +181,35 @@ export class Tasks {
 
     deleteTodoCard: () => {},
 
-    findTodoCard: () => {},
+    findTodoCard: (condition) => {
+      const { projects, regular } = this.#currentAppState.todoInfo,
+      pathString = 'this.#currentAppState.todoInfo';
+      let cardFound = false;
+
+      for (let project in projects) {
+        if (cardFound) break;
+        for (let todoCard in projects[project]) {
+          if (cardFound) break;
+          if (todoCard === condition) {
+            pathString += `.projects[${project}][${todoCard}]`
+            cardFound = !cardFound;
+          }
+        }
+      }
+      if (!cardFound) {
+        for (let todoCard in regular) {
+          if (cardFound) break;
+          if (todoCard === condition) {
+              pathString += `.regular[${todoCard}]`
+            cardFound = !cardFound;
+          }
+        }
+      }
+
+      if(cardFound && pathString !== 'this.#currentAppState.todoInfo') {
+        return pathString;
+      }
+    },
   };
 
   #emitStateChange() {
