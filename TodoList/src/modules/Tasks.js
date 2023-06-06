@@ -158,6 +158,57 @@ export class Tasks {
   //the retrieved todo cards will be stored on another data structure that is then forwarded to a todo card builder
   //and then a todo card renderer
 
+  //still need to add event listeners to activate the functionality for the individual todo cards
+
+  #initCardListEventListener() {
+    const { cardListElement } = this.#DOMcache;
+    if (cardListElement) {
+      cardListElement.removeEventListener("click", (e) => {
+        this.#todoCardButtonLogic(e);
+      });
+      cardListElement.addEventListener("click", (e) => {
+        this.#todoCardButtonLogic(e);
+      });
+    }
+  }
+
+  #todoCardButtonLogic(event) {
+    const targetClassList = Array.from(event.target.classList);
+    if (targetClassList.includes("Delete-Card")) {
+      const rightContainer = event.target.parentElement,
+        mainContainer = rightContainer.parentElement,
+        textContainer = mainContainer.querySelector(
+          ".Todo-Card-Left-Container"
+        );
+      this.#deleteTodoCard(textContainer.textContent);
+      mainContainer.remove();
+      //If the trashcan button is clicked on a card
+      //should delete the todo card
+      //also remove the todo card from the DOM without having to rerender all of the cards
+    } else if (targetClassList.includes("Todo-Card-Left-Container")) {
+      this.#toggleTodoCardDone(event.target.textContent);
+      //If anywhere else is clicked on the card
+      //should toggle done status of that specific todo card
+      //also remove the todo card from the DOM without having to rerender all of the cards
+    }
+  }
+
+  #deleteTodoCard(todoCardText) {
+    const { todoInfo } = this.#currentAppState;
+    for (let todoCardIndex in todoInfo) {
+      if (todoInfo[todoCardIndex].text === todoCardText) {
+        delete todoInfo[todoCardIndex];
+      }
+    }
+  }
+  #toggleTodoCardDone(todoCardText) {
+    const { todoInfo } = this.#currentAppState;
+    for (let todoCardIndex in todoInfo) {
+      if (todoInfo[todoCardIndex].text === todoCardText) {
+        todoInfo[todoCardIndex].done = !todoInfo[todoCardIndex].done;
+      }
+    }
+  }
   #emitStateChange() {
     //emit the change in appstate to the publisher so that it can relay the change to
     //the other modules
@@ -175,6 +226,7 @@ export class Tasks {
     }
     if (this.#DOMcache.contentElement && this.#DOMcache.navbarElement) {
       this.#renderContainer();
+      this.#initCardListEventListener();
     }
     if (this.#DOMcache.cardContainerElement) {
       this.#renderCards();
