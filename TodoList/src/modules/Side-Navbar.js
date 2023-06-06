@@ -3,22 +3,20 @@ import "../styles/navbar-style.css";
 export class SideNavBar {
   #currentAppState = {
     selectedOption: "Inbox",
-    todoInfo: {
-      projects: {
-        projectName: {
-          todoText: {
-            date: "date",
-            done: "false",
-          },
-        },
+    todoInfo: [
+      {
+        text: "text for todo card goes here",
+        date: "date value goes here",
+        done: false,
+        project: null,
       },
-      regular: {
-        todoText: {
-          date: "date",
-          done: "false",
-        },
+      {
+        text: "text for todo card goes here",
+        date: "date value goes here",
+        done: true,
+        project: "string of project name goes here",
       },
-    },
+    ],
   };
   #DOMcache = {
     bodyElement: document.body,
