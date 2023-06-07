@@ -2,17 +2,17 @@ import "../styles/tasks-style.css";
 
 export class Tasks {
   #currentAppState = {
-    selectedOption: "Inbox",
+    selectedOption: "This Week",
     todoInfo: [
       {
         text: "first todo",
-        date: "date value goes here",
+        date: "2023-06-06T13:30:00.000z",
         done: false,
         project: null,
       },
       {
         text: "second todo",
-        date: "date value goes here",
+        date: "2023-06-01T13:30:00.000z",
         done: true,
         project: "string of project name goes here",
       },
@@ -100,11 +100,16 @@ export class Tasks {
           todoCardTemplate = range.createContextualFragment(
             this.#DOMtemplates.todoCard
           ),
-          textBox = todoCardTemplate.querySelector(".Todo-Card-Left-Container");
+          textBox = todoCardTemplate.querySelector(".Todo-Card-Left-Container"),
+          mainContainer = todoCardTemplate.querySelector(".Todo-Card");
 
         textBox.textContent = todoCardObj.text;
 
         const initializedTodoCard = todoCardTemplate;
+
+        if (todoCardObj.done) {
+          mainContainer.classList.add("Done");
+        }
 
         this.#DOMcache.cardListElement.insertBefore(
           initializedTodoCard,
@@ -160,8 +165,7 @@ export class Tasks {
         //will pass all cards essentially if this is true
         //only occurs for the Inbox selected option
       } else if (
-        this.#daysDifferenceCalc(todoCardObj.date, currentDate) <
-        comparedDayValue
+        this.#daysDifferenceCalc(todoCardObj.date) < comparedDayValue
       ) {
         selectedTodoCards.push(todoCardObj);
         //will filter cards that meet the time difference requirement which is defined by using the selected
@@ -171,10 +175,13 @@ export class Tasks {
     return selectedTodoCards;
   }
 
-  #daysDifferenceCalc(todoCardDate, currentDate) {
-    return (
-      (currentDate.getTime() - todoCardDate.getTime()) / (24 * 60 * 60 * 1000)
-    );
+  #daysDifferenceCalc(todoCardDateString) {
+    const todoCardDate = new Date(todoCardDateString),
+      currentDate = new Date(),
+      differenceInDays =
+        (currentDate.getTime() - todoCardDate.getTime()) /
+        (60 * 60 * 1000 * 24);
+    return differenceInDays;
   }
 
   //functionality for rendering cards and giving each card functionality for their buttons goes here
@@ -269,6 +276,7 @@ export class Tasks {
         todoCard.done = !todoCard.done;
       }
     }
+    6;
   }
   #emitStateChange() {
     //emit the change in appstate to the publisher so that it can relay the change to

@@ -147,11 +147,10 @@
 }
 
 .Add-Card > .Add-Card-Text:hover {
-  color:rgb(115, 115, 115);
+  color: rgb(115, 115, 115);
 
   cursor: pointer;
 }
-
 
 .Add-Card > .Add-Card-Form {
   display: none;
@@ -163,11 +162,24 @@
   width: 100%;
   height: 100%;
 
-  padding: 5px;
+  padding: 10px;
 }
 
 .Add-Card > .Add-Card-Form > input {
   flex-grow: 1;
+
+  height: 70%;
+
+  border-radius: 25px;
+
+  border: none;
+
+  padding-left: 10px;
+}
+
+.Add-Card > .Add-Card-Form > input:focus {
+  border: none;
+  outline: none;
 }
 
 .Add-Card > .Add-Card-Form > button {
@@ -176,7 +188,7 @@
 
   border: none;
 
-  height: 70%;
+  height: 85%;
   width: 70px;
 
   border-radius: 5px;
@@ -185,16 +197,14 @@
   font-size: 1.2rem;
 
   margin-left: 10px;
-  margin-right: 5px;
 }
 
 .Add-Card > .Add-Card-Form > button:hover {
   background-color: rgb(97, 187, 222);
-  color:white;
+  color: white;
 
   cursor: pointer;
 }
-
 
 .Add-Card.Selected {
   border-radius: 3px;
@@ -202,7 +212,6 @@
   background-color: rgb(214, 212, 212);
 
   border: 1px solid rgb(155, 155, 155);
-
 }
 
 .Add-Card.Selected > .Add-Card-Text {
