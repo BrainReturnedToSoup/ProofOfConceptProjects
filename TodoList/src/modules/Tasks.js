@@ -2,7 +2,7 @@ import "../styles/tasks-style.css";
 
 export class Tasks {
   #currentAppState = {
-    selectedOption: "This Week",
+    selectedOption: "Inbox",
     todoInfo: [
       {
         text: "first todo",
@@ -15,6 +15,12 @@ export class Tasks {
         date: "2023-06-01T13:30:00.000z",
         done: true,
         project: "string of project name goes here",
+      },
+      {
+        text: "project todo",
+        date: "2023-06-01T13:30:00.000z",
+        done: true,
+        project: "Project 1",
       },
     ],
   };
@@ -124,16 +130,16 @@ export class Tasks {
   #cardFiltering() {
     const { todoInfo, selectedOption } = this.#currentAppState;
     if (selectedOption?.project) {
-      return this.#filterForProject(todoInfo, selectedOption);
+      return this.#filterForProject(todoInfo, selectedOption.project);
     } else if (typeof selectedOption === "string") {
       return this.#filterForRegular(todoInfo, selectedOption);
     }
   }
 
-  #filterForProject(todoInfo, selectedOption) {
+  #filterForProject(todoInfo, targetProject) {
     const selectedTodoCards = [];
     for (let todoCardObj of todoInfo) {
-      if (todoCardObj.project === selectedOption) {
+      if (todoCardObj.project === targetProject) {
         selectedTodoCards.push(todoCardObj);
       }
     }
