@@ -34,7 +34,10 @@ export class SideNavBar {
       </div>
       <div class="Add-Project-Container">
           <div class="Add-Project-Button">Add Project</div>
-          <form></form>
+          <form>
+            <label id="NewProjectName">Project Name</label>
+            <input id="NewProjectName" name="NewProjectName" required>
+          </form>
       </div>
     </nav>
     `,
@@ -94,18 +97,30 @@ export class SideNavBar {
     }
   }
   #clickEventListenerLogic(event) {
+    const targetClassList = Array.from(event.target.classList);
     if (event.target.tagName === "LI") {
       this.#currentAppState.selectedOption = event.target.textContent;
       this.#selectedButtonStyling();
-    } else if (
-      Array.from(event.target.classList).includes(
-        "Projects-List-Project-Button"
-      )
-    ) {
+    } else if (targetClassList.includes("Projects-List-Project-Button")) {
       this.#currentAppState.selectedOption = {
         project: event.target.textContent,
       };
       this.#selectedButtonStyling();
+    } else if (targetClassList.includes("Add-Project-Button")) {
+      const addButtonContainer = event.target.parentElement;
+      addButtonContainer.classList.add("Selected");
+    } else {
+      if (!this.#DOMcache.addProjectContainer) {
+        this.#DOMcache.addProjectContainer =
+          this.#DOMcache.navBarElement.querySelector(".Add-Project-Container");
+      }
+      if (
+        Array.from(this.#DOMcache.addProjectContainer.classList).includes(
+          "Selected"
+        )
+      ) {
+        this.#DOMcache.addProjectContainer.classList.remove("Selected");
+      }
     }
   }
 

@@ -2,7 +2,7 @@ import "../styles/tasks-style.css";
 
 export class Tasks {
   #currentAppState = {
-    selectedOption: "Inbox",
+    selectedOption: "Today",
     todoInfo: [
       {
         text: "first todo",
@@ -95,11 +95,12 @@ export class Tasks {
       addCardFrag = addCardRange.createContextualFragment(
         this.#DOMtemplates.addCard
       );
-      this.#DOMcache.addCardElement = addCardFrag.querySelector('.Add-Card');
+    this.#DOMcache.addCardElement = addCardFrag.querySelector(".Add-Card");
     cardListElement.innerHTML = "";
     cardListElement.append(addCardFrag);
 
     const selectedCardsArr = this.#cardFiltering();
+
     if (selectedCardsArr.length > 0) {
       for (let todoCardObj of selectedCardsArr) {
         const range = document.createRange(),
@@ -237,8 +238,10 @@ export class Tasks {
       }
 
       todoInfo.push(newTodoCardObj);
+
+      this.#renderCards();
+      this.#emitStateChange();
     }
-    this.#renderCards();
   }
   //logic for when a submit event within the card list happens,
   //thus it will only be for instances at which a new card is added
@@ -268,9 +271,11 @@ export class Tasks {
         );
       this.#deleteTodoCard(textContainer.textContent);
       mainContainer.remove();
+      this.#emitStateChange();
       //If the trashcan button is clicked on a card
       //should delete the todo card
-      //also remove the todo card from the DOM without having to rerender all of the cards
+      //remove the todo card from the DOM without having to rerender all of the cards
+      //emit the state change to other modules
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
       const mainContainer = event.target.parentElement,
         mainContainerClassList = Array.from(mainContainer.classList);
@@ -283,9 +288,12 @@ export class Tasks {
       } else if (mainContainerClassList.includes("Todo-Card")) {
         mainContainer.classList.add("Done");
       }
+
+      this.#emitStateChange();
       //If anywhere else is clicked on the card
       //should toggle done status of that specific todo card
       //also remove the todo card from the DOM without having to rerender all of the cards
+      //emit the change to other modules
     } else if (targetClassList.includes("Add-Card-Text")) {
       const addCardContainerElement = event.target.parentElement,
         ACCEclassList = Array.from(addCardContainerElement.classList);
