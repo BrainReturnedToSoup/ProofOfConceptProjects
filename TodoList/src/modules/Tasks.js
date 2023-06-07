@@ -5,13 +5,13 @@ export class Tasks {
     selectedOption: "Inbox",
     todoInfo: [
       {
-        text: "text for todo card goes here",
+        text: "first todo",
         date: "date value goes here",
         done: false,
         project: null,
       },
       {
-        text: "text for todo card goes here",
+        text: "second todo",
         date: "date value goes here",
         done: true,
         project: "string of project name goes here",
@@ -26,6 +26,13 @@ export class Tasks {
     <div class="Todo-Card-Container">
       <h1 class="Current-Selection"></h1>
       <div class="Todo-Card-List">
+      <div class="Add-Card">
+        <div class="Add-Card-Text">Add Todo +</div>
+          <form class="Add-Card-Form Form-Element">
+           <input class="Form-Element">
+            <button class="Form-Element">Add</button>
+          </form>
+      </div>
       </div>
     </div>
     `,
@@ -39,6 +46,7 @@ export class Tasks {
     `,
     addCard: `
     <div class="Add-Card">
+      <div class="Add-Card-Text">Add Todo+</div>
       <form>
         <input>
         <button type="submit">Add</button>
@@ -57,9 +65,12 @@ export class Tasks {
       ),
       cardContainerHeaderElement =
         cardContainerElement.querySelector(".Current-Selection"),
-      cardListElement = cardContainerElement.querySelector(".Todo-Card-List");
+      cardListElement = cardContainerElement.querySelector(".Todo-Card-List"),
+      addCardElement = cardListElement.querySelector(".Add-Card");
+
     this.#DOMcache.cardContainerHeaderElement = cardContainerHeaderElement;
     this.#DOMcache.cardListElement = cardListElement;
+    this.#DOMcache.addCardElement = addCardElement;
 
     this.#renderSelectedHeader();
 
@@ -97,7 +108,7 @@ export class Tasks {
 
         this.#DOMcache.cardListElement.insertBefore(
           initializedTodoCard,
-          this.#DOMcache.cardListElement.lastChild
+          this.#DOMcache.addCardElement
         );
         //iterates through the app state todo info array, creates a todo card for each todo card element, and appends it before the last child
         //The last child should always be the button that is used to add another todo item
@@ -188,6 +199,21 @@ export class Tasks {
 
   #todoCardButtonLogic(event) {
     const targetClassList = Array.from(event.target.classList);
+
+    if (!targetClassList.includes("Form-Element")) {
+      const { addCardElement } = this.#DOMcache,
+        ACCEclassList = Array.from(addCardElement.classList);
+      if (ACCEclassList.includes("Selected")) {
+        const formElement = addCardElement.querySelector("form"),
+          inputElement = formElement.querySelector("input");
+
+        inputElement.value = "";
+        addCardElement.classList.remove("Selected");
+      }
+    }
+
+    //checks to see if you clicked off of a form, which if you did it resets the add book element essentially
+
     if (targetClassList.includes("Delete-Card")) {
       const rightContainer = event.target.parentElement,
         mainContainer = rightContainer.parentElement,
@@ -214,7 +240,18 @@ export class Tasks {
       //If anywhere else is clicked on the card
       //should toggle done status of that specific todo card
       //also remove the todo card from the DOM without having to rerender all of the cards
+    } else if (targetClassList.includes("Add-Card-Text")) {
+      const addCardContainerElement = event.target.parentElement,
+        ACCEclassList = Array.from(addCardContainerElement.classList);
+      if (
+        ACCEclassList.includes("Add-Card") &&
+        !ACCEclassList.includes("Selected")
+      ) {
+        addCardContainerElement.classList.add("Selected");
+      }
     }
+    //If you clicked on the add todo card link, it will transform the link into a form to fill out at which it's going to be another
+    //todo card that will be added
   }
 
   #deleteTodoCard(todoCardText) {
