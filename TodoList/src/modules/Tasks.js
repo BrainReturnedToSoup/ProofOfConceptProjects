@@ -32,13 +32,7 @@ export class Tasks {
     <div class="Todo-Card-Container">
       <h1 class="Current-Selection"></h1>
       <div class="Todo-Card-List">
-      <div class="Add-Card">
-        <div class="Add-Card-Text">Add Todo +</div>
-          <form class="Add-Card-Form Form-Element">
-           <input class="Form-Element">
-            <button class="Form-Element">Add</button>
-          </form>
-      </div>
+     
       </div>
     </div>
     `,
@@ -52,11 +46,10 @@ export class Tasks {
     `,
     addCard: `
     <div class="Add-Card">
-      <div class="Add-Card-Text">Add Todo+</div>
-      <form>
-        <input>
-        <button type="submit">Add</button>
-        <button type="button">Cancel</button>
+    <div class="Add-Card-Text">Add Todo +</div>
+      <form class="Add-Card-Form Form-Element">
+       <input name="TodoCardTextInput" class="Form-Element" required>
+        <button class="Form-Element">Add</button>
       </form>
     </div>
     `,
@@ -71,12 +64,10 @@ export class Tasks {
       ),
       cardContainerHeaderElement =
         cardContainerElement.querySelector(".Current-Selection"),
-      cardListElement = cardContainerElement.querySelector(".Todo-Card-List"),
-      addCardElement = cardListElement.querySelector(".Add-Card");
+      cardListElement = cardContainerElement.querySelector(".Todo-Card-List");
 
     this.#DOMcache.cardContainerHeaderElement = cardContainerHeaderElement;
     this.#DOMcache.cardListElement = cardListElement;
-    this.#DOMcache.addCardElement = addCardElement;
 
     this.#renderSelectedHeader();
 
@@ -99,6 +90,15 @@ export class Tasks {
   }
 
   #renderCards() {
+    const { cardListElement } = this.#DOMcache,
+      addCardRange = document.createRange(),
+      addCardFrag = addCardRange.createContextualFragment(
+        this.#DOMtemplates.addCard
+      );
+      this.#DOMcache.addCardElement = addCardFrag.querySelector('.Add-Card');
+    cardListElement.innerHTML = "";
+    cardListElement.append(addCardFrag);
+
     const selectedCardsArr = this.#cardFiltering();
     if (selectedCardsArr.length > 0) {
       for (let todoCardObj of selectedCardsArr) {
@@ -198,7 +198,7 @@ export class Tasks {
 
   //still need to add event listeners to activate the functionality for the individual todo cards
 
-  #initCardListEventListener() {
+  #initCardListEventListeners() {
     const { cardListElement } = this.#DOMcache;
     if (cardListElement) {
       cardListElement.removeEventListener("click", (e) => {
@@ -207,8 +207,41 @@ export class Tasks {
       cardListElement.addEventListener("click", (e) => {
         this.#todoCardButtonLogic(e);
       });
+      cardListElement.removeEventListener("submit", (e) => {
+        this.#addCardSubmissionLogic(e);
+      });
+      cardListElement.addEventListener("submit", (e) => {
+        this.#addCardSubmissionLogic(e);
+      });
     }
   }
+
+  #addCardSubmissionLogic(event) {
+    event.preventDefault();
+
+    const formData = new FormData(event.target),
+      enteredText = formData.get("TodoCardTextInput"),
+      currentDate = new Date(),
+      storedDateString = currentDate.toISOString();
+
+    if (typeof enteredText === "string") {
+      const newTodoCardObj = {
+        text: enteredText,
+        date: storedDateString,
+        done: false,
+        project: null,
+      };
+      const { selectedOption, todoInfo } = this.#currentAppState;
+      if (selectedOption["project"]) {
+        newTodoCardObj.project = selectedOption["project"];
+      }
+
+      todoInfo.push(newTodoCardObj);
+    }
+    this.#renderCards();
+  }
+  //logic for when a submit event within the card list happens,
+  //thus it will only be for instances at which a new card is added
 
   #todoCardButtonLogic(event) {
     const targetClassList = Array.from(event.target.classList);
@@ -282,7 +315,6 @@ export class Tasks {
         todoCard.done = !todoCard.done;
       }
     }
-    6;
   }
   #emitStateChange() {
     //emit the change in appstate to the publisher so that it can relay the change to
@@ -301,7 +333,7 @@ export class Tasks {
     }
     if (this.#DOMcache.contentElement && this.#DOMcache.navbarElement) {
       this.#renderContainer();
-      this.#initCardListEventListener();
+      this.#initCardListEventListeners();
     }
     if (this.#DOMcache.cardContainerElement) {
       this.#renderCards();
