@@ -66,6 +66,12 @@
   align-items: center;
 }
 
+.Todo-Card:hover {
+  cursor: pointer;
+
+  background-color: rgb(235, 235, 235);
+}
+
 .Todo-Card-Right-Container {
   aspect-ratio: 1/1;
 
@@ -98,4 +104,32 @@
   background-image: url("../images-icons-logos/delete-card-highlight.svg");
 
   cursor: pointer;
+}
+
+.Todo-Card.Done {
+  background-color: rgb(66, 146, 66);
+}
+
+.Todo-Card.Done > .Todo-Card-Left-Container {
+  color: white;
+}
+
+.Todo-Card.Done:hover {
+  background-color: rgb(55, 119, 55);
+}
+
+.Todo-Card.Done:hover > .Todo-Card-Left-Container {
+  color: white;
+}
+
+.Todo-Card.Done:hover > .Todo-Card-Right-Container > .Delete-Card {
+  background-image: url(../images-icons-logos/delete-card-done.svg);
+}
+
+.Todo-Card.Done > .Todo-Card-Right-Container > .Delete-Card:hover {
+  background-image: url(../images-icons-logos/delete-card-highlight-done.svg);
+}
+
+.Add-Card {
+  
 }

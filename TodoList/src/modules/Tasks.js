@@ -37,6 +37,15 @@ export class Tasks {
       </div>
     </div>
     `,
+    addCard: `
+    <div class="Add-Card">
+      <form>
+        <input>
+        <button type="submit">Add</button>
+        <button type="button">Cancel</button>
+      </form>
+    </div>
+    `,
   };
   #renderContainer() {
     const range = document.createRange(),
@@ -86,7 +95,12 @@ export class Tasks {
 
         const initializedTodoCard = todoCardTemplate;
 
-        this.#DOMcache.cardListElement.append(initializedTodoCard);
+        this.#DOMcache.cardListElement.insertBefore(
+          initializedTodoCard,
+          this.#DOMcache.cardListElement.lastChild
+        );
+        //iterates through the app state todo info array, creates a todo card for each todo card element, and appends it before the last child
+        //The last child should always be the button that is used to add another todo item
       }
     }
   }
@@ -186,7 +200,17 @@ export class Tasks {
       //should delete the todo card
       //also remove the todo card from the DOM without having to rerender all of the cards
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
+      const mainContainer = event.target.parentElement,
+        mainContainerClassList = Array.from(mainContainer.classList);
       this.#toggleTodoCardDone(event.target.textContent);
+      if (
+        mainContainerClassList.includes("Todo-Card") &&
+        mainContainerClassList.includes("Done")
+      ) {
+        mainContainer.classList.remove("Done");
+      } else if (mainContainerClassList.includes("Todo-Card")) {
+        mainContainer.classList.add("Done");
+      }
       //If anywhere else is clicked on the card
       //should toggle done status of that specific todo card
       //also remove the todo card from the DOM without having to rerender all of the cards
@@ -197,15 +221,15 @@ export class Tasks {
     const { todoInfo } = this.#currentAppState;
     for (let todoCardIndex in todoInfo) {
       if (todoInfo[todoCardIndex].text === todoCardText) {
-        delete todoInfo[todoCardIndex];
+        todoInfo.splice(todoCardIndex, 1);
       }
     }
   }
   #toggleTodoCardDone(todoCardText) {
     const { todoInfo } = this.#currentAppState;
-    for (let todoCardIndex in todoInfo) {
-      if (todoInfo[todoCardIndex].text === todoCardText) {
-        todoInfo[todoCardIndex].done = !todoInfo[todoCardIndex].done;
+    for (let todoCard of todoInfo) {
+      if (todoCard.text === todoCardText) {
+        todoCard.done = !todoCard.done;
       }
     }
   }
