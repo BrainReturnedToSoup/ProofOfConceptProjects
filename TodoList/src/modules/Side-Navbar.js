@@ -3,6 +3,7 @@ import "../styles/navbar-style.css";
 export class SideNavBar {
   #currentAppState = {
     selectedOption: "Inbox",
+    existingProjects: [],
     todoInfo: [
       {
         text: "text for todo card goes here",
@@ -34,9 +35,9 @@ export class SideNavBar {
       </div>
       <div class="Add-Project-Container">
           <div class="Add-Project-Button">Add Project</div>
-          <form>
-            <label id="NewProjectName">Project Name</label>
-            <input id="NewProjectName" name="NewProjectName" required>
+          <form class="Form-Element">
+            <input class="Form-Element" name="NewProjectName" required>
+            <button>Add</button>
           </form>
       </div>
     </nav>
@@ -96,8 +97,22 @@ export class SideNavBar {
       }
     }
   }
-  #clickEventListenerLogic(event) {
+  #dynamicNavBarStyling(event) {
     const targetClassList = Array.from(event.target.classList);
+
+    if (!this.#DOMcache.addProjectContainer) {
+      this.#DOMcache.addProjectContainer =
+        this.#DOMcache.navBarElement.querySelector(".Add-Project-Container");
+    }
+    if (
+      Array.from(this.#DOMcache.addProjectContainer.classList).includes(
+        "Selected"
+      ) &&
+      !targetClassList.includes("Form-Element")
+    ) {
+      this.#DOMcache.addProjectContainer.classList.remove("Selected");
+    }
+
     if (event.target.tagName === "LI") {
       this.#currentAppState.selectedOption = event.target.textContent;
       this.#selectedButtonStyling();
@@ -109,22 +124,27 @@ export class SideNavBar {
     } else if (targetClassList.includes("Add-Project-Button")) {
       const addButtonContainer = event.target.parentElement;
       addButtonContainer.classList.add("Selected");
-    } else {
-      if (!this.#DOMcache.addProjectContainer) {
-        this.#DOMcache.addProjectContainer =
-          this.#DOMcache.navBarElement.querySelector(".Add-Project-Container");
-      }
-      if (
-        Array.from(this.#DOMcache.addProjectContainer.classList).includes(
-          "Selected"
-        )
-      ) {
-        this.#DOMcache.addProjectContainer.classList.remove("Selected");
-      }
     }
   }
 
-  #submitEventListenerLogic(event) {}
+  #submitNewProject(event) {}
+
+  #initializeEventListeners() {
+    if (this.#DOMcache.navBarElement) {
+      this.#DOMcache.navBarElement.removeEventListener("click", (e) => {
+        this.#dynamicNavBarStyling(e);
+      });
+      this.#DOMcache.navBarElement.addEventListener("click", (e) => {
+        this.#dynamicNavBarStyling(e);
+      });
+      this.#DOMcache.navBarElement.removeEventListener("submit", (e) => {
+        this.#submitNewProject(e);
+      });
+      this.#DOMcache.navBarElement.addEventListener("submit", (e) => {
+        this.#submitNewProject(e);
+      });
+    }
+  }
   #render() {
     const { contentElement } = this.#DOMcache,
       range = document.createRange(),
@@ -133,20 +153,20 @@ export class SideNavBar {
       ),
       navElement = navBarElement.querySelector("nav");
 
-    navElement.addEventListener("click", (e) => {
-      this.#clickEventListenerLogic(e);
-    });
-
     this.#DOMcache.navBarElement = navElement;
 
     contentElement.append(navBarElement);
   }
+
+  #renderProjectCards() {}
   interface_init() {
     this.#grabDependencies();
 
     const { contentElement } = this.#DOMcache;
     if (contentElement && !contentElement.querySelector("nav")) {
       this.#render();
+      this.#renderProjectCards();
+      this.#initializeEventListeners();
       this.#selectedButtonStyling();
     }
   }

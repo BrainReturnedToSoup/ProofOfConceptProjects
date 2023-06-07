@@ -3,6 +3,7 @@ import "../styles/tasks-style.css";
 export class Tasks {
   #currentAppState = {
     selectedOption: "Today",
+    existingProjects: [],
     todoInfo: [
       {
         text: "first todo",
@@ -139,17 +140,20 @@ export class Tasks {
 
   #filterForProject(todoInfo, targetProject) {
     const selectedTodoCards = [];
-    for (let todoCardObj of todoInfo) {
-      if (todoCardObj.project === targetProject) {
-        selectedTodoCards.push(todoCardObj);
+    if (this.#currentAppState.existingProjects.includes(targetProject)) {
+      for (let todoCardObj of todoInfo) {
+        if (todoCardObj.project === targetProject) {
+          selectedTodoCards.push(todoCardObj);
+        }
       }
+      return selectedTodoCards;
+    } else {
+      throw new Error('ERROR: target project not found in existing projects data')
     }
-    return selectedTodoCards;
   }
 
   #filterForRegular(todoInfo, selectedOption) {
-    const selectedTodoCards = [],
-      currentDate = new Date();
+    const selectedTodoCards = [];
     let comparedDayValue = null;
 
     switch (true) {
