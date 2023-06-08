@@ -80,7 +80,7 @@ nav > h3 {
   width: 80%;
 
   margin-top: 5px;
-  padding-left: 20px;
+  padding-inline: 20px;
 
   font-size: 1.1rem;
   font-weight: 400;
@@ -89,6 +89,7 @@ nav > h3 {
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .Projects-List-Project-Button:hover {
@@ -160,3 +161,25 @@ nav > h3 {
 .Add-Project-Container.Selected > form {
   display: block;
 }
+
+.Delete-Project-Button {
+  aspect-ratio: 1/1;
+  height: 60%;
+  width: auto;
+
+  display: inherit;
+  justify-self: end;
+}
+
+.Projects-List-Project-Button:hover > .Delete-Project-Button {
+  background-image: url(../images-icons-logos/delete-card.svg);
+
+  background-size: cover;
+  background-position: center;
+}
+
+.Projects-List-Project-Button > .Delete-Project-Button:hover {
+  background-image: url(../images-icons-logos/delete-card-highlight.svg);
+  cursor: pointer;
+}
+

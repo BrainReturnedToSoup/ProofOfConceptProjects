@@ -3,7 +3,7 @@ import "../styles/navbar-style.css";
 export class SideNavBar {
   #currentAppState = {
     selectedOption: "Inbox",
-    existingProjects: [],
+    existingProjects: ["among us"],
     todoInfo: [
       {
         text: "text for todo card goes here",
@@ -43,7 +43,10 @@ export class SideNavBar {
     </nav>
     `,
     projectButton: `
-    <div class="Projects-List-Project-Button">Project 1</div>
+    <div class="Projects-List-Project-Button">
+      <div class="Project-Button-Text"></div>
+      <div class="Delete-Project-Button"></div>
+    </div>
     `,
   };
   #grabDependencies() {
@@ -56,14 +59,22 @@ export class SideNavBar {
       navButtons = Array.from(
         this.#DOMcache.navBarElement.querySelectorAll("li")
       ),
-      projectButtons = Array.from(
+      projectButtonsElements = Array.from(
         this.#DOMcache.navBarElement.querySelectorAll(
           ".Projects-List-Project-Button"
         )
+      ),
+      projectButtonsTextElements = projectButtonsElements.map(
+        (projectButtonElement) => {
+          //return a new array of each project button text element
+          return projectButtonElement.querySelector(".Project-Button-Text");
+        }
       );
 
     navButtons.forEach((button) => button.removeAttribute("style"));
-    projectButtons.forEach((button) => button.removeAttribute("style"));
+    projectButtonsTextElements.forEach((button) =>
+      button.removeAttribute("style")
+    );
 
     switch (true) {
       case selectedOption === "Inbox":
@@ -77,7 +88,10 @@ export class SideNavBar {
         break;
       case selectedOption instanceof Object &&
         selectedOption.hasOwnProperty("project"):
-        this.#selectedButtonStyling_Project(selectedOption, projectButtons);
+        this.#selectedButtonStyling_Project(
+          selectedOption,
+          projectButtonsTextElements
+        );
         break;
       default:
         throw new Error(
@@ -97,7 +111,7 @@ export class SideNavBar {
       }
     }
   }
-  #dynamicNavBarStyling(event) {
+  #navbarFunctionality(event) {
     const targetClassList = Array.from(event.target.classList);
 
     if (!this.#DOMcache.addProjectContainer) {
@@ -116,9 +130,14 @@ export class SideNavBar {
     if (event.target.tagName === "LI") {
       this.#currentAppState.selectedOption = event.target.textContent;
       this.#selectedButtonStyling();
-    } else if (targetClassList.includes("Projects-List-Project-Button")) {
+    } else if (targetClassList.includes("Project-Button-Text")) {
       this.#currentAppState.selectedOption = {
         project: event.target.textContent,
+      };
+      this.#selectedButtonStyling();
+    } else if (targetClassList.includes("Projects-List-Project-Button")) {
+      this.#currentAppState.selectedOption = {
+        project: event.target.children[0].textContent,
       };
       this.#selectedButtonStyling();
     } else if (targetClassList.includes("Add-Project-Button")) {
@@ -143,10 +162,10 @@ export class SideNavBar {
   #initializeEventListeners() {
     if (this.#DOMcache.navBarElement) {
       this.#DOMcache.navBarElement.removeEventListener("click", (e) => {
-        this.#dynamicNavBarStyling(e);
+        this.#navbarFunctionality(e);
       });
       this.#DOMcache.navBarElement.addEventListener("click", (e) => {
-        this.#dynamicNavBarStyling(e);
+        this.#navbarFunctionality(e);
       });
       this.#DOMcache.navBarElement.removeEventListener("submit", (e) => {
         this.#submitNewProject(e);
@@ -191,7 +210,7 @@ export class SideNavBar {
         const range = document.createRange(),
           projectButtonFrag = range.createContextualFragment(projectButton),
           projectButtonTextElement = projectButtonFrag.querySelector(
-            ".Projects-List-Project-Button"
+            ".Project-Button-Text"
           );
 
         projectButtonTextElement.textContent = projectName;

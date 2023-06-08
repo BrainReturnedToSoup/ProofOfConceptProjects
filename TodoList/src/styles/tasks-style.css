@@ -97,11 +97,11 @@
   background-size: cover;
   background-position: center;
 
-  background-image: url("../images-icons-logos/delete-card.svg");
+  background-image: url(../images-icons-logos/delete-card.svg);
 }
 
 .Delete-Card:hover {
-  background-image: url("../images-icons-logos/delete-card-highlight.svg");
+  background-image: url(../images-icons-logos/delete-card-highlight.svg);
 
   cursor: pointer;
 }
