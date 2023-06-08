@@ -3,7 +3,7 @@ import "../styles/navbar-style.css";
 export class SideNavBar {
   #currentAppState = {
     selectedOption: "Inbox",
-    existingProjects: ["among us"],
+    existingProjects: [],
     todoInfo: [
       {
         text: "text for todo card goes here",
@@ -140,10 +140,21 @@ export class SideNavBar {
         project: event.target.children[0].textContent,
       };
       this.#selectedButtonStyling();
+    } else if (targetClassList.includes("Delete-Project-Button")) {
+      const selectedProjectText =
+        event.target.previousElementSibling.textContent;
+      this.#deleteExistingProject(selectedProjectText);
+      this.#selectedButtonStyling();
     } else if (targetClassList.includes("Add-Project-Button")) {
       const addButtonContainer = event.target.parentElement;
       addButtonContainer.classList.add("Selected");
     }
+  }
+
+  #deleteExistingProject(targetProject) {
+    //delete the existing project from the existing project
+    //also filter through all the todo cards and delete any card linked to the specific project
+    //if the specific project is the selected project, default the view to inbox
   }
 
   #submitNewProject(event) {
