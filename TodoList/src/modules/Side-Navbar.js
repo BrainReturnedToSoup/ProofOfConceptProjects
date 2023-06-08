@@ -127,7 +127,18 @@ export class SideNavBar {
     }
   }
 
-  #submitNewProject(event) {}
+  #submitNewProject(event) {
+    //add the project to the existing projects property in the app state
+    event.preventDefault();
+
+    const formData = new FormData(event.target),
+      projectName = formData.get("NewProjectName");
+
+    if (typeof projectName === "string") {
+      this.#currentAppState.existingProjects.push(projectName);
+      this.#renderProjectButtons();
+    }
+  }
 
   #initializeEventListeners() {
     if (this.#DOMcache.navBarElement) {
@@ -158,14 +169,48 @@ export class SideNavBar {
     contentElement.append(navBarElement);
   }
 
-  #renderProjectCards() {}
+  #renderProjectButtons() {
+    if (!this.#DOMcache.projectsList) {
+      this.#DOMcache.projectsList =
+        this.#DOMcache.navBarElement.querySelector(".Projects-List");
+      //checks if the projectsList element has been references and saved in the cache
+      //if not it defines such
+    }
+
+    const { projectsList } = this.#DOMcache,
+      { existingProjects } = this.#currentAppState;
+
+    projectsList.innerHTML = "";
+
+    if (existingProjects.length > 0) {
+      //if there are existing projects
+      const { projectButton } = this.#DOMtemplates;
+      projectsList.style.display = "";
+
+      for (let projectName of existingProjects) {
+        const range = document.createRange(),
+          projectButtonFrag = range.createContextualFragment(projectButton),
+          projectButtonTextElement = projectButtonFrag.querySelector(
+            ".Projects-List-Project-Button"
+          );
+
+        projectButtonTextElement.textContent = projectName;
+
+        const initializedProjectButton = projectButtonFrag;
+        projectsList.append(initializedProjectButton);
+      }
+    } else {
+      //if there aren't any existingg projects
+      projectsList.style.display = "none";
+    }
+  }
   interface_init() {
     this.#grabDependencies();
 
     const { contentElement } = this.#DOMcache;
     if (contentElement && !contentElement.querySelector("nav")) {
       this.#render();
-      this.#renderProjectCards();
+      this.#renderProjectButtons();
       this.#initializeEventListeners();
       this.#selectedButtonStyling();
     }
