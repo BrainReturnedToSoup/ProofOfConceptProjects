@@ -118,6 +118,7 @@ export class SideNavBar {
       this.#DOMcache.addProjectContainer =
         this.#DOMcache.navBarElement.querySelector(".Add-Project-Container");
     }
+
     if (
       Array.from(this.#DOMcache.addProjectContainer.classList).includes(
         "Selected"
@@ -127,27 +128,43 @@ export class SideNavBar {
       this.#DOMcache.addProjectContainer.classList.remove("Selected");
     }
 
-    if (event.target.tagName === "LI") {
-      this.#currentAppState.selectedOption = event.target.textContent;
-      this.#selectedButtonStyling();
-    } else if (targetClassList.includes("Project-Button-Text")) {
-      this.#currentAppState.selectedOption = {
-        project: event.target.textContent,
-      };
-      this.#selectedButtonStyling();
-    } else if (targetClassList.includes("Projects-List-Project-Button")) {
-      this.#currentAppState.selectedOption = {
-        project: event.target.children[0].textContent,
-      };
-      this.#selectedButtonStyling();
-    } else if (targetClassList.includes("Delete-Project-Button")) {
-      const selectedProjectText =
-        event.target.previousElementSibling.textContent;
-      this.#deleteExistingProject(selectedProjectText);
-      this.#selectedButtonStyling();
-    } else if (targetClassList.includes("Add-Project-Button")) {
-      const addButtonContainer = event.target.parentElement;
-      addButtonContainer.classList.add("Selected");
+    switch (true) {
+      case event.target.tagName === "LI":
+        this.#currentAppState.selectedOption = event.target.textContent;
+
+        this.#selectedButtonStyling();
+
+        break;
+      case targetClassList.includes("Project-Button-Text"):
+        this.#currentAppState.selectedOption = {
+          project: event.target.textContent,
+        };
+
+        this.#selectedButtonStyling();
+
+        break;
+      case targetClassList.includes("Projects-List-Project-Button"):
+        this.#currentAppState.selectedOption = {
+          project: event.target.children[0].textContent,
+        };
+
+        this.#selectedButtonStyling();
+
+        break;
+      case targetClassList.includes("Delete-Project-Button"):
+        const selectedProjectText =
+          event.target.previousElementSibling.textContent;
+
+        this.#deleteExistingProject(selectedProjectText);
+        this.#selectedButtonStyling();
+
+        break;
+      case targetClassList.includes("Add-Project-Button"):
+        const addButtonContainer = event.target.parentElement;
+
+        addButtonContainer.classList.add("Selected");
+
+        break;
     }
   }
 
@@ -180,9 +197,12 @@ export class SideNavBar {
 
     const formData = new FormData(event.target),
       projectName = formData.get("NewProjectName"),
-      { existingProjects } = this.#currentAppState
+      { existingProjects } = this.#currentAppState;
 
-    if (typeof projectName === "string" && !existingProjects.includes(projectName)) {
+    if (
+      typeof projectName === "string" &&
+      !existingProjects.includes(projectName)
+    ) {
       this.#currentAppState.existingProjects.push(projectName);
       this.#renderProjectButtons();
     }
