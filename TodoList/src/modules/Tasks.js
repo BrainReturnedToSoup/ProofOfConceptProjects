@@ -346,9 +346,17 @@ export class Tasks {
       }
     }
   }
+
+  #appStateSubscriberMethods = [];
+
   #emitStateChange() {
-    //emit the change in appstate to the publisher so that it can relay the change to
-    //the other modules
+    for (let emitMethod of this.#appStateSubscriberMethods) {
+      emitMethod();
+    }
+  }
+
+  interface_subscribe_appstate() {
+    //
   }
 
   #grabDependencies() {

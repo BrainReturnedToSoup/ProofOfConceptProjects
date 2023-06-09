@@ -22,7 +22,7 @@ export class PageStructure {
       },
     },
   };
-  
+
   #DOMcache = {
     bodyElement: document.body,
   };
@@ -57,6 +57,18 @@ export class PageStructure {
 
       bodyElement.append(currentFrag);
     }
+  }
+
+  #appStateSubscriberMethods = [];
+
+  #emitStateChange() {
+    for (let emitMethod of this.#appStateSubscriberMethods) {
+      emitMethod('publish', this.#currentAppState);
+    }
+  }
+
+  interface_subscribe_appstate() {
+    //
   }
 
   interface_init() {

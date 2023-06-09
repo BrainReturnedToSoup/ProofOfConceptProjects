@@ -136,6 +136,7 @@ export class SideNavBar {
         this.#currentAppState.selectedOption = event.target.textContent;
 
         this.#selectedButtonStyling();
+        this.#emitStateChange();
 
         break;
       case targetClassList.includes("Project-Button-Text"):
@@ -144,6 +145,7 @@ export class SideNavBar {
         };
 
         this.#selectedButtonStyling();
+        this.#emitStateChange();
 
         break;
       case targetClassList.includes("Projects-List-Project-Button"):
@@ -152,6 +154,7 @@ export class SideNavBar {
         };
 
         this.#selectedButtonStyling();
+        this.#emitStateChange();
 
         break;
       case targetClassList.includes("Delete-Project-Button"):
@@ -160,12 +163,14 @@ export class SideNavBar {
 
         this.#deleteExistingProject(selectedProjectText);
         this.#selectedButtonStyling();
+        this.#emitStateChange();
 
         break;
       case targetClassList.includes("Add-Project-Button"):
         const addButtonContainer = event.target.parentElement;
 
         addButtonContainer.classList.add("Selected");
+        this.#emitStateChange();
 
         break;
     }
@@ -210,6 +215,7 @@ export class SideNavBar {
     ) {
       this.#currentAppState.existingProjects.push(projectName);
       this.#renderProjectButtons();
+      this.#emitStateChange();
     }
   }
 
@@ -276,6 +282,18 @@ export class SideNavBar {
       //if there aren't any existing projects
       projectsList.style.display = "none";
     }
+  }
+
+  #appStateSubscriberMethods = [];
+
+  #emitStateChange() {
+    for (let emitMethod of this.#appStateSubscriberMethods) {
+      emitMethod("publish", this.#currentAppState);
+    }
+  }
+
+  interface_subscribe_appstate() {
+    //
   }
 
   interface_init() {
