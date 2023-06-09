@@ -4,20 +4,7 @@ export class Tasks {
   #currentAppState = {
     selectedOption: "Inbox",
     existingProjects: [],
-    todoInfo: [
-      {
-        text: "first todo",
-        date: "2023-06-06T13:30:00.000z",
-        done: false,
-        project: null,
-      },
-      {
-        text: "second todo",
-        date: "2023-06-01T13:30:00.000z",
-        done: true,
-        project: "string of project name goes here",
-      },
-    ],
+    todoInfo: [],
   };
   #DOMcache = {
     bodyElement: document.body,
