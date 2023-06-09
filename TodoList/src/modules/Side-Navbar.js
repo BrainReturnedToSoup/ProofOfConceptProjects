@@ -24,7 +24,7 @@ export class SideNavBar {
       </div>
       <div class="Add-Project-Container">
           <div class="Add-Project-Button">Add Project</div>
-          <form class="Form-Element">
+          <form class="Add-Project-Form Form-Element">
             <input class="Form-Element" name="NewProjectName" required>
             <button>Add</button>
           </form>
@@ -299,6 +299,7 @@ export class SideNavBar {
 
   interface_sync_appstate(newAppState) {
     this.#currentAppState = newAppState;
+    this.#renderProjectButtons();
     this.#selectedButtonStyling();
   }
 }
