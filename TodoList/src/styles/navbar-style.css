@@ -114,7 +114,6 @@ nav > h3 {
   flex-direction: column;
 
   align-items: center;
-  justify-content: center;
 }
 
 .Add-Project-Button {
@@ -160,7 +159,7 @@ nav > h3 {
 }
 
 .Add-Project-Container.Selected > form {
-  display: block;
+  display: flex;
 }
 
 .Delete-Project-Button {
@@ -184,7 +183,7 @@ nav > h3 {
   cursor: pointer;
 }
 
- .Add-Project-Form > input {
+.Add-Project-Form > input {
   border-radius: 20px;
 
   background-color: rgb(216, 216, 216);
@@ -198,17 +197,25 @@ nav > h3 {
 }
 
 .Add-Project-Form {
-  display: flex;
-
   justify-content: center;
 }
 .Add-Project-Form > button {
   height: 28px;
+  width: 48px;
+
+  font-weight: 600;
 
   border: none;
   border-radius: 10px;
 
   background-color: rgb(216, 216, 216);
 
+  margin-left: 5px;
+}
 
+.Add-Project-Form > button:hover {
+  color: white;
+  background-color: skyblue;
+
+  cursor: pointer;
 }

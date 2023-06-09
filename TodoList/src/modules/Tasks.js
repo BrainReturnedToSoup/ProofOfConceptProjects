@@ -20,7 +20,7 @@ export class Tasks {
     `,
     todoCard: `
     <div class="Todo-Card">
-      <div class="Todo-Card-Left-Container">rendered</div>
+      <div class="Todo-Card-Left-Container"></div>
       <div class="Todo-Card-Right-Container">
         <div class="Delete-Card"></div>
       </div>
