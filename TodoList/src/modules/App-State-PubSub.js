@@ -1,10 +1,9 @@
 export function AppStatePublisher() {
   const subscribers = {
-    "subscriber module": "app state sync method for specific module",
   };
 
-  function subscribe(module, appStateMethod) {
-    subscribers[module] = appStateMethod;
+  function subscribe(module, publisherSideEmitMethod) {
+    subscribers[module] = publisherSideEmitMethod;
   }
 
   function unsubscribe(targetModule) {
@@ -12,8 +11,9 @@ export function AppStatePublisher() {
   }
 
   function publish(appStateData) {
-    for (let appStatemethod of subscribers) {
-      appStatemethod(appStateData);
+    for (let publisherSideEmitMethodKey in subscribers) {
+      const method = subscribers[publisherSideEmitMethodKey]
+      method(appStateData);
     }
   }
 

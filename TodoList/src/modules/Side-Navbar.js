@@ -6,14 +6,14 @@ export class SideNavBar {
     existingProjects: [],
     todoInfo: [
       {
-        text: "text for todo card goes here",
-        date: "date value goes here",
+        text: "first todo",
+        date: "2023-06-06T13:30:00.000z",
         done: false,
         project: null,
       },
       {
-        text: "text for todo card goes here",
-        date: "date value goes here",
+        text: "second todo",
+        date: "2023-06-01T13:30:00.000z",
         done: true,
         project: "string of project name goes here",
       },
@@ -162,8 +162,8 @@ export class SideNavBar {
           event.target.previousElementSibling.textContent;
 
         this.#deleteExistingProject(selectedProjectText);
-        this.#selectedButtonStyling();
         this.#emitStateChange();
+        this.#selectedButtonStyling();
 
         break;
       case targetClassList.includes("Add-Project-Button"):
@@ -181,15 +181,15 @@ export class SideNavBar {
       this.#currentAppState;
 
     if (existingProjects.includes(targetProject)) {
-      for (let project of existingProjects) {
-        if (project === targetProject) {
-          existingProjects.splice(project, 1);
+      for (let projectKey in existingProjects) {
+        if (existingProjects[projectKey] === targetProject) {
+          existingProjects.splice(projectKey, 1);
         }
       }
 
-      for (let todoCardObj of todoInfo) {
-        if (todoCardObj.project === targetProject) {
-          todoInfo.splice(todoCardObj, 1);
+      for (let todoCardObjKey in todoInfo) {
+        if (todoInfo[todoCardObjKey].project === targetProject) {
+          todoInfo.splice(todoCardObjKey, 1);
         }
       }
 
@@ -288,12 +288,14 @@ export class SideNavBar {
 
   #emitStateChange() {
     for (let emitMethod of this.#appStateSubscriberMethods) {
-      emitMethod("publish", this.#currentAppState);
+      emitMethod(this.#currentAppState);
     }
   }
 
-  interface_subscribe_appstate() {
-    //
+  interface_subscribe_appstate(method) {
+    if (!this.#appStateSubscriberMethods.includes(method)) {
+      this.#appStateSubscriberMethods.push(method);
+    }
   }
 
   interface_init() {

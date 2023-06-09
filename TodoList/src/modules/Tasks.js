@@ -2,7 +2,7 @@ import "../styles/tasks-style.css";
 
 export class Tasks {
   #currentAppState = {
-    selectedOption: "Today",
+    selectedOption: "Inbox",
     existingProjects: [],
     todoInfo: [
       {
@@ -16,12 +16,6 @@ export class Tasks {
         date: "2023-06-01T13:30:00.000z",
         done: true,
         project: "string of project name goes here",
-      },
-      {
-        text: "project todo",
-        date: "2023-06-01T13:30:00.000z",
-        done: true,
-        project: "Project 1",
       },
     ],
   };
@@ -347,24 +341,27 @@ export class Tasks {
     }
   }
 
-  #appStateSubscriberMethods = [];
-
-  #emitStateChange() {
-    for (let emitMethod of this.#appStateSubscriberMethods) {
-      emitMethod();
-    }
-  }
-
-  interface_subscribe_appstate() {
-    //
-  }
-
   #grabDependencies() {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".Content");
     this.#DOMcache.navbarElement =
       this.#DOMcache.contentElement.querySelector("nav");
   }
+
+  #appStateSubscriberMethods = [];
+
+  #emitStateChange() {
+    for (let emitMethod of this.#appStateSubscriberMethods) {
+      emitMethod(this.#currentAppState);
+    }
+  }
+
+  interface_subscribe_appstate(method) {
+    if (!this.#appStateSubscriberMethods.includes(method)) {
+      this.#appStateSubscriberMethods.push(method);
+    }
+  }
+
   interface_init() {
     if (!this.#DOMcache.contentElement || !this.#DOMcache.navbarElement) {
       this.#grabDependencies();

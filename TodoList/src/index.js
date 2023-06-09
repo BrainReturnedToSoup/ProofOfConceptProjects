@@ -13,14 +13,24 @@ const classInstance = {
     0: [classInstance.PageStructure],
     1: [classInstance.SideNavBar, classInstance.Tasks],
   },
-  initializeSubscribers = () => {},
+  publisher = AppStatePublisher(),
+  initializeTwoWaySubscriptions = () => {
+    for (let module in classInstance) {
+      const appModule = classInstance[module]
+      publisher.subscribe(
+        module,
+        appModule.interface_sync_appstate.bind(appModule)
+      );
+      appModule.interface_subscribe_appstate(publisher.publish);
+    }
+  },
   appRender = () => {
     for (let key in renderHierarchyConfig) {
       renderHierarchyConfig[key].forEach((module) => module.interface_init());
     }
   },
   startApp = () => {
-    initializeSubscribers();
+    initializeTwoWaySubscriptions();
     appRender();
   };
 

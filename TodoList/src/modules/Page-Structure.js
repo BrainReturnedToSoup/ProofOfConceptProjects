@@ -5,22 +5,20 @@ export class PageStructure {
   #currentAppState = {
     selectedOption: "Inbox",
     existingProjects: [],
-    todoInfo: {
-      projects: {
-        projectName: {
-          todoText: {
-            date: "date",
-            done: "false",
-          },
-        },
+    todoInfo: [
+      {
+        text: "first todo",
+        date: "2023-06-06T13:30:00.000z",
+        done: false,
+        project: null,
       },
-      regular: {
-        todoText: {
-          date: "date",
-          done: "false",
-        },
+      {
+        text: "second todo",
+        date: "2023-06-01T13:30:00.000z",
+        done: true,
+        project: "string of project name goes here",
       },
-    },
+    ],
   };
 
   #DOMcache = {
@@ -63,12 +61,14 @@ export class PageStructure {
 
   #emitStateChange() {
     for (let emitMethod of this.#appStateSubscriberMethods) {
-      emitMethod('publish', this.#currentAppState);
+      emitMethod(this.#currentAppState);
     }
   }
 
-  interface_subscribe_appstate() {
-    //
+  interface_subscribe_appstate(method) {
+    if (!this.#appStateSubscriberMethods.includes(method)) {
+      this.#appStateSubscriberMethods.push(method);
+    }
   }
 
   interface_init() {
