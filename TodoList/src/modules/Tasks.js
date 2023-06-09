@@ -55,6 +55,7 @@ export class Tasks {
     </div>
     `,
   };
+
   #renderContainer() {
     const range = document.createRange(),
       cardContainerFrag = range.createContextualFragment(
@@ -75,6 +76,7 @@ export class Tasks {
     this.#DOMcache.cardContainerElement = cardContainerElement;
     this.#DOMcache.contentElement.append(cardContainerFrag);
   }
+
   #renderSelectedHeader() {
     if (typeof this.#currentAppState.selectedOption === "string") {
       this.#DOMcache.cardContainerHeaderElement.textContent =
@@ -96,8 +98,11 @@ export class Tasks {
       addCardFrag = addCardRange.createContextualFragment(
         this.#DOMtemplates.addCard
       );
+
     this.#DOMcache.addCardElement = addCardFrag.querySelector(".Add-Card");
+
     cardListElement.innerHTML = "";
+
     cardListElement.append(addCardFrag);
 
     const selectedCardsArr = this.#cardFiltering();
@@ -131,6 +136,7 @@ export class Tasks {
 
   #cardFiltering() {
     const { todoInfo, selectedOption } = this.#currentAppState;
+
     if (selectedOption?.project) {
       return this.#filterForProject(todoInfo, selectedOption.project);
     } else if (typeof selectedOption === "string") {
@@ -140,15 +146,19 @@ export class Tasks {
 
   #filterForProject(todoInfo, targetProject) {
     const selectedTodoCards = [];
+
     if (this.#currentAppState.existingProjects.includes(targetProject)) {
       for (let todoCardObj of todoInfo) {
         if (todoCardObj.project === targetProject) {
           selectedTodoCards.push(todoCardObj);
         }
       }
+
       return selectedTodoCards;
     } else {
-      throw new Error('ERROR: target project not found in existing projects data')
+      throw new Error(
+        "ERROR: target project not found in existing projects data"
+      );
     }
   }
 
@@ -192,6 +202,7 @@ export class Tasks {
       differenceInDays =
         (currentDate.getTime() - todoCardDate.getTime()) /
         (60 * 60 * 1000 * 24);
+
     return differenceInDays;
   }
 
@@ -256,6 +267,7 @@ export class Tasks {
     if (!targetClassList.includes("Form-Element")) {
       const { addCardElement } = this.#DOMcache,
         ACCEclassList = Array.from(addCardElement.classList);
+
       if (ACCEclassList.includes("Selected")) {
         const formElement = addCardElement.querySelector("form"),
           inputElement = formElement.querySelector("input");
@@ -273,6 +285,7 @@ export class Tasks {
         textContainer = mainContainer.querySelector(
           ".Todo-Card-Left-Container"
         );
+
       this.#deleteTodoCard(textContainer.textContent);
       mainContainer.remove();
       this.#emitStateChange();
@@ -283,7 +296,9 @@ export class Tasks {
     } else if (targetClassList.includes("Todo-Card-Left-Container")) {
       const mainContainer = event.target.parentElement,
         mainContainerClassList = Array.from(mainContainer.classList);
+
       this.#toggleTodoCardDone(event.target.textContent);
+
       if (
         mainContainerClassList.includes("Todo-Card") &&
         mainContainerClassList.includes("Done")
@@ -301,6 +316,7 @@ export class Tasks {
     } else if (targetClassList.includes("Add-Card-Text")) {
       const addCardContainerElement = event.target.parentElement,
         ACCEclassList = Array.from(addCardContainerElement.classList);
+
       if (
         ACCEclassList.includes("Add-Card") &&
         !ACCEclassList.includes("Selected")
@@ -314,6 +330,7 @@ export class Tasks {
 
   #deleteTodoCard(todoCardText) {
     const { todoInfo } = this.#currentAppState;
+
     for (let todoCardIndex in todoInfo) {
       if (todoInfo[todoCardIndex].text === todoCardText) {
         todoInfo.splice(todoCardIndex, 1);
@@ -322,6 +339,7 @@ export class Tasks {
   }
   #toggleTodoCardDone(todoCardText) {
     const { todoInfo } = this.#currentAppState;
+
     for (let todoCard of todoInfo) {
       if (todoCard.text === todoCardText) {
         todoCard.done = !todoCard.done;

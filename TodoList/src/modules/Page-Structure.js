@@ -22,9 +22,11 @@ export class PageStructure {
       },
     },
   };
+  
   #DOMcache = {
     bodyElement: document.body,
   };
+
   #DOMtemplates = {
     header: `
         <div class="Header-Container">
@@ -66,6 +68,7 @@ export class PageStructure {
       this.#render();
     }
   }
+
   interface_sync_appstate(newAppState) {
     this.#currentAppState = newAppState;
   }

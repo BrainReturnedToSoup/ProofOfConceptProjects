@@ -19,9 +19,11 @@ export class SideNavBar {
       },
     ],
   };
+
   #DOMcache = {
     bodyElement: document.body,
   };
+
   #DOMtemplates = {
     mainStructure: `
     <nav>
@@ -49,6 +51,7 @@ export class SideNavBar {
     </div>
     `,
   };
+
   #grabDependencies() {
     this.#DOMcache.contentElement =
       this.#DOMcache.bodyElement.querySelector(".Content");
@@ -99,9 +102,11 @@ export class SideNavBar {
         );
     }
   }
+
   #selectedButtonStyling_Nav(targetButton) {
     targetButton.style["font-weight"] = "700";
   }
+
   #selectedButtonStyling_Project(projectObject, projectButtons) {
     const { project } = projectObject;
     for (let button of projectButtons) {
@@ -111,21 +116,19 @@ export class SideNavBar {
       }
     }
   }
+
   #navbarFunctionality(event) {
     const targetClassList = Array.from(event.target.classList);
 
-    if (!this.#DOMcache.addProjectContainer) {
-      this.#DOMcache.addProjectContainer =
-        this.#DOMcache.navBarElement.querySelector(".Add-Project-Container");
-    }
+    switch (true) {
+      case !this.#DOMcache.addProjectContainer:
+        this.#DOMcache.addProjectContainer =
+          this.#DOMcache.navBarElement.querySelector(".Add-Project-Container");
 
-    if (
-      Array.from(this.#DOMcache.addProjectContainer.classList).includes(
+      case Array.from(this.#DOMcache.addProjectContainer.classList).includes(
         "Selected"
-      ) &&
-      !targetClassList.includes("Form-Element")
-    ) {
-      this.#DOMcache.addProjectContainer.classList.remove("Selected");
+      ) && !targetClassList.includes("Form-Element"):
+        this.#DOMcache.addProjectContainer.classList.remove("Selected");
     }
 
     switch (true) {
@@ -178,6 +181,7 @@ export class SideNavBar {
           existingProjects.splice(project, 1);
         }
       }
+
       for (let todoCardObj of todoInfo) {
         if (todoCardObj.project === targetProject) {
           todoInfo.splice(todoCardObj, 1);
@@ -187,6 +191,7 @@ export class SideNavBar {
       if (selectedOption?.["project"] === targetProject) {
         this.#currentAppState.selectedOption = "Inbox";
       }
+
       this.#renderProjectButtons();
     }
   }
@@ -268,10 +273,11 @@ export class SideNavBar {
         projectsList.append(initializedProjectButton);
       }
     } else {
-      //if there aren't any existingg projects
+      //if there aren't any existing projects
       projectsList.style.display = "none";
     }
   }
+
   interface_init() {
     this.#grabDependencies();
 
@@ -283,6 +289,7 @@ export class SideNavBar {
       this.#selectedButtonStyling();
     }
   }
+
   interface_sync_appstate(newAppState) {
     this.#currentAppState = newAppState;
     this.#selectedButtonStyling();
