@@ -12,10 +12,9 @@ export function AppStatePublisher() {
 
   function publish(appStateData) {
     for (let publisherSideEmitMethodKey in subscribers) {
-      const method = subscribers[publisherSideEmitMethodKey]
+      const method = subscribers[publisherSideEmitMethodKey];
       method(appStateData);
     }
   }
-
   return { subscribe, unsubscribe, publish };
 }
