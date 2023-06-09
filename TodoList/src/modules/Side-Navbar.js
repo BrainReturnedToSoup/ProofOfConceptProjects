@@ -152,9 +152,26 @@ export class SideNavBar {
   }
 
   #deleteExistingProject(targetProject) {
-    //delete the existing project from the existing project
-    //also filter through all the todo cards and delete any card linked to the specific project
-    //if the specific project is the selected project, default the view to inbox
+    const { existingProjects, todoInfo, selectedOption } =
+      this.#currentAppState;
+
+    if (existingProjects.includes(targetProject)) {
+      for (let project of existingProjects) {
+        if (project === targetProject) {
+          existingProjects.splice(project, 1);
+        }
+      }
+      for (let todoCardObj of todoInfo) {
+        if (todoCardObj.project === targetProject) {
+          todoInfo.splice(todoCardObj, 1);
+        }
+      }
+
+      if (selectedOption?.["project"] === targetProject) {
+        this.#currentAppState.selectedOption = "Inbox";
+      }
+      this.#renderProjectButtons();
+    }
   }
 
   #submitNewProject(event) {
@@ -162,9 +179,10 @@ export class SideNavBar {
     event.preventDefault();
 
     const formData = new FormData(event.target),
-      projectName = formData.get("NewProjectName");
+      projectName = formData.get("NewProjectName"),
+      { existingProjects } = this.#currentAppState
 
-    if (typeof projectName === "string") {
+    if (typeof projectName === "string" && !existingProjects.includes(projectName)) {
       this.#currentAppState.existingProjects.push(projectName);
       this.#renderProjectButtons();
     }
