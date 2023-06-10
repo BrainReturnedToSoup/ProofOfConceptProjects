@@ -51,43 +51,56 @@ nav {
 .Home-Button-Dropdown,
 .About-Button-Dropdown,
 .Contact-Button-Dropdown {
-    display: none;
+  display: none;
 
-    box-sizing: border-box;
+  box-sizing: border-box;
 
-    position: absolute;
+  position: absolute;
 
+  top: -30px;
+
+  height: 240px;
+  width: 300px;
+
+  background-color: lightgrey;
+  color: black;
+
+  padding: 15px;
+
+  animation: slideDown 0.2s forwards;
+
+  z-index: -1;
+}
+
+@keyframes slideDown {
+  from {
+    top: -30px;
+  }
+  to {
     top: 140px;
-
-    height: 240px;
-    width: 300px;
-
-    background-color: lightgrey;
-    color: black;
-
-    padding: 15px;
+  }
 }
 
 .Home-Button-Dropdown {
-    left: 0px;
+  left: 0px;
 }
 
 .About-Button-Dropdown {
-    left: 86.5px;
+  left: 86.5px;
 }
 
 .Contact-Button-Dropdown {
-    left: 181px;
+  left: 181px;
 }
 
 .Home-Button.Selected > .Home-Button-Dropdown {
-    display: block;
+  display: block;
 }
 
 .About-Button.Selected > .About-Button-Dropdown {
-    display: block;
+  display: block;
 }
 
 .Contact-Button.Selected > .Contact-Button-Dropdown {
-    display: block;
+  display: block;
 }
