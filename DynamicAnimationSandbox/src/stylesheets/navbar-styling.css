@@ -74,7 +74,7 @@ nav {
 
 @keyframes slideDown {
   from {
-    top: -30px;
+    top: 20px;
   }
   to {
     top: 140px;
