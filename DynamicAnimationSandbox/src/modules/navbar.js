@@ -19,11 +19,12 @@ export class Navbar {
   #appendNavBar(frag) {
     const { bodyElement } = this.#DOMcache;
     if (!bodyElement.querySelector("nav")) {
+      this.#DOMcache.navBarElement = frag.querySelector("nav");
       bodyElement.append(frag);
     }
   }
   init() {
-    if (this.#DOMcache.bodyElement) {
+    if (this.#DOMcache.bodyElement && !this.#DOMcache.navBarElement) {
       const navBarFrag = this.#buildNavBar();
       this.#appendNavBar(navBarFrag);
     }
