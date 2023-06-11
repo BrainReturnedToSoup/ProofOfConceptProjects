@@ -1,13 +1,12 @@
 export class ImageSlider {
-  constructor(uniqueIdentifier, numOfImages = 2) {
-    if (numOfImages >= 2) {
+  constructor(uniqueIdentifier, numOfImages = 2, intervalTime = 1000) {
+    if (numOfImages >= 2 && intervalTime >= 1000) {
       this.#uniqueIdentifier = uniqueIdentifier;
       this.#numOfImages = numOfImages;
+      this.#intervalTime = intervalTime;
     }
   }
-  #DOMcache = {
-    bodyElement: document.body,
-  };
+  #DOMcache = {};
   #DOMtemplates = {
     sliderContainer: `
       <div class="Image-Slider-Container"></div>
@@ -30,8 +29,8 @@ export class ImageSlider {
   #DOMSliderImageClasses = [];
   #arrCurrentKeySIC = 0;
 
-  #userClickedSliderButton = false;
   #autoTransitionInterval = null;
+  #intervalTime = 2000;
 
   #numOfImages = 2;
   #uniqueIdentifier = "";
@@ -42,7 +41,7 @@ export class ImageSlider {
     if (!this.#autoTransitionInterval) {
       this.#autoTransitionInterval = setInterval(() => {
         this.#moveSliderRight();
-      }, 2000);
+      }, this.#intervalTime);
     }
   }
 
