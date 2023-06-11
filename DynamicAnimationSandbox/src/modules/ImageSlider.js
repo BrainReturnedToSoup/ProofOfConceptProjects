@@ -10,7 +10,7 @@ export class ImageSlider {
   #DOMtemplates = {
     sliderContainer: `
       <div class="Image-Slider-Container"></div>
-    `, 
+    `,
     sliderDisplay: `
       <div class="Image-Slider-Display"></div>
     `,
