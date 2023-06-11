@@ -1,16 +1,16 @@
 export class ImageSlider {
   constructor(uniqueIdentifier, numOfImages = 2, intervalTime = 1000) {
     if (numOfImages >= 2 && intervalTime >= 1000) {
-      this.#uniqueIdentifier = uniqueIdentifier;
-      this.#numOfImages = numOfImages;
-      this.#intervalTime = intervalTime;
+      this.#stateData.uniqueIdentifier = uniqueIdentifier;
+      this.#stateData.numOfImages = numOfImages;
+      this.#stateData.intervalTime = intervalTime;
     }
   }
   #DOMcache = {};
   #DOMtemplates = {
     sliderContainer: `
       <div class="Image-Slider-Container"></div>
-    `,
+    `, 
     sliderDisplay: `
       <div class="Image-Slider-Display"></div>
     `,
@@ -26,87 +26,144 @@ export class ImageSlider {
     `,
   };
 
-  #DOMSliderImageClasses = [];
-  #arrCurrentKeySIC = 0;
-
-  #autoTransitionInterval = null;
-  #intervalTime = 2000;
-
-  #numOfImages = 2;
-  #uniqueIdentifier = "";
-
-  #init = false;
+  #stateData = {
+    DOMSliderImageClasses: [],
+    arrCurrentKeySIC: 0,
+    autoTransitionInterval: null,
+    intervalTime: 2000,
+    numOfImages: 2,
+    uniqueIdentifier: "",
+    sliderButtonClicked: false,
+  };
 
   #initSliderAutoTransition() {
-    if (!this.#autoTransitionInterval) {
-      this.#autoTransitionInterval = setInterval(() => {
+    if (!this.#stateData.autoTransitionInterval) {
+      this.#stateData.autoTransitionInterval = setInterval(() => {
         this.#moveSliderRight();
-      }, this.#intervalTime);
+      }, this.#stateData.intervalTime);
     }
   }
 
   #moveSliderRight() {
     const currentSelectedImage =
-      this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+      this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
-    this.#arrCurrentKeySIC++;
+    this.#stateData.arrCurrentKeySIC++;
 
-    if (this.#arrCurrentKeySIC > this.#DOMSliderImageClasses.length - 1) {
-      this.#arrCurrentKeySIC = 0;
+    if (
+      this.#stateData.arrCurrentKeySIC >
+      this.#stateData.DOMSliderImageClasses.length - 1
+    ) {
+      this.#stateData.arrCurrentKeySIC = 0;
     }
 
     const nextSelectedImage =
-      this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+      this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
     this.#DOMcache[currentSelectedImage].classList.remove("Selected");
     this.#DOMcache[nextSelectedImage].classList.add("Selected");
   }
   #moveSliderLeft() {
     const currentSelectedImage =
-      this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+      this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
-    this.#arrCurrentKeySIC--;
+    this.#stateData.arrCurrentKeySIC--;
 
-    if (this.#arrCurrentKeySIC < 0) {
-      this.#arrCurrentKeySIC = this.#DOMSliderImageClasses.length - 1;
+    if (this.#stateData.arrCurrentKeySIC < 0) {
+      this.#stateData.arrCurrentKeySIC =
+        this.#stateData.DOMSliderImageClasses.length - 1;
     }
+
+    const nextSelectedImage =
+      this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
     this.#DOMcache[currentSelectedImage].classList.remove("Selected");
     this.#DOMcache[nextSelectedImage].classList.add("Selected");
   }
   #resetSliderPosition() {
-    if (this.#arrCurrentKeySIC > 0) {
+    if (this.#stateData.arrCurrentKeySIC > 0) {
       const currentSelectedImage =
-        this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
-      this.#arrCurrentKeySIC = 0;
+      this.#stateData.arrCurrentKeySIC = 0;
 
       const defaultSelectedImage =
-        this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
       this.#DOMcache[currentSelectedImage].classList.remove("Selected");
       this.#DOMcache[defaultSelectedImage].classList.add("Selected");
-    } else if (this.#arrCurrentKeySIC === 0) {
+    } else if (this.#stateData.arrCurrentKeySIC === 0) {
       return;
     } else {
       const currentSelectedImage =
-        this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
-      this.#arrCurrentKeySIC = 0;
+      this.#stateData.arrCurrentKeySIC = 0;
 
       const defaultSelectedImage =
-        this.#DOMSliderImageClasses[this.#arrCurrentKeySIC];
+        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
       this.#DOMcache[currentSelectedImage].classList.remove("Selected");
       this.#DOMcache[defaultSelectedImage].classList.add("Selected");
     }
   }
 
-  #sliderButtonLogic(event) {}
+  #sliderButtonLogic(event) {
+    const {
+      sliderButtonLeftElement,
+      sliderButtonCenterElement,
+      sliderButtonRightElement,
+    } = this.#DOMcache;
 
-  #removeAllEventListeners() {}
+    switch (event.target) {
+      case sliderButtonLeftElement:
+        if (!this.#stateData.sliderButtonClicked) {
+          clearInterval(this.#stateData.autoTransitionInterval);
+          this.#stateData.autoTransitionInterval = null;
+          this.#stateData.sliderButtonClicked =
+            !this.#stateData.sliderButtonClicked;
+        }
+        this.#moveSliderLeft();
+        break;
+      case sliderButtonRightElement:
+        if (!this.#stateData.sliderButtonClicked) {
+          clearInterval(this.#stateData.autoTransitionInterval);
+          this.#stateData.autoTransitionInterval = null;
+          this.#stateData.sliderButtonClicked =
+            !this.#stateData.sliderButtonClicked;
+        }
+        this.#moveSliderRight();
+        break;
+      case sliderButtonCenterElement:
+        this.#resetSliderPosition();
+        clearInterval(this.#stateData.autoTransitionInterval);
+        this.#stateData.autoTransitionInterval = null;
+        this.#stateData.sliderButtonClicked =
+          !this.#stateData.sliderButtonClicked;
+        this.#initSliderAutoTransition();
+        break;
+      default:
+        return;
+    }
+  }
 
-  #addAllEventListeners() {}
+  #removeAllEventListeners() {
+    this.#DOMcache.sliderButtonsContainerElement.removeEventListener(
+      "click",
+      (e) => {
+        this.#sliderButtonLogic(e);
+      }
+    );
+  }
+
+  #addAllEventListeners() {
+    this.#DOMcache.sliderButtonsContainerElement.addEventListener(
+      "click",
+      (e) => {
+        this.#sliderButtonLogic(e);
+      }
+    );
+  }
 
   initializeEventListeners() {
     this.#removeAllEventListeners();
@@ -134,7 +191,9 @@ export class ImageSlider {
       ".Image-Slider-Container"
     );
 
-    this.#DOMcache.sliderContainerElement.classList.add(this.#uniqueIdentifier);
+    this.#DOMcache.sliderContainerElement.classList.add(
+      this.#stateData.uniqueIdentifier
+    );
 
     return sliderContainerFrag;
   }
@@ -149,7 +208,7 @@ export class ImageSlider {
       sliderDisplayFrag.querySelector(".Image-Slider-Display");
 
     this.#DOMcache.sliderDisplayContainerElement.classList.add(
-      this.#uniqueIdentifier
+      this.#stateData.uniqueIdentifier
     );
 
     return sliderDisplayFrag;
@@ -186,7 +245,7 @@ export class ImageSlider {
       sliderButtonCenterElement,
       sliderButtonRightElement,
     ].forEach((element) => {
-      element.classList.add(this.#uniqueIdentifier);
+      element.classList.add(this.#stateData.uniqueIdentifier);
     });
 
     return sliderButtonsFrag;
@@ -199,7 +258,7 @@ export class ImageSlider {
       ),
       sliderImageElement = sliderImageFrag.querySelector(".Image-Slider-Image");
 
-    sliderImageElement.classList.add(this.#uniqueIdentifier);
+    sliderImageElement.classList.add(this.#stateData.uniqueIdentifier);
 
     return sliderImageElement;
   }
@@ -215,7 +274,7 @@ export class ImageSlider {
       imageElement.classList.add(imageIdentifier);
 
       this.#DOMcache[imageIdentifier] = imageElement;
-      this.#DOMSliderImageClasses.push(imageIdentifier);
+      this.#stateData.DOMSliderImageClasses.push(imageIdentifier);
     });
   }
 
@@ -245,19 +304,19 @@ export class ImageSlider {
   init(parentElement) {
     if (
       parentElement &&
-      typeof this.#uniqueIdentifier === "string" &&
-      this.#numOfImages >= 2 &&
-      !this.#init
+      typeof this.#stateData.uniqueIdentifier === "string" &&
+      this.#stateData.numOfImages >= 2 &&
+      !this.#stateData.init
     ) {
       const assembledSlider = this.#buildCompleteSlider();
-      this.initializeEventListeners(assembledSlider);
+      this.initializeEventListeners();
 
-      this.#addImageElements(this.#numOfImages);
+      this.#addImageElements(this.#stateData.numOfImages);
 
       this.#appendSlider(parentElement, assembledSlider);
       this.#initSliderAutoTransition();
 
-      this.#init = !this.#init;
+      this.#stateData.init = !this.#stateData.init;
     }
   }
 }
