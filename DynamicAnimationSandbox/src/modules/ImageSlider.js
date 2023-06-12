@@ -68,10 +68,12 @@ export class ImageSlider {
     if (this.#stateData.sliderDirection !== "Right") {
       this.#DOMcache[currentSelectedImage].classList.remove("Selected-Left");
       this.#DOMcache[
-        this.#stateData.arrCurrentKeySIC ===
-        this.#stateData.DOMSliderImageClasses.length - 1
-          ? 0
-          : this.#stateData.arrCurrentKeySIC + 1
+        this.#stateData.DOMSliderImageClasses[
+          this.#stateData.arrCurrentKeySIC ===
+          this.#stateData.DOMSliderImageClasses.length - 1
+            ? 0
+            : this.#stateData.arrCurrentKeySIC + 1
+        ]
       ].classList.remove("Unselected-Left");
 
       this.#stateData.sliderDirection = "Right";
@@ -97,12 +99,35 @@ export class ImageSlider {
     this.#DOMcache[nextSelectedImage].classList.add("Selected-Right");
   }
   #moveSliderLeft() {
+    const currentSelectedImage =
+      this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
+
     if (this.#stateData.sliderDirection !== "Left") {
+      this.#DOMcache[currentSelectedImage].classList.remove("Selected-Right");
+      this.#DOMcache[
+        this.#stateData.DOMSliderImageClasses[
+          this.#stateData.arrCurrentKeySIC === 0
+            ? this.#stateData.DOMSliderImageClasses.length - 1
+            : this.#stateData.arrCurrentKeySIC - 1
+        ]
+      ].classList.remove("Unselected-Right");
+
       this.#stateData.sliderDirection = "Left";
     }
 
-    const currentSelectedImage =
-      this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
+    let previousUnselectedImage;
+
+    if (
+      this.#stateData.arrCurrentKeySIC + 1 >
+      this.#stateData.DOMSliderImageClasses.length - 1
+    ) {
+      previousUnselectedImage = this.#stateData.DOMSliderImageClasses[0];
+    } else {
+      previousUnselectedImage =
+        this.#stateData.DOMSliderImageClasses[
+          this.#stateData.arrCurrentKeySIC + 1
+        ];
+    }
 
     this.#stateData.arrCurrentKeySIC--;
 
@@ -114,8 +139,10 @@ export class ImageSlider {
     const nextSelectedImage =
       this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
-    this.#DOMcache[currentSelectedImage].classList.remove("Selected");
-    this.#DOMcache[nextSelectedImage].classList.add("Selected");
+    this.#DOMcache[previousUnselectedImage].classList.remove("Unselected-Left");
+    this.#DOMcache[currentSelectedImage].classList.remove("Selected-Left");
+    this.#DOMcache[currentSelectedImage].classList.add("Unselected-Left");
+    this.#DOMcache[nextSelectedImage].classList.add("Selected-Left");
   }
   #resetSliderPosition() {
     if (this.#stateData.arrCurrentKeySIC > 0) {
