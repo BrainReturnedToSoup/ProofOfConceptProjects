@@ -171,15 +171,20 @@ export class ImageSlider {
   }
 
   #buildCompleteSlider() {
-    const sliderContainer = this.#buildContainer(),
-      sliderDisplay = this.#buildDisplay(),
-      sliderButtons = this.#buildButtons();
+    this.#buildContainer();
+    this.#buildDisplay();
+    this.#buildButtons();
 
-    let assembledSlider = sliderContainer;
-    assembledSlider.appendChild(sliderDisplay);
-    assembledSlider.appendChild(sliderButtons);
+    const {
+      sliderContainerElement,
+      sliderDisplayContainerElement,
+      sliderButtonsContainerElement,
+    } = this.#DOMcache;
 
-    return assembledSlider;
+    sliderContainerElement.appendChild(sliderDisplayContainerElement);
+    sliderContainerElement.appendChild(sliderButtonsContainerElement);
+
+    return sliderContainerElement;
   }
 
   #buildContainer() {
@@ -194,8 +199,6 @@ export class ImageSlider {
     this.#DOMcache.sliderContainerElement.classList.add(
       this.#stateData.uniqueIdentifier
     );
-
-    return sliderContainerFrag;
   }
 
   #buildDisplay() {
@@ -210,8 +213,6 @@ export class ImageSlider {
     this.#DOMcache.sliderDisplayContainerElement.classList.add(
       this.#stateData.uniqueIdentifier
     );
-
-    return sliderDisplayFrag;
   }
 
   #buildButtons() {
@@ -247,8 +248,6 @@ export class ImageSlider {
     ].forEach((element) => {
       element.classList.add(this.#stateData.uniqueIdentifier);
     });
-
-    return sliderButtonsFrag;
   }
 
   #buildImage() {
@@ -298,7 +297,7 @@ export class ImageSlider {
   }
 
   #appendSlider(parentElement, assembledSlider) {
-    parentElement.appendChild(assembledSlider);
+    parentElement.append(assembledSlider);
   }
 
   init(parentElement) {
