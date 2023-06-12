@@ -7,7 +7,12 @@
   width: 100%;
   height: 80%;
 
-  background-color: orange;
+  display: flex;
+
+  overflow: hidden;
+  position: relative;
+
+  background-color: white;
 }
 
 .Image-Slider-Buttons.main {
@@ -25,14 +30,78 @@
 }
 
 .Image-Slider-Image {
-  display: none;
-
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+
+  opacity: 0;
+  transition: transform 0.5s ease, opacity 0.5s ease;
 }
 
-.Selected {
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToRight {
+  from {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+}
+
+.Image-Slider-Image.Selected-Right {
   display: block;
+  animation: slideInFromRight 0.5s ease forwards;
+}
+
+.Image-Slider-Image.Unselected-Right {
+  display: block;
+  animation: slideOutToRight 0.5s ease forwards;
+}
+
+.Image-Slider-Image.Selected-Left {
+  display: block;
+  animation: slideInFromLeft 0.5s ease forwards;
+}
+
+.Image-Slider-Image.Unselected-Left {
+  display: block;
+  animation: slideOutToLeft 0.5s ease forwards;
 }
 
 .Image-Slider-Button {
@@ -57,4 +126,22 @@
   cursor: pointer;
 }
 
+.Image-1 {
+  background-color: green;
+}
 
+.Image-2 {
+  background-color: blue;
+}
+
+.Image-3 {
+  background-color: red;
+}
+
+.Image-4 {
+  background-color: orange;
+}
+
+.Image-5 {
+  background-color: yellow;
+}
