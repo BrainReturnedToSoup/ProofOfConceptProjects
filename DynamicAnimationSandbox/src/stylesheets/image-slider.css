@@ -1,0 +1,60 @@
+.Image-Slider-Container.main {
+  width: 100%;
+  height: 400px;
+}
+
+.Image-Slider-Display.main {
+  width: 100%;
+  height: 80%;
+
+  background-color: orange;
+}
+
+.Image-Slider-Buttons.main {
+  width: 100%;
+  height: 20%;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  border: 1px solid grey;
+
+  background-color: white;
+}
+
+.Image-Slider-Image {
+  display: none;
+
+  width: 100%;
+  height: 100%;
+}
+
+.Selected {
+  display: block;
+}
+
+.Image-Slider-Button {
+  background-color: rgb(152, 152, 152);
+
+  width: 65px;
+  height: 30px;
+
+  margin-inline: 10px;
+
+  border-radius: 15px;
+
+  border: none;
+}
+
+.Image-Slider-Button.Center {
+  width: 30px;
+}
+
+.Image-Slider-Button:hover {
+  background-color: skyblue;
+  cursor: pointer;
+}
+
+

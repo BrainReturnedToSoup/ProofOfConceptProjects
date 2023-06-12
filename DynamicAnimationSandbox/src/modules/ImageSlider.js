@@ -1,3 +1,5 @@
+import "../stylesheets/image-slider.css";
+
 export class ImageSlider {
   constructor(uniqueIdentifier, numOfImages = 2, intervalTime = 1000) {
     if (numOfImages >= 2 && intervalTime >= 1000) {
@@ -34,6 +36,7 @@ export class ImageSlider {
     numOfImages: 2,
     uniqueIdentifier: "",
     sliderButtonClicked: false,
+    sliderDirection: "Right",
   };
 
   #initSliderAutoTransition() {
@@ -48,6 +51,32 @@ export class ImageSlider {
     const currentSelectedImage =
       this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
+    let previousUnselectedImage;
+
+    if (this.#stateData.arrCurrentKeySIC - 1 < 0) {
+      previousUnselectedImage =
+        this.#stateData.DOMSliderImageClasses[
+          this.#stateData.DOMSliderImageClasses.length - 1
+        ];
+    } else {
+      previousUnselectedImage =
+        this.#stateData.DOMSliderImageClasses[
+          this.#stateData.arrCurrentKeySIC - 1
+        ];
+    }
+
+    if (this.#stateData.sliderDirection !== "Right") {
+      this.#DOMcache[currentSelectedImage].classList.remove("Selected-Left");
+      this.#DOMcache[
+        this.#stateData.arrCurrentKeySIC ===
+        this.#stateData.DOMSliderImageClasses.length - 1
+          ? 0
+          : this.#stateData.arrCurrentKeySIC + 1
+      ].classList.remove("Unselected-Left");
+
+      this.#stateData.sliderDirection = "Right";
+    }
+
     this.#stateData.arrCurrentKeySIC++;
 
     if (
@@ -60,10 +89,18 @@ export class ImageSlider {
     const nextSelectedImage =
       this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
-    this.#DOMcache[currentSelectedImage].classList.remove("Selected");
-    this.#DOMcache[nextSelectedImage].classList.add("Selected");
+    this.#DOMcache[previousUnselectedImage].classList.remove(
+      "Unselected-Right"
+    );
+    this.#DOMcache[currentSelectedImage].classList.remove("Selected-Right");
+    this.#DOMcache[currentSelectedImage].classList.add("Unselected-Right");
+    this.#DOMcache[nextSelectedImage].classList.add("Selected-Right");
   }
   #moveSliderLeft() {
+    if (this.#stateData.sliderDirection !== "Left") {
+      this.#stateData.sliderDirection = "Left";
+    }
+
     const currentSelectedImage =
       this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
 
@@ -267,7 +304,7 @@ export class ImageSlider {
       const imageIdentifier = `Image-${index + 1}`;
 
       if (index === 0) {
-        imageElement.classList.add("Selected");
+        imageElement.classList.add("Selected-Right");
       }
 
       imageElement.classList.add(imageIdentifier);
