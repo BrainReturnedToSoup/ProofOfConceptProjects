@@ -37,6 +37,8 @@ export class ImageSlider {
     uniqueIdentifier: "",
     sliderButtonClicked: false,
     sliderDirection: "Right",
+    resetIntervalIndex: 0,
+    resetIntervalRef: null,
   };
 
   #initSliderAutoTransition() {
@@ -144,31 +146,57 @@ export class ImageSlider {
     this.#DOMcache[currentSelectedImage].classList.add("Unselected-Left");
     this.#DOMcache[nextSelectedImage].classList.add("Selected-Left");
   }
+
+  #resetSliderPositionInterval(directionMethodString, numberOfIntervals) {
+    let directionMethod;
+
+    if (directionMethodString === "Right") {
+      directionMethod = this.#moveSliderRight;
+    } else if (directionMethodString === "Left") {
+      directionMethod = this.#moveSliderLeft;
+    }
+
+    this.#stateData.resetIntervalRef = setInterval(() => {
+      this.#stateData.resetIntervalIndex++;
+      directionMethod.bind(this)();
+      if (this.#stateData.resetIntervalIndex === numberOfIntervals) {
+        clearInterval(this.#stateData.resetIntervalRef);
+        this.#stateData.resetIntervalRef = null;
+        this.#stateData.resetIntervalIndex = 0;
+        this.#stateData.sliderButtonClicked = false;
+        this.#initSliderAutoTransition();
+      }
+    }, 150);
+  }
   #resetSliderPosition() {
     if (this.#stateData.arrCurrentKeySIC > 0) {
-      const currentSelectedImage =
-        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
-
-      this.#stateData.arrCurrentKeySIC = 0;
-
-      const defaultSelectedImage =
-        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
-
-      this.#DOMcache[currentSelectedImage].classList.remove("Selected");
-      this.#DOMcache[defaultSelectedImage].classList.add("Selected");
+      if (
+        this.#stateData.arrCurrentKeySIC >=
+        Math.floor((this.#stateData.DOMSliderImageClasses.length - 1) / 2)
+      ) {
+        const numOfTimesGoRight =
+          this.#stateData.DOMSliderImageClasses.length -
+          Math.floor(this.#stateData.arrCurrentKeySIC - 1);
+        clearInterval(this.#stateData.autoTransitionInterval);
+        this.#stateData.autoTransitionInterval = null;
+        this.#resetSliderPositionInterval("Right", numOfTimesGoRight);
+        //go right until reset
+      } else if (
+        this.#stateData.arrCurrentKeySIC <
+        Math.floor((this.#stateData.DOMSliderImageClasses.length - 1) / 2)
+      ) {
+        const numOfTimesGoLeft = this.#stateData.arrCurrentKeySIC;
+        clearInterval(this.#stateData.autoTransitionInterval);
+        this.#stateData.autoTransitionInterval = null;
+        this.#resetSliderPositionInterval("Left", numOfTimesGoLeft);
+        //go left until reset
+      }
     } else if (this.#stateData.arrCurrentKeySIC === 0) {
+      clearInterval(this.#stateData.autoTransitionInterval);
+      this.#stateData.autoTransitionInterval = null;
+      this.#initSliderAutoTransition();
+      //if already on the first image
       return;
-    } else {
-      const currentSelectedImage =
-        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
-
-      this.#stateData.arrCurrentKeySIC = 0;
-
-      const defaultSelectedImage =
-        this.#stateData.DOMSliderImageClasses[this.#stateData.arrCurrentKeySIC];
-
-      this.#DOMcache[currentSelectedImage].classList.remove("Selected");
-      this.#DOMcache[defaultSelectedImage].classList.add("Selected");
     }
   }
 
@@ -200,11 +228,6 @@ export class ImageSlider {
         break;
       case sliderButtonCenterElement:
         this.#resetSliderPosition();
-        clearInterval(this.#stateData.autoTransitionInterval);
-        this.#stateData.autoTransitionInterval = null;
-        this.#stateData.sliderButtonClicked =
-          !this.#stateData.sliderButtonClicked;
-        this.#initSliderAutoTransition();
         break;
       default:
         return;
