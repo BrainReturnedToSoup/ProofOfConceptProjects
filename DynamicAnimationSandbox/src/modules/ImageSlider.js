@@ -1,11 +1,17 @@
 import "../stylesheets/image-slider.css";
 
 export class ImageSlider {
-  constructor(uniqueIdentifier, numOfImages = 2, intervalTime = 1000) {
+  constructor(
+    uniqueIdentifier,
+    numOfImages = 2,
+    intervalTime = 1000,
+    resetIntervalTime = 150
+  ) {
     if (numOfImages >= 2 && intervalTime >= 1000) {
       this.#stateData.uniqueIdentifier = uniqueIdentifier;
       this.#stateData.numOfImages = numOfImages;
       this.#stateData.intervalTime = intervalTime;
+      this.#stateData.resetIntervalTime = resetIntervalTime;
     }
   }
   #DOMcache = {};
@@ -33,6 +39,7 @@ export class ImageSlider {
     arrCurrentKeySIC: 0,
     autoTransitionInterval: null,
     intervalTime: 2000,
+    resetIntervalTime: 150,
     numOfImages: 2,
     uniqueIdentifier: "",
     sliderButtonClicked: false,
@@ -166,7 +173,7 @@ export class ImageSlider {
         this.#stateData.sliderButtonClicked = false;
         this.#initSliderAutoTransition();
       }
-    }, 150);
+    }, this.#stateData.resetIntervalTime);
   }
   #resetSliderPosition() {
     if (this.#stateData.arrCurrentKeySIC > 0) {
