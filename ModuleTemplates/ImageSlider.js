@@ -1,5 +1,3 @@
-import "../stylesheets/image-slider.css";
-
 export class ImageSlider {
   constructor(
     uniqueIdentifier,
