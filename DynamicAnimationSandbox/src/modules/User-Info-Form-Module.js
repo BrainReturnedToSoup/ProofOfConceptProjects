@@ -44,112 +44,48 @@ export function UserInfoFormModule() {
       },
     };
 
-    #templates = {
+    #DOMtemplates = {
       mainContainer: `
-        <form action="${this.#fragmentData.formAction}" method="${
-        this.#fragmentData.formMethod
-      }" class="${this.#fragmentData.uniqueIdentifier}">
+        <form action="${this.#fragmentData.formAction}" method="${this.#fragmentData.formMethod}" class="${this.#fragmentData.uniqueIdentifier}">
         </form>
         `,
       secondaryContainer: `
-        <div class="Form-Control-Container ${
-          this.#fragmentData.uniqueIdentifier
-        }"></div>
+        <div class="Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
+        </div>
         `,
       email: `
-        <div class="Email-Form-Control-Container ${
-          this.#fragmentData.uniqueIdentifier
-        }">
-            <label for="Email-Form-Control_${
-              this.#fragmentData.uniqueIdentifier
-            }">${this.#fragmentData.emailLabelText}</label>
-            
-            <input type="email" class="Email-Form-Control ${
-              this.#fragmentData.uniqueIdentifier
-            }" id="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}"
-            name="Email-Form-Control_${
-              this.#fragmentData.uniqueIdentifier
-            }_Var">
-
-            <div class="Email-Form-Control-Error-Container ${
-              this.#fragmentData.uniqueIdentifier
-            }>
-              <div class="Email-Form-Control-Error-Text-Pattern-Mismatch ${
-                this.#fragmentData.uniqueIdentifier
-              }">${this.#fragmentData.emailErrorBoxText.patternMismatch}</div>
-
-              <div class="Email-Form-Control-Error-Text-Too-Long ${
-                this.#fragmentData.uniqueIdentifier
-              }">${this.#fragmentData.emailErrorBoxText.tooLong}</div>
-
-              <div class="Email-Form-Control-Error-Text-Too-Short ${
-                this.#fragmentData.uniqueIdentifier
-              }">${this.#fragmentData.emailErrorBoxText.tooShort}</div>
-
-              <div class="Email-Form-Control-Error-Text-Value-Missing ${
-                this.#fragmentData.uniqueIdentifier
-              }">${this.#fragmentData.emailErrorBoxText.valueMissing}</div>
-
+        <div class="Email-Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
+            <label for="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailLabelText}</label>
+            <input type="email" class="Email-Form-Control ${this.#fragmentData.uniqueIdentifier}" id="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}" name="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}_Var">
+            <div class="Email-Form-Control-Error-Container ${this.#fragmentData.uniqueIdentifier}>
+              <div class="Email-Form-Control-Error-Text Pattern-Mismatch ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.patternMismatch}</div>
+              <div class="Email-Form-Control-Error-Text Too-Long ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.tooLong}</div>
+              <div class="Email-Form-Control-Error-Text Too-Short ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.tooShort}</div>
+              <div class="Email-Form-Control-Error-Text Value-Missing ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.valueMissing}</div>
             </div>
         </div>
         `,
       confirmEmail: `
-        <div class="Confirm-Email-Form-Control-Container ${
-          this.#fragmentData.uniqueIdentifier
-        }">
-
-            <label for="Confirm-Email-Form-Control_${
-              this.#fragmentData.uniqueIdentifier
-            }"></label>
-
-            <input type="email" class="Confirm-Email-Form-Control ${
-              this.#fragmentData.uniqueIdentifier
-            }" id="Confirm-Email-Form-Control_${
-        this.#fragmentData.uniqueIdentifier
-      }" name="Confirm-Email-Form-Control_${
-        this.#fragmentData.uniqueIdentifier
-      }_Var">
-
-                <div class="Confirm-Email-Form-Control-Error-Container ${
-                  this.#fragmentData.uniqueIdentifier
-                }">
-
-                  <div class="Confirm-Email-Form-Control-Error-Text-Pattern-Mismatch ${
-                    this.#fragmentData.uniqueIdentifier
-                  }">${
-        this.#fragmentData.confirmEmailErrorBoxText.patternMismatch
-      }</div>
-
-                  <div class="Confirm-Email-Form-Control-Error-Text-Too-Long ${
-                    this.#fragmentData.uniqueIdentifier
-                  }">${
-        this.#fragmentData.confirmEmailErrorBoxText.tooLong
-      }</div>
-
-                  <div class="Confirm-Email-Form-Control-Error-Text-Too-Short ${
-                    this.#fragmentData.uniqueIdentifier
-                  }">${
-        this.#fragmentData.confirmEmailErrorBoxText.tooShort
-      }</div>
-
-                  <div class="Confirm-Email-Form-Control-Error-Text-Value-Missing ${
-                    this.#fragmentData.uniqueIdentifier
-                  }">${
-        this.#fragmentData.confirmEmailErrorBoxText.valueMissing
-      }</div>
-                
-                </div>
-              </div>
+        <div class="Confirm-Email-Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
+            <label for="Confirm-Email-Form-Control_${this.#fragmentData.uniqueIdentifier}"></label>
+            <input type="email" class="Confirm-Email-Form-Control ${this.#fragmentData.uniqueIdentifier}" id="Confirm-Email-Form-Control_${this.#fragmentData.uniqueIdentifier}" name="Confirm-Email-Form-Control_${this.#fragmentData.uniqueIdentifier}_Var">
+            <div class="Confirm-Email-Form-Control-Error-Container ${this.#fragmentData.uniqueIdentifier}">
+                <div class="Confirm-Email-Form-Control-Error-Text Pattern-Mismatch ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.patternMismatch}</div>
+                <div class="Confirm-Email-Form-Control-Error-Text Too-Long ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.tooLong}</div>
+                <div class="Confirm-Email-Form-Control-Error-Text Too-Short ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.tooShort}</div>
+                <div class="Confirm-Email-Form-Control-Error-Text Value-Missing ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.valueMissing}</div>
+            </div>
+        </div>
         `,
       address: `
-      <div class="Address-Form-Control-Container ${}">
-          <label for="Address-Form-Control_${}">
-          <input type="text" class="Address-Form-Control ${}" id="Address-Form-Control_${}" name="Address-Form-Control_${}_Var">
+      <div class="Address-Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
+          <label for="Address-Form-Control_${this.#fragmentData.uniqueIdentifier}">
+          <input type="text" class="Address-Form-Control ${this.#fragmentData.uniqueIdentifier}" id="Address-Form-Control_${this.#fragmentData.uniqueIdentifier}" name="Address-Form-Control_${this.#fragmentData.uniqueIdentifier}_Var">
           <div class="Address-Form-Control-Error-Container">
-              <div class="Address-Form-Control-Error-Text-Pattern-Mismatch ${}">${}</div>
-              <div class="Address-Form-Control-Error-Text-Too-Long ${}">${}</div>
-              <div class="Address-Form-Control-Error-Text-Too-Short ${}">${}</div>
-              <div class="Address-Form-Control-Error-Text-Value-Missing ${}">${}</div>
+              <div class="Address-Form-Control-Error-Text Pattern-Mismatch ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.patternMismatch}</div>
+              <div class="Address-Form-Control-Error-Text Too-Long ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.tooLong}</div>
+              <div class="Address-Form-Control-Error-Text Too-Short ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.tooShort}</div>
+              <div class="Address-Form-Control-Error-Text Value-Missing ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.valueMissing}</div>
           </div>
       </div>
         `,
