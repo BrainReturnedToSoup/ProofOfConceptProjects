@@ -13,13 +13,35 @@ export function UserInfoFormModule() {
   };
 
   class FragmentBuilder {
+    constructor(configObj) {
+
+    }
     #fragmentData = {
       formAction: "#",
       formMethod: "get",
       uniqueIdentifier: "",
       emailLabelText: "Email",
-      emailErrorBoxText: { syntax: "Input not a valid email address" },
+      emailErrorBoxText: {
+        patternMismatch: "Value entered not a valid email address",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid email address",
+      },
       confirmEmailLabelText: "Confirm Email",
+      confirmEmailErrorBoxText: {
+        patternMismatch:
+          "Value entered does not match the previous email address",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter the same email address",
+      },
+      addressLabelText: "Address",
+      addressErrorBoxText: {
+        patternMismatch: 'Value entered is not a valid address',
+        tooLong: 'Value entered exceeds the maximum character count',
+        tooShort: 'Value enetered fails to meet minimum character count',
+        valueMissing: 'Please enter a valid address',
+      },
     };
 
     #templates = {
@@ -42,23 +64,94 @@ export function UserInfoFormModule() {
               this.#fragmentData.uniqueIdentifier
             }">${this.#fragmentData.emailLabelText}</label>
             
-            <input class="Email-Form-Control ${
+            <input type="email" class="Email-Form-Control ${
               this.#fragmentData.uniqueIdentifier
             }" id="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}"
             name="Email-Form-Control_${
               this.#fragmentData.uniqueIdentifier
             }_Var">
 
-            <div class="Email-Form-Control-Error ${
+            <div class="Email-Form-Control-Error-Container ${
               this.#fragmentData.uniqueIdentifier
-            }></div>
+            }>
+              <div class="Email-Form-Control-Error-Text-Pattern-Mismatch ${
+                this.#fragmentData.uniqueIdentifier
+              }">${this.#fragmentData.emailErrorBoxText.patternMismatch}</div>
+
+              <div class="Email-Form-Control-Error-Text-Too-Long ${
+                this.#fragmentData.uniqueIdentifier
+              }">${this.#fragmentData.emailErrorBoxText.tooLong}</div>
+
+              <div class="Email-Form-Control-Error-Text-Too-Short ${
+                this.#fragmentData.uniqueIdentifier
+              }">${this.#fragmentData.emailErrorBoxText.tooShort}</div>
+
+              <div class="Email-Form-Control-Error-Text-Value-Missing ${
+                this.#fragmentData.uniqueIdentifier
+              }">${this.#fragmentData.emailErrorBoxText.valueMissing}</div>
+
+            </div>
         </div>
         `,
       confirmEmail: `
+        <div class="Confirm-Email-Form-Control-Container ${
+          this.#fragmentData.uniqueIdentifier
+        }">
 
+            <label for="Confirm-Email-Form-Control_${
+              this.#fragmentData.uniqueIdentifier
+            }"></label>
+
+            <input type="email" class="Confirm-Email-Form-Control ${
+              this.#fragmentData.uniqueIdentifier
+            }" id="Confirm-Email-Form-Control_${
+        this.#fragmentData.uniqueIdentifier
+      }" name="Confirm-Email-Form-Control_${
+        this.#fragmentData.uniqueIdentifier
+      }_Var">
+
+                <div class="Confirm-Email-Form-Control-Error-Container ${
+                  this.#fragmentData.uniqueIdentifier
+                }">
+
+                  <div class="Confirm-Email-Form-Control-Error-Text-Pattern-Mismatch ${
+                    this.#fragmentData.uniqueIdentifier
+                  }">${
+        this.#fragmentData.confirmEmailErrorBoxText.patternMismatch
+      }</div>
+
+                  <div class="Confirm-Email-Form-Control-Error-Text-Too-Long ${
+                    this.#fragmentData.uniqueIdentifier
+                  }">${
+        this.#fragmentData.confirmEmailErrorBoxText.tooLong
+      }</div>
+
+                  <div class="Confirm-Email-Form-Control-Error-Text-Too-Short ${
+                    this.#fragmentData.uniqueIdentifier
+                  }">${
+        this.#fragmentData.confirmEmailErrorBoxText.tooShort
+      }</div>
+
+                  <div class="Confirm-Email-Form-Control-Error-Text-Value-Missing ${
+                    this.#fragmentData.uniqueIdentifier
+                  }">${
+        this.#fragmentData.confirmEmailErrorBoxText.valueMissing
+      }</div>
+                
+                </div>
+              </div>
         `,
       address: `
-
+      <div class="Address-Form-Control-Container ${}">
+          <label for="Address-Form-Control_${}">
+          <input type="text" class="Address-Form-Control ${}" id="Address-Form-Control_${}" name="Address-Form-Control_${}_Var">
+          <div class="Address-Form-Control-Error-Container">
+              <div class="Address-Form-Control-Error-Text-Pattern-Mismatch ${}">${}</div>
+              <div class="Address-Form-Control-Error-Text-Too-Long ${}">${}</div>
+              <div class="Address-Form-Control-Error-Text-Too-Short ${}">${}</div>
+              <div class="Address-Form-Control-Error-Text-Value-Missing ${}">${}</div>
+          </div>
+      </div>
         `,
       state: `
 
@@ -123,7 +216,7 @@ export function UserInfoFormModule() {
     }
   }
 
-  function processedConfig(configObj) {
+  function validateConfig(configObj) {
     //the start of the sanitization process, which checks for the most crucial formats first, because regardless of the
     //context of invocation, these properties are mandatory for the module to work correctly
     if (
@@ -205,17 +298,12 @@ export function UserInfoFormModule() {
   }
 
   function newClassInstance(config) {
-    const finalConfig = processedConfig(config);
-    //should return an object that holds the object that will be sent off and interpreted by the class constructors
+    validateConfig(config);
+    //function used to check if the supplied config argument is valid so that the class constructor can use it without issues,
+    //if the supplied config argument fails the validation, then an error is thrown corresponding to what it failed
+    //if no errors are thrown through this process the argument is good to be used in the class instance
 
-    if (typeof finalConfig === "object") {
-      return new UserInfoForm(finalConfig);
-    } else {
-      //error just in case for what ever reason that the value of the finalConfig variable isn't an object
-      throw new Error(
-        `ERROR: cannot create new user info form instance, final configuration variable not an object, received ${finalConfig}`
-      );
-    }
+    return new UserInfoForm(config);
   }
 
   return { newClassInstance };
