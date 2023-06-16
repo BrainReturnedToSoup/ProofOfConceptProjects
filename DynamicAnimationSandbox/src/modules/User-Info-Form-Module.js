@@ -1,7 +1,195 @@
 export function UserInfoFormModule() {
-  const uniqueInstances = [];
+  const defaultValues_FormTemplateBuilder = {
+    uniqueIdentifier: "NOT-SET",
 
-  const instancePresetsList = {
+    formAction: "#",
+    formMethod: "get",
+
+    email: {
+      labelText: "Email",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered not a valid email address",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort:
+          "Value entered fails to meet minimum character count required",
+        valueMissing: "Please enter a valid email address",
+      },
+    },
+
+    confirmEmail: {
+      labelText: "Confirm Email",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch:
+          "Value entered does not match the previous email address",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort:
+          "Value entered fails to meet minimum character count required",
+        valueMissing: "Please enter the same email address",
+      },
+    },
+
+    address: {
+      labelText: "Address",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid street address",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort:
+          "Value entered fails to meet minimum character count required",
+        valueMissing: "Please enter a valid street address",
+      },
+    },
+
+    stateOrProvince: {
+      labelText: "State/Province",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid state or province",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort:
+          "Value entered fails to meet minimum character count required",
+        valueMissing: "Please enter a valid state or province",
+      },
+    },
+
+    country: {
+      labelText: "Country",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid country",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort:
+          "Value entered fails to meet minimum character count required",
+        valueMissing: "Please enter a valid country",
+      },
+    },
+
+    postalCode: {
+      labelText: "Postal Code",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid postal code",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort:
+          "Value entered fails to meet minimum character count required",
+        valueMissing: "Please enter a valid postal code",
+      },
+    },
+
+    password: {
+      labelText: "Password",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid password",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid password",
+      },
+    },
+
+    confirmPassword: {
+      labelText: "Confirm Password",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered not equal to password",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter the same password",
+      },
+    },
+
+    dateOfBirth: {
+      labelText: "Date Of Birth",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid birth date",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid birth date",
+      },
+    },
+
+    phoneNumber: {
+      labelText: "Phone Number",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid phone number",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid phone number",
+      },
+    },
+
+    creditCardType: {
+      labelText: "",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid card type",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid card type",
+      },
+    },
+
+    creditCardNumber: {
+      labelText: "Card Number",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid credit card number",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid credit card number",
+      },
+    },
+
+    creditCardExpDate: {
+      labelText: "Card Expiration Date",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid expiration date",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid expiration date",
+      },
+    },
+
+    creditCardSecurityNumber: {
+      labelText: "Security Number",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid security number",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid security number",
+      },
+    },
+
+    subjectLine: {
+      labelText: "Subject",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid subject line",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter a valid subject line",
+      },
+    },
+
+    textBox: {
+      labelText: "",
+      instructionsText: "",
+      errorBoxText: {
+        patternMismatch: "Value entered is not a valid within this text box",
+        tooLong: "Value entered exceeds the maximum character count",
+        tooShort: "Value entered fails to meet minimum character count",
+        valueMissing: "Please enter valid information within this text box",
+      },
+    },
+  };
+
+  const formPresets = {
     newAccountBasic: {},
     newAccountFull: {},
     paymentBasic: {},
@@ -12,122 +200,42 @@ export function UserInfoFormModule() {
     contactBasic: {},
   };
 
-  class FragmentBuilder {
-    constructor(configObj) {
+  const uniqueInstances = [];
 
-    }
-    #fragmentData = {
-      formAction: "#",
-      formMethod: "get",
-      uniqueIdentifier: "",
-      emailLabelText: "Email",
-      emailErrorBoxText: {
-        patternMismatch: "Value entered not a valid email address",
-        tooLong: "Value entered exceeds the maximum character count",
-        tooShort: "Value entered fails to meet minimum character count",
-        valueMissing: "Please enter a valid email address",
-      },
-      confirmEmailLabelText: "Confirm Email",
-      confirmEmailErrorBoxText: {
-        patternMismatch:
-          "Value entered does not match the previous email address",
-        tooLong: "Value entered exceeds the maximum character count",
-        tooShort: "Value entered fails to meet minimum character count",
-        valueMissing: "Please enter the same email address",
-      },
-      addressLabelText: "Address",
-      addressErrorBoxText: {
-        patternMismatch: 'Value entered is not a valid address',
-        tooLong: 'Value entered exceeds the maximum character count',
-        tooShort: 'Value enetered fails to meet minimum character count',
-        valueMissing: 'Please enter a valid address',
-      },
+  class FormTemplateBuilder {
+    constructor(configObj) {}
+    
+    #classBehavior = {
+      useDefaultValues: true,
     };
+    #fragmentData = {};
 
     #DOMtemplates = {
       mainContainer: `
-        <form action="${this.#fragmentData.formAction}" method="${this.#fragmentData.formMethod}" class="${this.#fragmentData.uniqueIdentifier}">
+        <form action="${this.#fragmentData.formAction}" method="${
+        this.#fragmentData.formMethod
+      }" class="${this.#fragmentData.uniqueIdentifier}">
         </form>
         `,
-      secondaryContainer: `
-        <div class="Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
-        </div>
-        `,
-      email: `
-        <div class="Email-Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
-            <label for="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailLabelText}</label>
-            <input type="email" class="Email-Form-Control ${this.#fragmentData.uniqueIdentifier}" id="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}" name="Email-Form-Control_${this.#fragmentData.uniqueIdentifier}_Var">
-            <div class="Email-Form-Control-Error-Container ${this.#fragmentData.uniqueIdentifier}>
-              <div class="Email-Form-Control-Error-Text Pattern-Mismatch ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.patternMismatch}</div>
-              <div class="Email-Form-Control-Error-Text Too-Long ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.tooLong}</div>
-              <div class="Email-Form-Control-Error-Text Too-Short ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.tooShort}</div>
-              <div class="Email-Form-Control-Error-Text Value-Missing ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.emailErrorBoxText.valueMissing}</div>
-            </div>
-        </div>
-        `,
-      confirmEmail: `
-        <div class="Confirm-Email-Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
-            <label for="Confirm-Email-Form-Control_${this.#fragmentData.uniqueIdentifier}"></label>
-            <input type="email" class="Confirm-Email-Form-Control ${this.#fragmentData.uniqueIdentifier}" id="Confirm-Email-Form-Control_${this.#fragmentData.uniqueIdentifier}" name="Confirm-Email-Form-Control_${this.#fragmentData.uniqueIdentifier}_Var">
-            <div class="Confirm-Email-Form-Control-Error-Container ${this.#fragmentData.uniqueIdentifier}">
-                <div class="Confirm-Email-Form-Control-Error-Text Pattern-Mismatch ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.patternMismatch}</div>
-                <div class="Confirm-Email-Form-Control-Error-Text Too-Long ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.tooLong}</div>
-                <div class="Confirm-Email-Form-Control-Error-Text Too-Short ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.tooShort}</div>
-                <div class="Confirm-Email-Form-Control-Error-Text Value-Missing ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.confirmEmailErrorBoxText.valueMissing}</div>
-            </div>
-        </div>
-        `,
-      address: `
-      <div class="Address-Form-Control-Container ${this.#fragmentData.uniqueIdentifier}">
-          <label for="Address-Form-Control_${this.#fragmentData.uniqueIdentifier}">
-          <input type="text" class="Address-Form-Control ${this.#fragmentData.uniqueIdentifier}" id="Address-Form-Control_${this.#fragmentData.uniqueIdentifier}" name="Address-Form-Control_${this.#fragmentData.uniqueIdentifier}_Var">
-          <div class="Address-Form-Control-Error-Container">
-              <div class="Address-Form-Control-Error-Text Pattern-Mismatch ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.patternMismatch}</div>
-              <div class="Address-Form-Control-Error-Text Too-Long ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.tooLong}</div>
-              <div class="Address-Form-Control-Error-Text Too-Short ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.tooShort}</div>
-              <div class="Address-Form-Control-Error-Text Value-Missing ${this.#fragmentData.uniqueIdentifier}">${this.#fragmentData.addressErrorBoxText.valueMissing}</div>
-          </div>
-      </div>
-        `,
-      state: `
+      formControlTemplate: `
 
-        `,
-      country: `
-
-        `,
-      zipCode: `
-
-        `,
-      password: `
-
-        `,
-      confirmPassword: `
-
-        `,
-      dateOfBirth: `
-        
-        `,
-      phoneNumber: `
-        
-        `,
-      subjectLine: `
-
-        `,
-      textBox: `
-
-        `,
+      `,
       submissionButton: `
         `,
     };
   }
 
+  class DynamicOptionsManager {}
+
   class ElementCacheManager {
     #refsCache = {};
   }
 
-  class FunctionalityManager {}
+  class MainFunctionalityManager {}
 
   class UserInfoForm {
+    //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
+    //the form and handle certain state data attached to such
     init(parentElement) {}
   }
 
@@ -244,5 +352,3 @@ export function UserInfoFormModule() {
 
   return { newClassInstance };
 }
-
-//
