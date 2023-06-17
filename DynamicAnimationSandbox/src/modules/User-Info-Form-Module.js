@@ -3,11 +3,6 @@ import { config } from "webpack";
 export function UserInfoFormModule() {
   const defaultFormControlElements_FormFragmentConstructor = [];
   const defaultTextValues_FormFragmentConstructor = {
-    uniqueIdentifier: "NOT-SET",
-
-    formAction: "#",
-    formMethod: "get",
-
     email: {
       labelText: "Email",
       instructionsText: "",
@@ -216,17 +211,25 @@ export function UserInfoFormModule() {
     //data sets that the constructor will base all of its construction of fragments off of in this instance
     //determines the form controls used, their specific attributes, their specific text, and whether to include
     //elements relevant to the constraint API if this instance uses such
-    #fragmentTextData = {};
-    #formControlsUsed = [];
-    #fragmentAttributes = {};
-    #useContraintAPI = true;
+    #config = {
+      fragmentTextData: {}, //keys should be the corresponding form control element name that matches the method for the constructor
+      formControlsUsed: [], //elements should be the corresponding form control element name that matches the method for the constructor
+      fragmentAttributes: {}, //keys should be the corresponding form control element name that matches the method for the constructor
+      useContraintAPI: true,
+      uniqueIdentifier: "NOT-SET",
+      formAction: "#",
+      formMethod: "get",
+    };
 
     #processConfigObj(configObj) {
       this.#processConfigHierarchy.formControlElements(configObj);
       this.#processConfigHierarchy.formText(configObj);
-      this.#processConfigHierarchy.constraintAPI(configObj);
+      this.#processConfigHierarchy.formElementsAttributes(configObj);
+      this.#applyConfig.constraintAPI(configObj);
     }
 
+    //abstracted the processing into their own methods even if some of the code repeats, but
+    //this is to make it easier to fine tune processing in the future as well as help with debugging the module
     #processConfigHierarchy = {
       formControlElements: (configObj) => {
         let useTemplate = false,
@@ -324,6 +327,15 @@ export function UserInfoFormModule() {
         this.#applyConfigHierarchy.formText(appliedConfigsArr);
       },
       formElementsAttributes: (configObj) => {},
+    };
+
+    //used to take the present data and apply it to the various class state data structures,
+    //these methods may either accept an array demonstrating the hierary, or simply reference a specific property in
+    //the config file
+    #applyConfig = {
+      formControlElements: function () {},
+      formText: function () {},
+      formElementsAttributes: function () {},
       constraintAPI: (configObj) => {
         if (
           configObj.functionalityRules &&
@@ -332,7 +344,7 @@ export function UserInfoFormModule() {
           this.#useContraintAPI = configObj.functionalityRules.useConstraintAPI;
         } else if (configObj.type && configObj.type !== "custom") {
           if (formPresets[configObj.type]) {
-            this.#useContraintAPI =
+            this.#config.useContraintAPI =
               formPresets[configObj.type].functionalityRules.useConstraintAPI;
           } else {
             throw new Error(
@@ -345,18 +357,16 @@ export function UserInfoFormModule() {
       },
     };
 
-    #applyConfigHierarchy = {
-      formControlElements: function () {},
-      formText: function () {},
-    };
+    //this is the entrypoint at which the final configuration has been initialized and
+    //the form corresponding to the configuration starts its creation
+    #useFinalConfig() {}
 
-    #useFinalConfig(configObj) {}
-
+    //takes the array of the various form control elements included as per the configuration, and starts the creation
+    //of the templates
     #buildForm(elementsArr) {}
 
+    //creates the actual form element wrapper, needs rules to define the various properties and such
     #constructBaseTemplate(formWrapperRules) {}
-
-    #constructAllFormControls(formControlRules) {}
 
     #formControlConstructors = {
       email: function (props) {},
@@ -394,13 +404,6 @@ export function UserInfoFormModule() {
       textBoxOne: function (props) {},
 
       textBoxTwo: function (props) {},
-    };
-
-    #formElementConstructors = {
-      div: function (props) {},
-      label: function (props) {},
-      input: function (props) {},
-      dataList: function (props) {},
     };
   }
 
