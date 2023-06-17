@@ -1,7 +1,9 @@
 export function UserInfoFormModule() {
+  const defaultValues_Main_UserInfoForm = {};
   const defaultValues_DynamicOptionsManager = {};
+  const defaultValues_AutoFillFields = {};
   const defaultValues_MainFunctionalityManager = {};
-  const defaultValues_FormTemplateBuilder = {
+  const defaultValues_FormFragmentConstructor = {
     uniqueIdentifier: "NOT-SET",
 
     formAction: "#",
@@ -202,9 +204,7 @@ export function UserInfoFormModule() {
     contactBasic: {},
   };
 
-  function addPreset(presetsObj) {
-
-  }
+  function addPreset(presetsObj) {}
 
   const uniqueInstances = [];
 
@@ -360,8 +360,8 @@ export function UserInfoFormModule() {
 // configObj = {
 //    uniqueIdentifier: "",   (always required) (must be a string) (must match something that you would put within a class, because it's going to be used as a class tag)
 //    type: "",   (always required) (must be a string) (must match either 'custom' for a custom setup or one of the various presets)
-//    formAction: "", (optional if you use default values,otherwise required, determines the form instance, action attribute)
-//    formMethod: "", (optional if you use default values, otherwise required, determines the form instance, method attribute)
+//    formAction: "", (always required, determines the form instance, action attribute)
+//    formMethod: "", (always required, determines the form instance, method attribute)
 //    formControlElements = [],  (if type set to custom this property is required) (not necessary if type property isn't custom) (defines the form control elements to include) (each element must be a string and unique, also order counts but not critical) (can be stacked on top of a form template to include extra forms)
 //    applyDefaultValues: {
 //        formFragmentContructor: true,
@@ -371,13 +371,21 @@ export function UserInfoFormModule() {
 //        MainFunctionalityManager: true,
 //        Main_UserInfoForm: true,
 //    },
-//    fragmentRules: {
+//    fragmentAttributes: {
 //        specificFormControl1: {...properties},     (used to define specific attributes on specific elements)
 //        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
 //        ...,                                        (can use a mixture of default properties and custom properties if you wanted to this way, custom properties have a higher hierarchy and will be applied over default ones)
 //    },
 //    functionalityRules: {
-//
+//      validateInputs: true,
+//      useConstraintAPI: true,               (filled in properties help to define some user form functionality, such as input event listening, or submit event listening, using the constraint API etc.)
+//      listenOnInput: true,
+//      listenOnSubmit: true,
+//      regexpInputPatterns: {
+//        specificFormControl1: pattern,     (used to define specific form control input patterns for input validation)
+//        specificFormControl2: pattern,      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
+//        ...,
+//      },
 //    },
 //    thirdPartyApiRules: {
 //
