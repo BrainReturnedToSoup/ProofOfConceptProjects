@@ -1,9 +1,6 @@
 export function UserInfoFormModule() {
-  const defaultValues_Main_UserInfoForm = {};
-  const defaultValues_DynamicOptionsManager = {};
-  const defaultValues_AutoFillFields = {};
-  const defaultValues_MainFunctionalityManager = {};
-  const defaultValues_FormFragmentConstructor = {
+  const defaultFormControlElements_FormFragmentConstructor = [];
+  const defaultTextValues_FormFragmentConstructor = {
     uniqueIdentifier: "NOT-SET",
 
     formAction: "#",
@@ -213,16 +210,71 @@ export function UserInfoFormModule() {
       this.#processConfigObj(configObj);
     }
 
-    #classBehavior = {
-      useDefaultValues: true,
-      customConfig: false,
+    #fragmentTextData = {};
+    #formControlsUsed = [];
+    #formControlAttributes = {};
+
+    #processConfigObj(configObj) {
+      this.#processConfigHierarchy.formControlElements(configObj);
+      this.#processConfigHierarchy.formText(configObj);
+    }
+
+    #processConfigHierarchy = {
+      formControlElements: (configObj) => {},
+      formText: (configObj) => {
+        let useTemplate = false,
+          useDefault = true,
+          selectedTemplate,
+          defaultValues = defaultValues_FormFragmentConstructor,
+          appliedConfigsArr = [];
+
+        //checks to see if the applyDefaultValues property is being used, whether this class instance was mentioned, and whether the class instance was set to not use a default value
+        //shouldn't throw an error otherwise since this is an optional property to use
+        if (
+          configObj.applyDefaultValues &&
+          configObj.applyDefaultValues.FormFragmentConstructor &&
+          configObj.applyDefaultValues.FormFragmentConstructor === false
+        ) {
+          useDefault = false;
+        }
+
+        //if the type property doesn't equal 'custom' it assumes its a preset, and will check for the preset
+        //needs to be able to throw an error since this is a required property
+        if (configObj.type !== "custom") {
+          if (formPresets[configObj.type]) {
+            selectedTemplate = formPresets[configObj.type];
+          } else {
+            throw new Error(
+              `ERROR: template does not exist, received ${
+                configObj.type
+              }, available templates are "${Object.keys(formPresets)}"`
+            );
+          }
+        }
+
+        if (useDefault) {
+          appliedConfigsArr.push(defaultValues);
+        }
+
+        if (useTemplate) {
+          appliedConfigsArr.push(selectedTemplate);
+        }
+
+        appliedConfigsArr.push(configObj);
+
+        //all used config data sets will be push into the appliedConfigsArr in order
+        //from bottom to top, the last element will be the most current data set applied,
+        //which this array can feature any combination of default, template, and custom values
+        this.#applyConfigHierarchy.formText(appliedConfigsArr);
+      },
     };
 
-    #fragmentData = {};
+    #applyConfigHierarchy = {
+      formControlElements: function () {},
+      formText: function () {},
+    };
 
-    #processConfigObj(configObj) {}
-
-    #applyConfigHierarchy(configObj) {}
+    #useFinalConfig(configObj) {}
 
     #buildForm(elementsArr) {}
 
@@ -337,7 +389,7 @@ export function UserInfoFormModule() {
     type: function (configObj) {},
     formAttributes: function (configObj) {},
     formControlElements: function (configObj) {},
-    fragmentRules: function (configObj) {},
+    formControlText: function (configObj) {},
     functionalityRules: function (configObj) {},
     thirdPartyApiRules: function (configObj) {},
   };
@@ -371,8 +423,8 @@ export function UserInfoFormModule() {
 //        MainFunctionalityManager: true,
 //        Main_UserInfoForm: true,
 //    },
-//    fragmentAttributes: {
-//        specificFormControl1: {...properties},     (used to define specific attributes on specific elements)
+//    formControlText: {
+//        specificFormControl1: {...properties},     (used to define specific text attributes on specific elements, this is for defining say the text for a specific form control label, and all of its individual error box values)
 //        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
 //        ...,                                        (can use a mixture of default properties and custom properties if you wanted to this way, custom properties have a higher hierarchy and will be applied over default ones)
 //    },
