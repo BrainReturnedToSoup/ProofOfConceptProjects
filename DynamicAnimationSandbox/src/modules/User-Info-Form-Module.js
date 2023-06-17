@@ -202,6 +202,10 @@ export function UserInfoFormModule() {
     contactBasic: {},
   };
 
+  function addPreset(presetsObj) {
+
+  }
+
   const uniqueInstances = [];
 
   class FormFragmentConstructor {
@@ -218,9 +222,7 @@ export function UserInfoFormModule() {
 
     #processConfigObj(configObj) {}
 
-    #applyConfigHierarchy(configObj) {
-
-    }
+    #applyConfigHierarchy(configObj) {}
 
     #buildForm(elementsArr) {}
 
@@ -275,9 +277,9 @@ export function UserInfoFormModule() {
   }
 
   class DynamicOptionsManager {
-    //a mixture between the form fragment constructor and the main functionality manager as it will 
-    //create and render specific input elements such as options for data lists dynamically, this will be used 
-    //in instances such as rendering in options based on the data set being dynamic, such as countries, or card payment 
+    //a mixture between the form fragment constructor and the main functionality manager as it will
+    //create and render specific input elements such as options for data lists dynamically, this will be used
+    //in instances such as rendering in options based on the data set being dynamic, such as countries, or card payment
     //types, as well as render in options based on already selected options, such as relevant states to the selected country.
     //This class will use various geocoding API's in order to facilitate this dynamic rendering
   }
@@ -290,7 +292,7 @@ export function UserInfoFormModule() {
   class ElementCacheManager {
     #refsCache = {};
     //will be used to manage all element references created in the form instance, this way it makes it easier to target specific elements based
-    //on the situation automatically, also it prevents multiple queries of the same elements. 
+    //on the situation automatically, also it prevents multiple queries of the same elements.
     //Thinking about adding an API that allows this class to emit all of it's references to a global DOM refs cache.
   }
 
@@ -304,7 +306,6 @@ export function UserInfoFormModule() {
     //the form and handle certain state data attached to such
     init(parentElement) {}
   }
-
 
   function validateConfig(config) {
     const allErrors = [];
@@ -334,8 +335,11 @@ export function UserInfoFormModule() {
   const validationMethods = {
     uniqueIdentifier: function (configObj) {},
     type: function (configObj) {},
+    formAttributes: function (configObj) {},
     formControlElements: function (configObj) {},
-    rules: function (configObj) {},
+    fragmentRules: function (configObj) {},
+    functionalityRules: function (configObj) {},
+    thirdPartyApiRules: function (configObj) {},
   };
 
   function newClassInstance(config) {
@@ -350,14 +354,15 @@ export function UserInfoFormModule() {
     }
   }
 
-  return { newClassInstance };
+  return { newClassInstance, addPreset };
 }
 
 // configObj = {
 //    uniqueIdentifier: "",   (always required) (must be a string) (must match something that you would put within a class, because it's going to be used as a class tag)
 //    type: "",   (always required) (must be a string) (must match either 'custom' for a custom setup or one of the various presets)
-//    formAction: "",
-//    formMethod: "",
+//    formAction: "", (optional if you use default values,otherwise required, determines the form instance, action attribute)
+//    formMethod: "", (optional if you use default values, otherwise required, determines the form instance, method attribute)
+//    formControlElements = [],  (if type set to custom this property is required) (not necessary if type property isn't custom) (defines the form control elements to include) (each element must be a string and unique, also order counts but not critical) (can be stacked on top of a form template to include extra forms)
 //    applyDefaultValues: {
 //        formFragmentContructor: true,
 //        DynamicOptionsManager: true,
@@ -366,13 +371,17 @@ export function UserInfoFormModule() {
 //        MainFunctionalityManager: true,
 //        Main_UserInfoForm: true,
 //    },
-//    formControlElements = [],  (if type set to custom this property is required) (not necessary if type property isn't custom) (defines the form control elements to include) (each element must be a string and unique, also order counts but not critical) (can be stacked on top of a form template to include extra forms)
-//    rules: {
+//    fragmentRules: {
 //        specificFormControl1: {...properties},     (used to define specific attributes on specific elements)
 //        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
 //        ...,                                        (can use a mixture of default properties and custom properties if you wanted to this way, custom properties have a higher hierarchy and will be applied over default ones)
 //    },
+//    functionalityRules: {
 //
+//    },
+//    thirdPartyApiRules: {
+//
+//    },
 //}
 //
 // configuration value application hierarcy from bottom to top application, the top most application will be the most concurrent value application.
