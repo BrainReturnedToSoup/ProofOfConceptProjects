@@ -1,3 +1,5 @@
+import { config } from "webpack";
+
 export function UserInfoFormModule() {
   const defaultFormControlElements_FormFragmentConstructor = [];
   const defaultTextValues_FormFragmentConstructor = {
@@ -146,7 +148,7 @@ export function UserInfoFormModule() {
     },
 
     creditCardExpDate: {
-      labelText: "Card Expiration Date",
+      labelText: "Expiration Date",
       instructionsText: "",
       errorBoxText: {
         patternMismatch: "Value entered is not a valid expiration date",
@@ -157,7 +159,7 @@ export function UserInfoFormModule() {
     },
 
     creditCardSecurityNumber: {
-      labelText: "Security Number",
+      labelText: "CVV",
       instructionsText: "",
       errorBoxText: {
         patternMismatch: "Value entered is not a valid security number",
@@ -209,23 +211,70 @@ export function UserInfoFormModule() {
     constructor(configObj) {
       this.#processConfigObj(configObj);
     }
+    //constructor acts as the entry point at which to apply the various configurations to the constructor instance
 
+    //data sets that the constructor will base all of its construction of fragments off of in this instance
+    //determines the form controls used, their specific attributes, their specific text, and whether to include
+    //elements relevant to the constraint API if this instance uses such
     #fragmentTextData = {};
     #formControlsUsed = [];
-    #formControlAttributes = {};
+    #fragmentAttributes = {};
+    #useContraintAPI = true;
 
     #processConfigObj(configObj) {
       this.#processConfigHierarchy.formControlElements(configObj);
       this.#processConfigHierarchy.formText(configObj);
+      this.#processConfigHierarchy.constraintAPI(configObj);
     }
 
     #processConfigHierarchy = {
-      formControlElements: (configObj) => {},
+      formControlElements: (configObj) => {
+        let useTemplate = false,
+          useDefault = true,
+          selectedTemplateFormControlElements,
+          defaultFormControlElements,
+          appliedConfigsArr = [];
+
+        if (
+          configObj.applyDefaultValues &&
+          configObj.applyDefaultValues.FormFragmentConstructor &&
+          configObj.applyDefaultValues.FormFragmentConstructor === false
+        ) {
+          useDefault = false;
+        }
+
+        if (configObj.type !== "custom") {
+          if (formPresets[configObj.type]) {
+            this.#formControlsUsed =
+              formPresets[configObj.type].formControlsUsed;
+          } else {
+            throw new Error(
+              `ERROR: template does not exist, received ${
+                configObj.type
+              }, available templates are "${Object.keys(formPresets)}"`
+            );
+          }
+        }
+        if (useDefault) {
+          appliedConfigsArr.push(defaultFormControlElements);
+        }
+
+        if (useTemplate) {
+          appliedConfigsArr.push(selectedTemplateFormControlElements);
+        }
+
+        appliedConfigsArr.push(configObj.formControlElements);
+
+        //all used config data specifically for text fields will be push into the appliedConfigsArr in order
+        //from bottom to top, the last element will be the most current data set applied,
+        //which this array can feature any combination of default, template, and custom values
+        this.#applyConfigHierarchy.formText(appliedConfigsArr);
+      },
       formText: (configObj) => {
         let useTemplate = false,
           useDefault = true,
-          selectedTemplate,
-          defaultValues = defaultValues_FormFragmentConstructor,
+          selectedTemplateTextValues,
+          defaultTextValues = defaultTextValues_FormFragmentConstructor,
           appliedConfigsArr = [];
 
         //checks to see if the applyDefaultValues property is being used, whether this class instance was mentioned, and whether the class instance was set to not use a default value
@@ -236,13 +285,20 @@ export function UserInfoFormModule() {
           configObj.applyDefaultValues.FormFragmentConstructor === false
         ) {
           useDefault = false;
+        } else if (
+          configObj.applyDefaultValues &&
+          configObj.applyDefaultValues.FormFragmentConstructor &&
+          configObj.applyDefaultValues.FormFragmentConstructor === true
+        ) {
+          useDefault = true;
         }
 
         //if the type property doesn't equal 'custom' it assumes its a preset, and will check for the preset
         //needs to be able to throw an error since this is a required property
         if (configObj.type !== "custom") {
           if (formPresets[configObj.type]) {
-            selectedTemplate = formPresets[configObj.type];
+            selectedTemplateTextValues =
+              formPresets[configObj.type].fragmentTextData;
           } else {
             throw new Error(
               `ERROR: template does not exist, received ${
@@ -253,19 +309,39 @@ export function UserInfoFormModule() {
         }
 
         if (useDefault) {
-          appliedConfigsArr.push(defaultValues);
+          appliedConfigsArr.push(defaultTextValues);
         }
 
         if (useTemplate) {
-          appliedConfigsArr.push(selectedTemplate);
+          appliedConfigsArr.push(selectedTemplateTextValues);
         }
 
-        appliedConfigsArr.push(configObj);
+        appliedConfigsArr.push(configObj.formControlText);
 
-        //all used config data sets will be push into the appliedConfigsArr in order
+        //all used config data specifically for text fields will be push into the appliedConfigsArr in order
         //from bottom to top, the last element will be the most current data set applied,
         //which this array can feature any combination of default, template, and custom values
         this.#applyConfigHierarchy.formText(appliedConfigsArr);
+      },
+      formElementsAttributes: (configObj) => {},
+      constraintAPI: (configObj) => {
+        if (
+          configObj.functionalityRules &&
+          configObj.functionalityRules.useConstraintAPI
+        ) {
+          this.#useContraintAPI = configObj.functionalityRules.useConstraintAPI;
+        } else if (configObj.type && configObj.type !== "custom") {
+          if (formPresets[configObj.type]) {
+            this.#useContraintAPI =
+              formPresets[configObj.type].functionalityRules.useConstraintAPI;
+          } else {
+            throw new Error(
+              `ERROR: template does not exist, received ${
+                configObj.type
+              }, available templates are "${Object.keys(formPresets)}"`
+            );
+          }
+        }
       },
     };
 
@@ -423,6 +499,11 @@ export function UserInfoFormModule() {
 //        MainFunctionalityManager: true,
 //        Main_UserInfoForm: true,
 //    },
+//    formControlAttributes: {
+//        specificFormControl1: {...properties},     (used to define specific inline attributes on specific elements, this is for defining say the name for a specific form control input etc)
+//        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
+//        ...,                                        (can use a mixture of default properties and custom properties if you wanted to this way, custom properties have a higher hierarchy and will be applied over default ones)
+//    }
 //    formControlText: {
 //        specificFormControl1: {...properties},     (used to define specific text attributes on specific elements, this is for defining say the text for a specific form control label, and all of its individual error box values)
 //        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
