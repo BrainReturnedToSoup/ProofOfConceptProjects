@@ -1,4 +1,6 @@
 export function UserInfoFormModule() {
+  const defaultValues_DynamicOptionsManager = {};
+  const defaultValues_MainFunctionalityManager = {};
   const defaultValues_FormTemplateBuilder = {
     uniqueIdentifier: "NOT-SET",
 
@@ -202,153 +204,177 @@ export function UserInfoFormModule() {
 
   const uniqueInstances = [];
 
-  class FormTemplateBuilder {
-    constructor(configObj) {}
-    
+  class FormFragmentConstructor {
+    constructor(configObj) {
+      this.#processConfigObj(configObj);
+    }
+
     #classBehavior = {
       useDefaultValues: true,
+      customConfig: false,
     };
+
     #fragmentData = {};
 
-    #DOMtemplates = {
-      mainContainer: `
-        <form action="${this.#fragmentData.formAction}" method="${
-        this.#fragmentData.formMethod
-      }" class="${this.#fragmentData.uniqueIdentifier}">
-        </form>
-        `,
-      formControlTemplate: `
+    #processConfigObj(configObj) {}
 
-      `,
-      submissionButton: `
-        `,
+    #applyConfigHierarchy(configObj) {
+
+    }
+
+    #buildForm(elementsArr) {}
+
+    #constructBaseTemplate(formWrapperRules) {}
+
+    #constructAllFormControls(formControlRules) {}
+
+    #formControlConstructors = {
+      email: function (props) {},
+
+      confirmEmail: function (props) {},
+
+      address: function (props) {},
+
+      stateOrProvince: function (props) {},
+
+      country: function (props) {},
+
+      postalCode: function (props) {},
+
+      password: function (props) {},
+
+      confirmPassword: function (props) {},
+
+      dateOfBirth: function (props) {},
+
+      phoneNumber: function (props) {},
+
+      creditCardType: function (props) {},
+
+      creditCardNumber: function (props) {},
+
+      creditCardExpDate: function (props) {},
+
+      creditCardSecurityNumber: function (props) {},
+
+      subjectLineOne: function (props) {},
+
+      subjectLineTwo: function (props) {},
+
+      textBoxOne: function (props) {},
+
+      textBoxTwo: function (props) {},
+    };
+
+    #formElementConstructors = {
+      div: function (props) {},
+      label: function (props) {},
+      input: function (props) {},
+      dataList: function (props) {},
     };
   }
 
-  class DynamicOptionsManager {}
+  class DynamicOptionsManager {
+    //a mixture between the form fragment constructor and the main functionality manager as it will 
+    //create and render specific input elements such as options for data lists dynamically, this will be used 
+    //in instances such as rendering in options based on the data set being dynamic, such as countries, or card payment 
+    //types, as well as render in options based on already selected options, such as relevant states to the selected country.
+    //This class will use various geocoding API's in order to facilitate this dynamic rendering
+  }
+
+  class AutoFillFields {
+    //will be used to autofill fields if the user allows such, this includes allowing access to ones location,
+    //or allowing browser apis to autofill common form fields etc
+  }
 
   class ElementCacheManager {
     #refsCache = {};
+    //will be used to manage all element references created in the form instance, this way it makes it easier to target specific elements based
+    //on the situation automatically, also it prevents multiple queries of the same elements. 
+    //Thinking about adding an API that allows this class to emit all of it's references to a global DOM refs cache.
   }
 
-  class MainFunctionalityManager {}
+  class MainFunctionalityManager {
+    //will append all necessary functionality to the created HTML form fragment, including the validation
+    //and actual submission logic if necessary
+  }
 
-  class UserInfoForm {
+  class Main_UserInfoForm {
     //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
     //the form and handle certain state data attached to such
     init(parentElement) {}
   }
 
-  function checkForUniqueInstance(uniqueIdentifier) {
-    if (
-      uniqueIdentifier.replace(/\s/g, "") === uniqueIdentifier &&
-      uniqueIdentifier.split("").length > 0
-      //checks to see if the supplied string isn't just a bunch of spaces, a completely empty string, or contains any number of spaces since this identifier is appended to every form element class
-    ) {
-      if (uniqueInstances.includes(uniqueIdentifier)) {
-        //if the string passes this check, it can then be looked for in the uniqueInstances array to see if this identifier is already being used on a different form instance.
-        //if if does, throw an error
-        throw new Error(
-          `ERROR: supplied unique identifier has already been used for a form class instance`
-        );
-      }
-    } else {
-      //error thrown if the string supplied fails the space check
-      throw new Error(
-        `ERROR: supplied string for the unique identifier is not useable as a class tag, received ${uniqueIdentifier}`
+
+  function validateConfig(config) {
+    const allErrors = [];
+
+    if (typeof config !== "object") {
+      allErrors.push(
+        `ERROR: supplied config argument is not an object, received ${typeof config}`
       );
     }
+
+    const { uniqueIdentifier, type, formControlElements, rules } =
+        validationMethods,
+      errorsUI = uniqueIdentifier(config),
+      errorsType = type(config),
+      errorsFCE = formControlElements(config),
+      errorsRules = rules(config);
+
+    [errorsUI, errorsType, errorsFCE, errorsRules].forEach((errors) => {
+      return errors.forEach((error) => {
+        return allErrors.push(error);
+      });
+    });
+
+    return allErrors;
   }
 
-  function validateConfig(configObj) {
-    //the start of the sanitization process, which checks for the most crucial formats first, because regardless of the
-    //context of invocation, these properties are mandatory for the module to work correctly
-    if (
-      typeof configObj === "object" &&
-      configObj.type &&
-      typeof configObj.type === "string" &&
-      configObj.type !== "custom"
-      //if the configObj is in fact an object, checks for the type object, and if it exists whether it's a string itself, and checking if the string isn't equal to 'custom'
-    ) {
-      return instancePresets(configObj);
-    } else if (
-      typeof configObj === "object" &&
-      configObj.type &&
-      typeof configObj.type === "string" &&
-      configObj.type === "custom"
-      //if the configObj is in fact an object, checks for the type object, and if it exists whether it's a string itself, and checking if the string is equal to 'custom'
-    ) {
-      return customConfigSanitizer(configObj);
-    } else if (typeof configObj !== "object") {
-      //error for if the value of configObj isn't even an object
-      throw new Error(
-        `ERROR: supplied config is not an object, received ${configObj}`
-      );
-    } else if (!configObj.type || typeof configObj.type !== "string") {
-      //error for whether the type property exists on the configObj or if the value of this property isn't a string
-      throw new Error(
-        `ERROR: the type property on the config object is either not a valid format or undefined, received ${configObj.type}`
-      );
-    }
-  }
-
-  function customConfigSanitizer(configObj) {
-    if (
-      configObj.uniqueIdentifier &&
-      typeof configObj.uniqueIdentifier === "string"
-      //checks for the existence of the uniqueIdentifier property and whether it's a string
-    ) {
-      checkForUniqueInstance(configObj.uniqueIdentifier);
-
-      //fallthrough switch statement used to check for existing configuration properties and to validate the ones that do exist, these are less crucial properties
-      //used to determine the form instance behavior, but won't break the functionality if these properties aren't included in the config object
-      switch (true) {
-        case property1 in configObj:
-
-        case property1 in configObj:
-      }
-    } else {
-      throw new Error(
-        //error for whether the uniqueIdentifier property doesn't exist on the configObj or if the type of said property isn't valid
-        `ERROR: the uniqueIdentifier property on the config object is either an incorrect format, or does not exist, received ${configObj.uniqueIdentifier} for a custom config property`
-      );
-    }
-  }
-
-  function instancePresets(configObj) {
-    if (
-      configObj.uniqueIdentifier &&
-      typeof configObj.uniqueIdentifier === "string"
-      //checks for the existence of the uniqueIdentifier property and whether it's a string
-    ) {
-      checkForUniqueInstance(configObj.uniqueIdentifier);
-      const { type } = configObj;
-      //the type property should be equal to the desired preset if not set to custom
-      if (instancePresetsList[type]) {
-        //if the type property is equal to an existing preset, return the config object for the corresponding preset
-        return instancePresetsList[type];
-      } else {
-        //if the type property is not equal to any existing preset, throw and error
-        throw new Error(
-          `ERROR: type property not equal to an existing preset, received ${type}`
-        );
-      }
-    } else {
-      throw new Error(
-        //error for whether the uniqueIdentifier property doesn't exist on the configObj or if the type of said property isn't valid
-        `ERROR: the uniqueIdentifier property on the config object is either an incorrect format, or does not exist, received ${configObj.uniqueIdentifier} for an instance preset config property `
-      );
-    }
-  }
+  const validationMethods = {
+    uniqueIdentifier: function (configObj) {},
+    type: function (configObj) {},
+    formControlElements: function (configObj) {},
+    rules: function (configObj) {},
+  };
 
   function newClassInstance(config) {
-    validateConfig(config);
-    //function used to check if the supplied config argument is valid so that the class constructor can use it without issues,
-    //if the supplied config argument fails the validation, then an error is thrown corresponding to what it failed
-    //if no errors are thrown through this process the argument is good to be used in the class instance
-
-    return new UserInfoForm(config);
+    const allErrorStrings = validateConfig(config);
+    if (allErrorStrings.length < 0) {
+      return new Main_UserInfoForm(config);
+    } else {
+      const allErrorInstances = allErrorStrings.map((errorString) => {
+        return new Error(errorString);
+      });
+      throw allErrorInstances;
+    }
   }
 
   return { newClassInstance };
 }
+
+// configObj = {
+//    uniqueIdentifier: "",   (always required) (must be a string) (must match something that you would put within a class, because it's going to be used as a class tag)
+//    type: "",   (always required) (must be a string) (must match either 'custom' for a custom setup or one of the various presets)
+//    formAction: "",
+//    formMethod: "",
+//    applyDefaultValues: {
+//        formFragmentContructor: true,
+//        DynamicOptionsManager: true,
+//        AutoFillFields: true,                   (determines if the various classes will pull from a default value preset, this is separate from the various form templates, this is the true default values of various characteristics, modules will pull from a default value set by default)
+//        ElementCacheManager: true,
+//        MainFunctionalityManager: true,
+//        Main_UserInfoForm: true,
+//    },
+//    formControlElements = [],  (if type set to custom this property is required) (not necessary if type property isn't custom) (defines the form control elements to include) (each element must be a string and unique, also order counts but not critical) (can be stacked on top of a form template to include extra forms)
+//    rules: {
+//        specificFormControl1: {...properties},     (used to define specific attributes on specific elements)
+//        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
+//        ...,                                        (can use a mixture of default properties and custom properties if you wanted to this way, custom properties have a higher hierarchy and will be applied over default ones)
+//    },
+//
+//}
+//
+// configuration value application hierarcy from bottom to top application, the top most application will be the most concurrent value application.
+// bottom: Default values(if enabled) mid: preset form template values(if used) top: all custom properties defined by the config file
+// This way you can mix-match default values, preset form template data, and custom data in order to meet your needs in a more concise manner.
