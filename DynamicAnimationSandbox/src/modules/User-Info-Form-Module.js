@@ -185,7 +185,7 @@ export function UserInfoFormModule() {
       },
     },
     fragmentAttributes: {},
-    formControlsUsed: ["email"],
+    formControlElements: [],
   };
 
   const formPresets = {
@@ -214,14 +214,15 @@ export function UserInfoFormModule() {
     //elements relevant to the constraint API if this instance uses such
     #config = {
       fragmentTextData: {}, //keys should be the corresponding form control element name that matches the method for the constructor
-      formControlsUsed: [], //elements should be the corresponding form control element name that matches the method for the constructor
-      fragmentAttributes: {}, //keys should be the corresponding form control element name that matches the method for the constructor
-      useContraintAPI: true,
+      formControlElements: [], //elements should be the corresponding form control element name that matches the method for the constructor
+      formControlAttributes: {}, //keys should be the corresponding form control element name that matches the method for the constructor
+      useConstraintAPI: true,
       uniqueIdentifier: "NOT-SET",
       formAction: "#",
       formMethod: "get",
     };
 
+    //main method to begin applying the configuration to this class instance
     #processConfigObj(configObj) {
       this.#processConfigHierarchy.formControlElements(configObj);
       this.#processConfigHierarchy.formText(configObj);
@@ -237,9 +238,10 @@ export function UserInfoFormModule() {
           useDefault = true,
           selectedTemplateFormControlElements,
           defaultFormControlElements =
-            defaultValues_FormFragmentConstructor.formControlsUsed,
+            defaultValues_FormFragmentConstructor.formControlElements,
           appliedConfigsArr = [];
 
+        //checks to see whether to apply default values or not
         if (
           configObj.applyDefaultValues &&
           configObj.applyDefaultValues.FormFragmentConstructor &&
@@ -248,10 +250,14 @@ export function UserInfoFormModule() {
           useDefault = false;
         }
 
+        //looks for corresponding template matching the type property if its not equal to "custom"
+        //if found applies the corresponding data to a variable and
+        //sets the useTemplate variable boolean equal to true;
         if (configObj.type !== "custom") {
           if (formPresets[configObj.type]) {
-            this.#formControlsUsed =
-              formPresets[configObj.type].formControlsUsed;
+            selectedTemplateFormControlElements =
+              formPresets[configObj.type].formControlElements;
+            useTemplate = true;
           } else {
             throw new Error(
               `ERROR: template does not exist, received ${
@@ -260,20 +266,32 @@ export function UserInfoFormModule() {
             );
           }
         }
+
+        //pushes default value first if applicable
         if (useDefault) {
           appliedConfigsArr.push(defaultFormControlElements);
         }
 
+        //pushes template value next if applicable
         if (useTemplate) {
           appliedConfigsArr.push(selectedTemplateFormControlElements);
         }
 
-        appliedConfigsArr.push(configObj.formControlElements);
+        //always pushes the config value last
+        if (configObj.formControlElements) {
+          appliedConfigsArr.push(configObj.formControlElements);
+        }
 
         //all used config data specifically for text fields will be pushed into the appliedConfigsArr in order
         //from bottom to top, the last element will be the most current data set applied,
         //which this array can feature any combination of default, template, and custom values
-        this.#applyConfigHierarchy.formControlElements(appliedConfigsArr);
+        if (appliedConfigsArr.length > 0) {
+          this.#applyConfigHierarchy.formControlElements(appliedConfigsArr);
+        } else {
+          throw new Error(
+            `ERROR: appliedConfigArr lacks configuration data sets for form control elements`
+          );
+        }
       },
       formText: (configObj) => {
         let useTemplate = false,
@@ -291,20 +309,17 @@ export function UserInfoFormModule() {
           configObj.applyDefaultValues.FormFragmentConstructor === false
         ) {
           useDefault = false;
-        } else if (
-          configObj.applyDefaultValues &&
-          configObj.applyDefaultValues.FormFragmentConstructor &&
-          configObj.applyDefaultValues.FormFragmentConstructor === true
-        ) {
-          useDefault = true;
         }
 
         //if the type property doesn't equal 'custom' it assumes its a preset, and will check for the preset
+        //apply the corresponding data to the variable selectedTemplateTextValues
+        //and then set the useTemplate variable boolean equal to true
         //needs to be able to throw an error since this is a required property
         if (configObj.type !== "custom") {
           if (formPresets[configObj.type]) {
             selectedTemplateTextValues =
               formPresets[configObj.type].fragmentTextData;
+            useTemplate = true;
           } else {
             throw new Error(
               `ERROR: template does not exist, received ${
@@ -322,12 +337,19 @@ export function UserInfoFormModule() {
           appliedConfigsArr.push(selectedTemplateTextValues);
         }
 
-        appliedConfigsArr.push(configObj.formControlText);
-
+        if (configObj.formControlText) {
+          appliedConfigsArr.push(configObj.formControlText);
+        }
         //all used config data specifically for text fields will be pushed into the appliedConfigsArr in order
         //from bottom to top, the last element will be the most current data set applied,
         //which this array can feature any combination of default, template, and custom values
-        this.#applyConfigHierarchy.formText(appliedConfigsArr);
+        if (appliedConfigsArr.length > 0) {
+          this.#applyConfigHierarchy.formText(appliedConfigsArr);
+        } else {
+          throw new Error(
+            `ERROR: appliedConfigArr lacks configuration data sets for form text`
+          );
+        }
       },
       formElementsAttributes: (configObj) => {
         let useTemplate = false,
@@ -376,12 +398,20 @@ export function UserInfoFormModule() {
           appliedConfigsArr.push(selectedTemplateFormControlElementAttributes);
         }
 
-        appliedConfigsArr.push(configObj.defaultFormControlElementAttributes);
+        if (configObj.formControlAttributes) {
+          appliedConfigsArr.push(configObj.formControlAttributes);
+        }
 
         //all used config data specifically for form control elements will be pushed into the appliedConfigsArr in order
         //from bottom to top, the last element will be the most current data set applied,
         //which this array can feature any combination of default, template, and custom values
-        this.#applyConfigHierarchy.formElementsAttributes(appliedConfigsArr);
+        if (appliedConfigsArr.length > 0) {
+          this.#applyConfigHierarchy.formElementsAttributes(appliedConfigsArr);
+        } else {
+          throw new Error(
+            `ERROR: appliedConfigArr lacks configuration data sets for form element attributes`
+          );
+        }
       },
     };
 
@@ -389,18 +419,133 @@ export function UserInfoFormModule() {
     //these methods may either accept an array demonstrating the hierary, or simply reference a specific property in
     //the config file
     #applyConfig = {
-      formControlElements: function (appliedConfigsArr) {},
-      formText: function (appliedConfigsArr) {},
-      formElementsAttributes: function (appliedConfigsArr) {},
+      formControlElements: (appliedConfigsArr) => {
+        //arg should be an array in which its elements are
+        //arrays that each contain a list of the form control elements being used
+
+        //purpose of this code block is to set the formControlElements config to equal the first element, and
+        //then check the other elements and add any form control elements that weren't already listed from the first
+        //element. This should be a method of only side effects as it edits and applies this data to the final config
+        if (Array.isArray(appliedConfigsArr)) {
+          for (let i = 0; i < appliedConfigsArr.length; i++) {
+            if (i === 0) {
+              this.#config.formControlElements = appliedConfigsArr[i];
+            } else {
+              appliedConfigsArr[i].forEach((formControlElement) => {
+                if (
+                  !this.#config.formControlElements.includes(formControlElement)
+                ) {
+                  this.#config.formControlElements.push(formControlElement);
+                }
+              });
+            }
+          }
+        } else {
+          throw new Error(
+            `ERROR: appliedConfigsArr argument within formControlElements method isn't an array, received ${appliedConfigsArr}`
+          );
+        }
+      },
+      formText: (appliedConfigsArr) => {
+        //arg should be an array in which its elements are objects, in which each object holds the same structure but
+        //may have different values to the properties within them
+        if (Array.isArray(appliedConfigsArr)) {
+          this.#config.fragmentTextData = appliedConfigsArr[0];
+
+          //sets the fragmentTextData property equal to the first element, then checks for any other elements and all
+          //of their properties using some pretty nested loops, but it shouldn't be an issue as the scope of the
+          //iteration should never exceed a max of 15 iterations in any given level, also the inner most scope
+          //is simply applying a value to a variable, so the level of complexity is pretty low in this context
+
+          for (let i = 1; i < appliedConfigsArr.length; i++) {
+            if (!appliedConfigsArr[i]) break; //will break immediately if a current config data element doesn't exist
+            for (let formControlElement in appliedConfigsArr[i]) {
+              if (this.#config.fragmentTextData[formControlElement]) {
+                for (let property in appliedConfigsArr[i][formControlElement]) {
+                  if (property === "errorBoxText") {
+                    for (let errorProperty in appliedConfigsArr[i][
+                      formControlElement
+                    ][property]) {
+                      //iterate over the properties in the errorBoxText property which is within the formControl element property
+                      if (
+                        this.#config.fragmentTextData[formControlElement][
+                          property
+                        ][errorProperty]
+                      ) {
+                        this.#config.fragmentTextData[formControlElement][
+                          property
+                        ][errorProperty] =
+                          appliedConfigsArr[i][formControlElement][property][
+                            errorProperty
+                          ];
+                      }
+                    }
+                  } else {
+                    //applies various form text propertie values from the second data set to the equivalent property in the config object
+                    if (
+                      this.#config.fragmentTextData[formControlElement][
+                        property
+                      ]
+                    ) {
+                      this.#config.fragmentTextData[formControlElement][
+                        property
+                      ] = appliedConfigsArr[i][formControlElement][property];
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          throw new Error(
+            `ERROR: appliedConfigsArr argument within formText method isn't an array, received ${appliedConfigsArr}`
+          );
+        }
+      },
+      formElementsAttributes: (appliedConfigsArr) => {
+        //arg should be an array in which its elements are objects, in which each object holds the same structure but
+        //may have different values to the properties within them
+        if (Array.isArray(appliedConfigsArr)) {
+          this.#config.formControlAttributes = appliedConfigsArr[0];
+
+          //applies the attribute values for each and every selected form control element
+          //in the hierarchy pattern
+          for (let i = 1; i < appliedConfigsArr.length; i++) {
+            if (!appliedConfigsArr[i]) break;
+            for (let formControlElement in appliedConfigsArr[i]) {
+              if (this.#config.formControlAttributes[formControlElement]) {
+                for (let attribute in appliedConfigsArr[i][
+                  formControlElement
+                ]) {
+                  if (
+                    this.#config.formControlAttributes[formControlElement][
+                      attribute
+                    ]
+                  ) {
+                    this.#config.formControlAttributes[formControlElement][
+                      attribute
+                    ] = appliedConfigsArr[i][formControlElement][attribute];
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          throw new Error(
+            `ERROR: appliedConfigsArr argument within formElementsAttributes method isn't an array, received ${appliedConfigsArr}`
+          );
+        }
+      },
       constraintAPI: (configObj) => {
         if (
           configObj.functionalityRules &&
           configObj.functionalityRules.useConstraintAPI
         ) {
-          this.#useContraintAPI = configObj.functionalityRules.useConstraintAPI;
+          this.#config.useConstraintAPIcontraintAPI =
+            configObj.functionalityRules.useConstraintAPI;
         } else if (configObj.type && configObj.type !== "custom") {
           if (formPresets[configObj.type]) {
-            this.#config.useContraintAPI =
+            this.#config.useConstraintAPI =
               formPresets[configObj.type].functionalityRules.useConstraintAPI;
           } else {
             throw new Error(
@@ -411,6 +556,9 @@ export function UserInfoFormModule() {
           }
         }
       },
+      uniqueIdentifier: (configObj) => {},
+      formAction: (configObj) => {},
+      formMethod: (configObj) => {},
     };
 
     //this is the entrypoint at which the final configuration has been initialized and
@@ -521,6 +669,7 @@ export function UserInfoFormModule() {
     return allErrors;
   }
 
+  //check if the target data is in the correct format and a usable value
   const validationMethods = {
     uniqueIdentifier: function (configObj) {},
     type: function (configObj) {},
