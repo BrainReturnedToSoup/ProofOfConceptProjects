@@ -1,193 +1,6 @@
+import { config } from "webpack";
+
 export function UserInfoFormModule() {
-  const defaultValues_FormFragmentConstructor = {
-    fragmentTextData: {
-      email: {
-        labelText: "Email",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered not a valid email address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid email address",
-        },
-      },
-
-      confirmEmail: {
-        labelText: "Confirm Email",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch:
-            "Value entered does not match the previous email address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter the same email address",
-        },
-      },
-
-      address: {
-        labelText: "Address",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid street address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid street address",
-        },
-      },
-
-      stateOrProvince: {
-        labelText: "State/Province",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid state or province",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid state or province",
-        },
-      },
-
-      country: {
-        labelText: "Country",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid country",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid country",
-        },
-      },
-
-      postalCode: {
-        labelText: "Postal Code",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid postal code",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid postal code",
-        },
-      },
-
-      password: {
-        labelText: "Password",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid password",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid password",
-        },
-      },
-
-      confirmPassword: {
-        labelText: "Confirm Password",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered not equal to password",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter the same password",
-        },
-      },
-
-      dateOfBirth: {
-        labelText: "Date Of Birth",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid birth date",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid birth date",
-        },
-      },
-
-      phoneNumber: {
-        labelText: "Phone Number",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid phone number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid phone number",
-        },
-      },
-
-      creditCardType: {
-        labelText: "",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid card type",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid card type",
-        },
-      },
-
-      creditCardNumber: {
-        labelText: "Card Number",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid credit card number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid credit card number",
-        },
-      },
-
-      creditCardExpDate: {
-        labelText: "Expiration Date",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid expiration date",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid expiration date",
-        },
-      },
-
-      creditCardSecurityNumber: {
-        labelText: "CVV",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid security number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid security number",
-        },
-      },
-
-      subjectLine: {
-        labelText: "Subject",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid subject line",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid subject line",
-        },
-      },
-
-      textBox: {
-        labelText: "",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid within this text box",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter valid information within this text box",
-        },
-      },
-    },
-    fragmentAttributes: {},
-    formControlElements: [],
-  };
-
   const formPresets = {
     newAccountBasic: {},
     newAccountFull: {},
@@ -633,8 +446,8 @@ export function UserInfoFormModule() {
     //<div class="Form-Control-Container">
     //  <labe></label>
     //  *<input></input>
-    //  *<div class="Form-Control-Element-Instructions"></div>
-    //  *<div class="Form-Control-Element-Error-Text-Container">
+    //  *<div class="Form-Control-Instructions"></div>
+    //  *<div class="Form-Control-Error-Text-Container">
     //
     //   </div>
     //</div>
@@ -842,7 +655,7 @@ export function UserInfoFormModule() {
     //Thinking about adding an API that allows this class to emit all of it's references to a global DOM refs cache.
   }
 
-  class MainFunctionalityManager {
+  class FunctionalityManager {
     //will append all necessary functionality to the created HTML form fragment, including the validation
     //and actual submission logic if necessary
   }
@@ -851,6 +664,217 @@ export function UserInfoFormModule() {
     //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
     //the form and handle certain state data attached to such
     init(parentElement) {}
+  }
+
+  const DefaultValues = {
+    formControlText: {
+      email: {
+        labelText: "Email",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered not a valid email address",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid email address",
+        },
+      },
+
+      confirmEmail: {
+        labelText: "Confirm Email",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch:
+            "Value entered does not match the previous email address",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter the same email address",
+        },
+      },
+
+      address: {
+        labelText: "Address",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid street address",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid street address",
+        },
+      },
+
+      stateOrProvince: {
+        labelText: "State/Province",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid state or province",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid state or province",
+        },
+      },
+
+      country: {
+        labelText: "Country",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid country",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid country",
+        },
+      },
+
+      postalCode: {
+        labelText: "Postal Code",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid postal code",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid postal code",
+        },
+      },
+
+      password: {
+        labelText: "Password",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid password",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid password",
+        },
+      },
+
+      confirmPassword: {
+        labelText: "Confirm Password",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered not equal to password",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter the same password",
+        },
+      },
+
+      dateOfBirth: {
+        labelText: "Date Of Birth",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid birth date",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid birth date",
+        },
+      },
+
+      phoneNumber: {
+        labelText: "Phone Number",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid phone number",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid phone number",
+        },
+      },
+
+      creditCardType: {
+        labelText: "",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid card type",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid card type",
+        },
+      },
+
+      creditCardNumber: {
+        labelText: "Card Number",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid credit card number",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid credit card number",
+        },
+      },
+
+      creditCardExpDate: {
+        labelText: "Expiration Date",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid expiration date",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid expiration date",
+        },
+      },
+
+      creditCardSecurityNumber: {
+        labelText: "CVV",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid security number",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid security number",
+        },
+      },
+
+      subjectLine: {
+        labelText: "Subject",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid subject line",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid subject line",
+        },
+      },
+
+      textBox: {
+        labelText: "",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid within this text box",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter valid information within this text box",
+        },
+      },
+    },
+    formControlAttributes: {},
+    formControlElements: [],
+    functionalityRules: {},
+    thirdPartyApiRules: {},
+  };
+
+  class CreateFinalConfig {
+    constructor(configObj) {
+      if (configObj.applyDefaultValues) {
+        this.#stateData.applyDefaultValues = configObj.applyDefaultValues;
+      } else if (
+        configObj.type !== "custom" &&
+        Object.keys(formPresets).includes(configObj.type)
+      ) {
+        this.#stateData.applyDefaultValues =
+          formPresets[configObj.type].applyDefaultValues;
+        this.#stateData.applyTemplate = true;
+      }
+    }
+
+    #stateData = {
+      applyDefaultValues: true,
+      applyTemplate: false,
+    };
   }
 
   function validateConfig(config) {
@@ -910,14 +934,7 @@ export function UserInfoFormModule() {
 //    formAction: "", (always required, determines the form instance, action attribute)
 //    formMethod: "", (always required, determines the form instance, method attribute)
 //    formControlElements = [],  (if type set to custom this property is required) (not necessary if type property isn't custom) (defines the form control elements to include) (each element must be a string and unique, also order counts but not critical) (can be stacked on top of a form template to include extra forms)
-//    applyDefaultValues: {
-//        formFragmentContructor: true,
-//        DynamicOptionsManager: true,
-//        AutoFillFields: true,                   (determines if the various classes will pull from a default value preset, this is separate from the various form templates, this is the true default values of various characteristics, modules will pull from a default value set by default)
-//        ElementCacheManager: true,
-//        MainFunctionalityManager: true,
-//        Main_UserInfoForm: true,
-//    },
+//    applyDefaultValues: true,
 //    formControlAttributes: {
 //        specificFormControl1: {...properties},     (used to define specific inline attributes on specific elements, this is for defining say the name for a specific form control input etc)
 //        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
