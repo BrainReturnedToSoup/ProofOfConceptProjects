@@ -1,7 +1,7 @@
 import { config } from "webpack";
 
 export function UserInfoFormModule() {
-  const formPresets = {
+  const formTemplates = {
     newAccountBasic: {},
     newAccountFull: {},
     paymentBasic: {},
@@ -859,6 +859,8 @@ export function UserInfoFormModule() {
 
   class CreateFinalConfig {
     constructor(configObj) {
+      //returns an object representing the final configuration that the other classes will use to determine their behavior
+      //will only contain data that is necessary, and data that has been processed by the data merging hierarchy
       if (configObj.applyDefaultValues) {
         this.#stateData.applyDefaultValues = configObj.applyDefaultValues;
       } else if (
@@ -868,12 +870,195 @@ export function UserInfoFormModule() {
         this.#stateData.applyDefaultValues =
           formPresets[configObj.type].applyDefaultValues;
         this.#stateData.applyTemplate = true;
+        this.#stateData.templateName = configObj.type;
       }
+
+      this.uniqueIdentifier = configObj.uniqueIdentifier;
+      this.formAction = configObj.formAction;
+      this.formMethod = configObj.formMethod;
+
+      this.formControlElements = this.#dataMergingMethods.formControlElements(
+        configObj.formControlElements
+      );
+      this.formControlAttributes =
+        this.#dataMergingMethods.formControlAttributes(
+          configObj.formControlAttributes
+        );
+      this.formControlText = this.#dataMergingMethods.formControlText(
+        configObj.formControlText
+      );
+      this.functionalityRules = this.#dataMergingMethods.functionalityRules(
+        configObj.functionalityRules
+      );
+      this.thirdPartyApiRules = this.#dataMergingMethods.thirdPartyApiRules(
+        configObj.thirdPartyApiRules
+      );
     }
 
     #stateData = {
       applyDefaultValues: true,
       applyTemplate: false,
+      templateName: null,
+      defaultValues: DefaultValues,
+    };
+
+    #dataMergingMethods = {
+      formControlElements: function (formControlElements) {
+        const dataSetArr = [];
+
+        if (this.#stateData.applyDefaultValues) {
+          dataSetArr.push(this.#stateData.defaultValues.formControlElements);
+        }
+        if (this.#stateData.applyTemplate) {
+          dataSetArr.push(
+            formPresets[this.#stateData.templateName].formControlElements
+          );
+        }
+        dataSetArr.push(formControlElements);
+
+        //merges all present data sets within dataSetArr into one large array, and creates a set in order to remove duplicates
+        //the set then converted into an array, and the array is returned
+        if (dataSetArr.length > 1) {
+          const finalConfig = Array.from(new Set([].concat(...dataSetArr)));
+          return finalConfig;
+        } else if (dataSetArr.length === 1) {
+          return dataSetArr[0];
+        }
+      },
+      formControlAttributes: function (formControlAttributes) {
+        const dataSetArr = [];
+        let finalConfig;
+
+        if (this.#stateData.applyDefaultValues) {
+          dataSetArr.push(this.#stateData.defaultValues.formControlAttributes);
+        }
+        if (this.#stateData.applyTemplate) {
+          dataSetArr.push(
+            formTemplates[this.#stateData.templateName].formControlAttributes
+          );
+        }
+        dataSetArr.push(formControlAttributes);
+
+        //will set finalConfig equal to the first element in the data set, and then iterate through the other
+        //data sets and update the individual properties that either aren't present from a lower hierarchy in the finalConfig accordingly
+        //The nesting is needed in order to iterate over the dataSetArr, iterate over the existing formControlElements within
+        //any of the data sets, and then iterate over the individual attributes within a specific form control element
+        for (let i = 0; i < dataSetArr.length; i++) {
+          if (!dataSetArr[i]) break;
+          if (i === 0) {
+            finalConfig = dataSetArr[i];
+          } else {
+            for (let formControlElement in dataSetArr[i]) {
+              for (let attribute in dataSetArr[i][formControlElement]) {
+                finalConfig[formControlElement][attribute] =
+                  dataSetArr[i][formControlElement][attribute];
+              }
+            }
+          }
+        }
+
+        return finalConfig;
+      },
+      formControlText: function (formControlText) {
+        const dataSetArr = [];
+        let finalConfig;
+
+        if (this.#stateData.applyDefaultValues) {
+          dataSetArr.push(this.#stateData.defaultValues.formControlText);
+        }
+        if (this.#stateData.applyTemplate) {
+          dataSetArr.push(formTemplates[this.#stateData.templateName]);
+        }
+        dataSetArr.push(formControlText);
+
+        //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
+        //and either adds missing properties or makes updates to existing ones.
+        //The nesting is needed in order to iterate over the dataSetArr, then iterate over the existing
+        //formControlElements, then iterate over the text properties within the corresponding form control element
+        //and then iterate over the properties within the error text property if currently targeted
+        for (let i = 0; i < dataSetArr.length; i++) {
+          if (!dataSetArr[i]) break;
+          if (i === 0) {
+            finalConfig = dataSetArr[i];
+          } else {
+            for (let formControlElement in dataSetArr[i]) {
+              for (let textProperty in dataSetArr[i][formControlElement]) {
+                if (textProperty === "errorBoxText") {
+                  for (let error in dataSetArr[i][
+                    formControlElement[textProperty]
+                  ]) {
+                    finalConfig[formControlElement][textProperty][error] =
+                      dataSetArr[i][formControlElement][textProperty][error];
+                  }
+                } else {
+                  finalConfig[formControlElement][textProperty] =
+                    dataSetArr[i][formControlElement][textProperty];
+                }
+              }
+            }
+          }
+        }
+
+        return finalConfig;
+      },
+      functionalityRules: function (functionalityRules) {
+        const dataSetArr = [];
+        let finalConfig;
+
+        if (this.#stateData.applyDefaultValues) {
+          dataSetArr.push(this.#stateData.defaultValues.functionalityRules);
+        }
+        if (this.#stateData.applyTemplate) {
+          dataSetArr.push(
+            formTemplates[this.#stateData.templateName].functionalityRules
+          );
+        }
+        dataSetArr.push(functionalityRules);
+
+        //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
+        //and either adds missing properties or makes updates to existing ones.
+        for (let i = 0; i < dataSetArr.length; i++) {
+          if (!dataSetArr[i]) break;
+          if (i === 0) {
+            finalConfig = dataSetArr[0];
+          } else {
+            for (let rule in dataSetArr[i]) {
+              finalConfig[rule] = dataSetArr[i][rule];
+            }
+          }
+        }
+
+        return finalConfig;
+      },
+      thirdPartyApiRules: function (thirdPartyApiRules) {
+        const dataSetArr = [];
+        let finalConfig;
+
+        if (this.#stateData.applyDefaultValues) {
+          dataSetArr.push(this.#stateData.defaultValues.thirdPartyApiRules);
+        }
+        if (this.#stateData.applyTemplate) {
+          dataSetArr.push(
+            formTemplates[this.#stateData.templateName].thirdPartyApiRules
+          );
+        }
+        dataSetArr.push(thirdPartyApiRules);
+
+        //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
+        //and either adds missing properties or makes updates to existing ones.
+        for (let i = 0; i < dataSetArr.length; i++) {
+          if (!dataSetArr[i]) break;
+          if (i === 0) {
+            finalConfig = dataSetArr[i];
+          } else {
+            for (let rule in dataSetArr[i]) {
+              finalConfig[rule] = dataSetArr[i][rule];
+            }
+          }
+        }
+
+        return finalConfig;
+      },
     };
   }
 
@@ -950,13 +1135,9 @@ export function UserInfoFormModule() {
 //      useConstraintAPI: true,               (filled in properties help to define some user form functionality, such as input event listening, or submit event listening, using the constraint API etc.)
 //      listenOnInput: true,
 //      listenOnSubmit: true,
-//      regexpInputPatterns: {
-//        specificFormControl1: pattern,     (used to define specific form control input patterns for input validation)
-//        specificFormControl2: pattern,      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
-//        ...,
-//      },
 //    },
 //    thirdPartyApiRules: {
+//      useGeoNamesAPI: true,
 //
 //    },
 //}
