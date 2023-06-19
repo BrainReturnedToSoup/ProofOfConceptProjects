@@ -1062,32 +1062,7 @@ export function UserInfoFormModule() {
     };
   }
 
-  function validateConfig(config) {
-    const allErrors = [];
-
-    if (typeof config !== "object") {
-      allErrors.push(
-        `ERROR: supplied config argument is not an object, received ${typeof config}`
-      );
-    }
-
-    const { uniqueIdentifier, type, formControlElements, rules } =
-        validationMethods,
-      errorsUI = uniqueIdentifier(config),
-      errorsType = type(config),
-      errorsFCE = formControlElements(config),
-      errorsRules = rules(config);
-
-    [errorsUI, errorsType, errorsFCE, errorsRules].forEach((errors) => {
-      return errors.forEach((error) => {
-        return allErrors.push(error);
-      });
-    });
-
-    return allErrors;
-  }
-
-  //check if the target data is in the correct format and a usable value
+  //each method has to return a string about the error, not throw a new error
   const validationMethods = {
     uniqueIdentifier: function (configObj) {},
     type: function (configObj) {},
@@ -1098,9 +1073,27 @@ export function UserInfoFormModule() {
     thirdPartyApiRules: function (configObj) {},
   };
 
+  function validateConfig(config) {
+    const allErrors = [];
+
+    if (typeof config !== "object") {
+      allErrors.push(
+        `ERROR: supplied config argument is not an object, received ${typeof config}`
+      );
+    }
+
+    Object.keys(validationMethods).forEach((method) => {
+      allErrors.push(validationMethods[method](config));
+    });
+
+    return allErrors;
+  }
+
+  //check if the target data is in the correct format and a usable value
+
   function newClassInstance(config) {
     const allErrorStrings = validateConfig(config);
-    if (allErrorStrings.length < 0) {
+    if (allErrorStrings.length === 0) {
       return new Main_UserInfoForm(config);
     } else {
       const allErrorInstances = allErrorStrings.map((errorString) => {
