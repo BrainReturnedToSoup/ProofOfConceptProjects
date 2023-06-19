@@ -632,6 +632,8 @@ export function UserInfoFormModule() {
       textBoxOne: function (props) {},
 
       textBoxTwo: function (props) {},
+
+      fileUpload: function (props) {},
     };
   }
 
@@ -1064,14 +1066,103 @@ export function UserInfoFormModule() {
 
   //each method has to return a string about the error, not throw a new error
   const validationMethods = {
-    uniqueIdentifier: function (configObj) {},
-    type: function (configObj) {},
-    formAttributes: function (configObj) {},
-    formControlElements: function (configObj) {},
-    formControlText: function (configObj) {},
-    functionalityRules: function (configObj) {},
-    thirdPartyApiRules: function (configObj) {},
-  };
+      uniqueIdentifier: function (configObj) {
+        //checks for existence of the uniqueIdentifier property, and whether its value is a string that doesn't contain any special characters or spaces, aside from dashes and underscores
+        if (configObj.uniqueIdentifier) {
+          const cleanedIdentifier = configObj.uniqueIdentifier.replace(
+            /[\s~`!@#$%^&*()\=+[{\]}\\|;:'",<.>/?]/g,
+            ""
+          );
+
+          if (
+            typeof configObj.uniqueIdentifier !== "string" &&
+            configObj.uniqueIdentifier !== cleanedIdentifier
+          ) {
+            return `ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
+          }
+        } else {
+          return `ERROR: uniqueIdentifier property doesn't exist`;
+        }
+      },
+      type: function (configObj) {
+        if (configObj.type) {
+          if (configObj.type === "string") {
+            if (
+              configObj.type !== "custom" ||
+              Object.keys(formTemplates).includes(configObj.type)
+            ) {
+              return `ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${Object.keys(
+                formTemplates
+              )}`;
+            }
+          } else {
+            return `ERROR: type property isn't a string, received ${configObj.type}`;
+          }
+        } else {
+          return `ERROR: type property doesn't exist`;
+        }
+      },
+      formAttributes: function (configObj) {
+        if (configObj.formControlAttributes) {
+        }
+      },
+      formControlElements: function (configObj) {},
+      formControlText: function (configObj) {},
+      functionalityRules: function (configObj) {},
+      thirdPartyApiRules: function (configObj) {},
+    },
+    formControlElements = [
+      "email",
+      "confirmEmail",
+      "address",
+      "stateOrProvince",
+      "country",
+      "postalCode",
+      "password",
+      "confirmPassword",
+      "dateOfBirth",
+      "phoneNumber",
+      "creditCardType",
+      "creditCardNumber",
+      "creditCardExpDate",
+      "creditCardSecurityNumber",
+      "subjectLineOne",
+      "subjectLineTwo",
+      "textBoxOne",
+      "textBoxTwo",
+      "fileUpload",
+    ],
+    formControlAttributes = [
+      "name",
+      "value",
+      "required",
+      "disabled",
+      "readonly",
+      "placeholder",
+      "maxlength",
+      "minlength",
+      "pattern",
+      "min",
+      "max",
+      "step",
+      "multiple",
+      "autofocus",
+      "autocomplete",
+      "autocorrect",
+      "autocapitalize",
+      "spellcheck",
+      "size",
+      "tabindex",
+      "formnovalidate",
+      "formtarget",
+      "formenctype",
+      "formmethod",
+      "aria-label",
+      "aria-labelledby",
+      "aria-describedby",
+      "validity",
+    ],
+    formAttributes = ["action", "method", "target", "enctype"];
 
   function validateConfig(config) {
     const allErrors = [];
@@ -1083,7 +1174,10 @@ export function UserInfoFormModule() {
     }
 
     Object.keys(validationMethods).forEach((method) => {
-      allErrors.push(validationMethods[method](config));
+      const validationString = validationMethods[method](config);
+      if (typeof validationString === "string") {
+        allErrors.push(validationString);
+      }
     });
 
     return allErrors;
