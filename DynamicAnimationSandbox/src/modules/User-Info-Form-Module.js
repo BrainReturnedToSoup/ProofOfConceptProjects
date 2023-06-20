@@ -1066,52 +1066,114 @@ export function UserInfoFormModule() {
 
   //each method has to return a string about the error, not throw a new error
   const validationMethods = {
-      uniqueIdentifier: function (configObj) {
-        //checks for existence of the uniqueIdentifier property, and whether its value is a string that doesn't contain any special characters or spaces, aside from dashes and underscores
-        if (configObj.uniqueIdentifier) {
-          const cleanedIdentifier = configObj.uniqueIdentifier.replace(
-            /[\s~`!@#$%^&*()\=+[{\]}\\|;:'",<.>/?]/g,
-            ""
+    uniqueIdentifier: function (configObj) {
+      //checks for existence of the uniqueIdentifier property, and whether its value is a string that doesn't contain any special characters or spaces, aside from dashes and underscores
+      if (configObj.uniqueIdentifier) {
+        const cleanedIdentifier = configObj.uniqueIdentifier.replace(
+          /[\s~`!@#$%^&*()\=+[{\]}\\|;:'",<.>/?]/g,
+          ""
+        );
+
+        if (
+          typeof configObj.uniqueIdentifier !== "string" &&
+          configObj.uniqueIdentifier !== cleanedIdentifier
+        ) {
+          return `ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
+        }
+      } else {
+        return `ERROR: uniqueIdentifier property doesn't exist`;
+      }
+
+      return null;
+    },
+    type: function (configObj) {
+      if (configObj.type) {
+        if (configObj.type === "string") {
+          if (
+            configObj.type !== "custom" ||
+            Object.keys(formTemplates).includes(configObj.type)
+          ) {
+            return `ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${Object.keys(
+              formTemplates
+            )}`;
+          }
+        } else {
+          return `ERROR: type property isn't a string, received ${configObj.type}`;
+        }
+      } else {
+        return `ERROR: type property doesn't exist`;
+      }
+
+      return null;
+    },
+    formAttributes: function (configObj) {
+      if (configObj.formControlAttributes) {
+        if (typeof configObj.formControlAttributes === "object") {
+          const formControlElementsKeys = Object.keys(
+            configObj.formControlAttributes
           );
 
-          if (
-            typeof configObj.uniqueIdentifier !== "string" &&
-            configObj.uniqueIdentifier !== cleanedIdentifier
-          ) {
-            return `ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
-          }
-        } else {
-          return `ERROR: uniqueIdentifier property doesn't exist`;
-        }
-      },
-      type: function (configObj) {
-        if (configObj.type) {
-          if (configObj.type === "string") {
-            if (
-              configObj.type !== "custom" ||
-              Object.keys(formTemplates).includes(configObj.type)
-            ) {
-              return `ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${Object.keys(
-                formTemplates
-              )}`;
-            }
+          if (formControlElementsKeys.length !== 0) {
+            const formControlKeys = Object.keys(
+              validationRefs.formControlElements
+            );
+            formControlElementsKeys.forEach((element) => {
+              if (formControlKeys.includes(element)) {
+                return `ERROR: unrecognized form control element, received ${element} within the formControlAttributes property, here is a list of available form control elements to target ${formControlElements}`;
+              }
+
+              for (let property in configObj.formControlAttributes[element]) {
+                if (
+                  !validationRefs.formControlElements[element].includes(
+                    property
+                  )
+                ) {
+                  return `ERROR: unrecognized form control element property, received ${property} in ${
+                    configObj.formControlAttributes[element]
+                  }, here are some available attributes ${Object.keys(
+                    formControlAttributes
+                  )}`;
+                }
+
+                //analyze the value of the corresponding property here
+              }
+            });
           } else {
-            return `ERROR: type property isn't a string, received ${configObj.type}`;
+            return `ERROR: formControlAttributes property was declared, but possesses no values within it`;
           }
         } else {
-          return `ERROR: type property doesn't exist`;
+          return `ERROR: formControlAttributes property was declared, but isn't a correct data type, must be an object`;
         }
-      },
-      formAttributes: function (configObj) {
-        if (configObj.formControlAttributes) {
-        }
-      },
-      formControlElements: function (configObj) {},
-      formControlText: function (configObj) {},
-      functionalityRules: function (configObj) {},
-      thirdPartyApiRules: function (configObj) {},
+      }
+
+      return null;
     },
-    formControlElements = [
+    formControlElements: function (configObj) {
+      if (configObj.formControlElements) {
+        if (Array.isArray(configObj.formControlElements)) {
+          if (configObj.formControlElements.length > 0) {
+            configObj.formControlElements.forEach((element) => {
+              if (!validationRefs.formControlElements.includes(element)) {
+                return `ERROR: unrecognized form control element, received ${element} within the formControlElements property array, here are the available form control elements to use ${formControlElements}`;
+              }
+            });
+          } else {
+            return `ERROR: formControlElements was declared, and is an array, but doesn't contain any form control elements`;
+          }
+        } else {
+          return `ERROR: formControlElements was declared, but isn't a correct data type, must be an array`;
+        }
+      }
+
+      return null;
+    },
+    formControlText: function (configObj) {},
+    functionalityRules: function (configObj) {},
+    thirdPartyApiRules: function (configObj) {},
+  };
+
+  const validationRefs = {
+    formControlElements: [
       "email",
       "confirmEmail",
       "address",
@@ -1132,37 +1194,41 @@ export function UserInfoFormModule() {
       "textBoxTwo",
       "fileUpload",
     ],
-    formControlAttributes = [
-      "name",
-      "value",
-      "required",
-      "disabled",
-      "readonly",
-      "placeholder",
-      "maxlength",
-      "minlength",
-      "pattern",
-      "min",
-      "max",
-      "step",
-      "multiple",
-      "autofocus",
-      "autocomplete",
-      "autocorrect",
-      "autocapitalize",
-      "spellcheck",
-      "size",
-      "tabindex",
-      "formnovalidate",
-      "formtarget",
-      "formenctype",
-      "formmethod",
-      "aria-label",
-      "aria-labelledby",
-      "aria-describedby",
-      "validity",
-    ],
-    formAttributes = ["action", "method", "target", "enctype"];
+    formControlAttributes: {
+      name: "string",
+      value: "string",
+      required: null,
+      disabled: null,
+      readonly: null,
+      placeholder: "string",
+      maxlength: "number",
+      minlength: "number",
+      pattern: "regexp",
+      min: "number",
+      max: "number",
+      step: "number",
+      multiple: "boolean",
+      autofocus: "boolean",
+      autocomplete: ["on", "off"],
+      autocorrect: ["on", "off"],
+      autocapitalize: ["none", "sentences", "words", "characters"],
+      spellcheck: "boolean",
+      size: "number",
+      tabindex: "number",
+      formnovalidate: null,
+    },
+    formAttributes: {
+      formtarget: ["_blank", "_self", "_parent", "_top"],
+      formenctype: [
+        "application/x-www-form-urlencoded",
+        "multipart/form-data",
+        "text/plain",
+      ],
+      "aria-label": "string",
+      "aria-labelledby": "string",
+      "aria-describedby": "string",
+    },
+  };
 
   function validateConfig(config) {
     const allErrors = [];
