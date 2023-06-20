@@ -1075,7 +1075,7 @@ export function UserInfoFormModule() {
         );
 
         if (
-          typeof configObj.uniqueIdentifier !== "string" &&
+          typeof configObj.uniqueIdentifier !== "string" ||
           configObj.uniqueIdentifier !== cleanedIdentifier
         ) {
           return `ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
@@ -1088,61 +1088,95 @@ export function UserInfoFormModule() {
     },
     type: function (configObj) {
       if (configObj.type) {
+        //checks for existence of the type property, this property is mandatory to include in the config
         if (configObj.type === "string") {
+          //checks if the value of this property is a string
+          const existingFormTemplates = Object.keys(formTemplates);
           if (
-            configObj.type !== "custom" ||
-            Object.keys(formTemplates).includes(configObj.type)
+            configObj.type !== "custom" &&
+            !existingFormTemplates.includes(configObj.type)
           ) {
-            return `ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${Object.keys(
-              formTemplates
-            )}`;
+            //checks if the type property is either equal to the 'custom' string or another string which helps determine the final configuration data set
+            return `ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${existingFormTemplates}`;
           }
         } else {
-          return `ERROR: type property isn't a string, received ${configObj.type}`;
+          return `CONFIG VALIDATION ERROR: type property isn't a string, received ${configObj.type}`;
         }
       } else {
-        return `ERROR: type property doesn't exist`;
+        return `CONFIG VALIDATION ERROR: type property doesn't exist`;
       }
 
       return null;
     },
     formAttributes: function (configObj) {
       if (configObj.formControlAttributes) {
+        //if the property exists, isn't mandatory
+        //property must equal and object if it does though
         if (typeof configObj.formControlAttributes === "object") {
-          const formControlElementsKeys = Object.keys(
+          const formControlElements = Object.keys(
             configObj.formControlAttributes
           );
-
-          if (formControlElementsKeys.length !== 0) {
-            const formControlKeys = Object.keys(
-              validationRefs.formControlElements
-            );
-            formControlElementsKeys.forEach((element) => {
-              if (formControlKeys.includes(element)) {
-                return `ERROR: unrecognized form control element, received ${element} within the formControlAttributes property, here is a list of available form control elements to target ${formControlElements}`;
-              }
-
-              for (let property in configObj.formControlAttributes[element]) {
+          //check for the existence of keys that represent specific form control elements
+          if (formControlElements.length !== 0) {
+            formControlElements.forEach((element) => {
+              //checks if current element isn't a valid form control element to target
+              if (!validationRefs.formControlElements.includes(element)) {
+                return `CONFIG VALIDATION ERROR: unrecognized form control element within the formControlAttributes property, received ${element}, here is a list of valid form control elements to use '${validationRefs.formControlElements}'`;
+              } else {
+                //checks if the value of the target form control element is a valid data type, that being an object
                 if (
-                  !validationRefs.formControlElements[element].includes(
-                    property
-                  )
+                  typeof configObj.formControlAttributes[element] === "object"
                 ) {
-                  return `ERROR: unrecognized form control element property, received ${property} in ${
-                    configObj.formControlAttributes[element]
-                  }, here are some available attributes ${Object.keys(
-                    formControlAttributes
-                  )}`;
+                  //iterates over all of the existing properties within the specific targeted form control element, and validates the values
+                  //of each of these properties
+                  for (let property in configObj.formControlAttributes[
+                    element
+                  ]) {
+                    if (
+                      typeof configObj.formControlAttributes[element][
+                        property
+                      ] === validationRefs.formControlAttributes[property]
+                    ) {
+                      continue;
+                      //continue the loop if this condition is met, the specific property passed the validation
+                    } else if (
+                      validationRefs.formControlAttributes[property] ===
+                      "regexp"
+                    ) {
+                      try {
+                        new RegExp(
+                          configObj.formControlAttributes[element][property]
+                        );
+                      } catch {
+                        return `CONFIG VALIDATION ERROR: target property is supposed to be a valid regular expression, received ${configObj.formControlAttributes[element][property]} for ${property}, within ${element} of the property formControlAttributes`;
+                      }
+                    } else if (
+                      Array.isArray(
+                        validationRefs.formControlAttributes[property]
+                      )
+                    ) {
+                      //check for a match within the corresponding attribute value reference array on the specific property
+                      if (
+                        !validationRefs.formControlAttributes[
+                          property
+                        ].includes(
+                          configObj.formControlAttributes[element][property]
+                        )
+                      ) {
+                        return `CONFIG VALIDATION ERROR: value of a specific attribute is not a valid selection within formControlAttributes and ${element}, received ${configObj.formControlAttributes[element][property]}, here are a list of available corresponding property values`;
+                      }
+                    } else {
+                      return `CONFIG VALIDATION ERROR: a target attribute value either does not meet the requirements for either the data type or equal a valid possible value, received ${configObj.formControlAttributes[element][property]}, valid formats and or possible inputs for this attribute are ${validationRefs.formControlAttributes[property]}`;
+                    }
+                  }
+                } else {
+                  return `CONFIG VALIDATION ERROR: formControlAttributes was declared, and a correct form control element was targeted, but the value of said form control element property isn't an object, received ${element} and ${configObj.formControlAttributes[element]} as its value`;
                 }
-
-                //analyze the value of the corresponding property here
               }
             });
-          } else {
-            return `ERROR: formControlAttributes property was declared, but possesses no values within it`;
           }
         } else {
-          return `ERROR: formControlAttributes property was declared, but isn't a correct data type, must be an object`;
+          return `CONFIG VALIDATION ERROR: formControlAttributes property was declared, but isn't a correct data type, must be an object`;
         }
       }
 
@@ -1154,14 +1188,14 @@ export function UserInfoFormModule() {
           if (configObj.formControlElements.length > 0) {
             configObj.formControlElements.forEach((element) => {
               if (!validationRefs.formControlElements.includes(element)) {
-                return `ERROR: unrecognized form control element, received ${element} within the formControlElements property array, here are the available form control elements to use ${formControlElements}`;
+                return `CONFIG VALIDATION ERROR: unrecognized form control element, received ${element} within the formControlElements property array, here are the available form control elements to use ${formControlElements}`;
               }
             });
           } else {
-            return `ERROR: formControlElements was declared, and is an array, but doesn't contain any form control elements`;
+            return `CONFIG VALIDATION ERROR: formControlElements was declared, and is an array, but doesn't contain any form control elements`;
           }
         } else {
-          return `ERROR: formControlElements was declared, but isn't a correct data type, must be an array`;
+          return `CONFIG VALIDATION ERROR: formControlElements was declared, but isn't a correct data type, must be an array`;
         }
       }
 
@@ -1235,7 +1269,7 @@ export function UserInfoFormModule() {
 
     if (typeof config !== "object") {
       allErrors.push(
-        `ERROR: supplied config argument is not an object, received ${typeof config}`
+        `CONFIG VALIDATION ERROR: supplied config argument is not an object, received ${typeof config}`
       );
     }
 
