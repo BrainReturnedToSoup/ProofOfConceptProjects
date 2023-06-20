@@ -444,7 +444,7 @@ export function UserInfoFormModule() {
     }
 
     //<div class="Form-Control-Container">
-    //  <labe></label>
+    //  <label></label>
     //  *<input></input>
     //  *<div class="Form-Control-Instructions"></div>
     //  *<div class="Form-Control-Error-Text-Container">
@@ -1078,10 +1078,10 @@ export function UserInfoFormModule() {
           typeof configObj.uniqueIdentifier !== "string" ||
           configObj.uniqueIdentifier !== cleanedIdentifier
         ) {
-          return `ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
+          return `CONFIG VALIDATION ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
         }
       } else {
-        return `ERROR: uniqueIdentifier property doesn't exist`;
+        return `CONFIG VALIDATION ERROR: uniqueIdentifier property doesn't exist`;
       }
 
       return null;
@@ -1097,7 +1097,7 @@ export function UserInfoFormModule() {
             !existingFormTemplates.includes(configObj.type)
           ) {
             //checks if the type property is either equal to the 'custom' string or another string which helps determine the final configuration data set
-            return `ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${existingFormTemplates}`;
+            return `CONFIG VALIDATION ERROR: type property isn't set to an existing form template or the 'custom' type, here is a list of available form templates ${existingFormTemplates}`;
           }
         } else {
           return `CONFIG VALIDATION ERROR: type property isn't a string, received ${configObj.type}`;
@@ -1142,6 +1142,7 @@ export function UserInfoFormModule() {
                     } else if (
                       validationRefs.formControlAttributes[property] ===
                       "regexp"
+                      //if the specific property should have a regular expression as its value, the value is tested to see if it becomes a valid regexp
                     ) {
                       try {
                         new RegExp(
@@ -1183,9 +1184,13 @@ export function UserInfoFormModule() {
       return null;
     },
     formControlElements: function (configObj) {
+      //checks if formControlElements property exists
       if (configObj.formControlElements) {
+        //checks if the property value is equal to an array
         if (Array.isArray(configObj.formControlElements)) {
+          //checks if said array contains any elements within it
           if (configObj.formControlElements.length > 0) {
+            //checks the validity of each element in the array, making sure each element is an actual form control element
             configObj.formControlElements.forEach((element) => {
               if (!validationRefs.formControlElements.includes(element)) {
                 return `CONFIG VALIDATION ERROR: unrecognized form control element, received ${element} within the formControlElements property array, here are the available form control elements to use ${formControlElements}`;
@@ -1201,7 +1206,94 @@ export function UserInfoFormModule() {
 
       return null;
     },
-    formControlText: function (configObj) {},
+    formControlText: function (configObj) {
+      //checks for the existence of the property
+      if (configObj.formControlText) {
+        //checks if the value of the property is an object
+        if (typeof configObj.formControlText === "object") {
+          const formControlElements = Object.keys(configObj.formControlText);
+          //checks if the resulting object contains any keys, hence the form control elements being targeted
+          if (formControlElements.length > 0) {
+            //checks every target form control element to see if they are all valid
+            formControlElements.forEach((element) => {
+              if (!validationRefs.formControlElements.includes(element)) {
+                return `CONFIG VALIDATION ERROR: unrecognized form control element within the formControlText property, received ${element}, here is a list of valid form control elements to use '${validationRefs.formControlElements}'`;
+              }
+
+              const textProperties = Object.keys(
+                configObj.formControlText[element]
+              );
+
+              //checks for if there are existing text properties within this targeted form control element instance
+              if (textProperties.length > 0) {
+                const formControlTextProperties = Object.keys(
+                  validationRefs.formControlText
+                );
+
+                //iterates over the existing text properties and checks if they are valid, as well as validate their values
+                for (let textProperty in configObj.formControlText[element]) {
+                  if (!formControlTextProperties.includes(textProperty)) {
+                    return `CONFIG VALIDATION ERROR: unrecognized text property within ${element} of formControlText, here is a list of valid text properties to use '${Object.keys(
+                      validationRefs.formControlText
+                    )}'`;
+                  }
+                  if (
+                    typeof configObj.formControlText[element][textProperty] ===
+                      "string" &&
+                    textProperty !== "validationFailure"
+                    //checks if the text property value is a string and making sure it's not the validationFailure property if so
+                  ) {
+                    continue;
+                  } else if (
+                    typeof configObj.formControlText[element][textProperty] ===
+                      "object" &&
+                    textProperty === "validationFailure"
+                    //checks if the text property valy is an object and making sure the property is called validationFailure
+                  ) {
+                    const validationFailureTextPropertiesRef = Object.keys(
+                      validationRefs.formControlText.validationFailure
+                    );
+
+                    for (let validationFailureTextProperty in configObj
+                      .formControlText[element][textProperty]) {
+                      if (
+                        !validationFailureTextPropertiesRef.includes(
+                          validationFailureTextProperty
+                          //checks if the target validationFailureText property is a valid property to target
+                        )
+                      ) {
+                        return `CONFIG VALIDATION ERROR: validation failure property unrecognized, received ${validationFailureTextProperty} within ${element}`;
+                      }
+                      if (
+                        typeof configObj.formControlText[element][textProperty][
+                          validationFailureTextProperty
+                        ] !== "string"
+                        //checks if the value of the target valildationFailureText property is a valid data type, that being a string
+                      ) {
+                        return `CONFIG VALIDATION ERROR: value of a validation failure text property is not the correct, received ${configObj.formControlText[element][textProperty][validationFailureTextProperty]} for ${validationFailureTextProperty} in ${element} of formControlText`;
+                      }
+                    }
+                  } else {
+                    return `CONFIG VALIDATION ERROR: a text property value is not the correct data type, received ${configObj.formControlText[element][textProperty]} for ${textProperty} within formControlText, needs to be a string for all properties except the validationFailure property`;
+                  }
+                }
+              } else {
+                return `CONFIG VALIDATION ERROR: formControlText was declared, is an object, and contains target form control element(s), but ${element} equals an empty object, here is a list of text properties to use within this object ${Object.keys(
+                  validationRefs.formControlText
+                )}  `;
+              }
+            });
+          } else {
+            return `CONFIG VALIDATION ERROR: the property formControlText was used and equals an object, but the object contains no properties within it, the properties should reference specific form control elements, and their values should be objects filled with the corresponding attributes desired`;
+          }
+        } else {
+          return `CONFIG VALIDATION ERROR: the property formControlText was used but isn't a valid data type, must be an object`;
+        }
+      }
+
+      return null;
+    },
+
     functionalityRules: function (configObj) {},
     thirdPartyApiRules: function (configObj) {},
   };
@@ -1261,6 +1353,19 @@ export function UserInfoFormModule() {
       "aria-label": "string",
       "aria-labelledby": "string",
       "aria-describedby": "string",
+    },
+    formControlText: {
+      label: "string",
+      instructions: "string",
+      validationFailure: {
+        patternMismatch: "string",
+        tooLong: "string",
+        tooShort: "string",
+        rangeOverflow: "string",
+        rangeUnderflow: "string",
+        typeMismatch: "string",
+        valueMissing: "string",
+      },
     },
   };
 
