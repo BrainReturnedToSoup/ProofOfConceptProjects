@@ -1074,6 +1074,7 @@ export function UserInfoFormModule() {
           ""
         );
 
+        //if the property isn't a string, or the cleaned version isn't the same as the uncleaned version, this means invalid characters were used
         if (
           typeof configObj.uniqueIdentifier !== "string" ||
           configObj.uniqueIdentifier !== cleanedIdentifier
@@ -1086,7 +1087,14 @@ export function UserInfoFormModule() {
 
       return null;
     },
-    applyDefaultValues: function () {},
+    applyDefaultValues: function (configObj) {
+      if (configObj.applyDefaultValues) {
+        if (configObj.applyDefaultValues !== "boolean") {
+          return `CONFIG VALIDATION ERROR: applyDefaultValues property should have a boolean value, but it does not, received ${configObj.applyDefaultValues}`;
+        }
+      }
+      return null;
+    },
     type: function (configObj) {
       if (configObj.type) {
         //checks for existence of the type property, this property is mandatory to include in the config
@@ -1127,6 +1135,7 @@ export function UserInfoFormModule() {
             } else {
               //iterates over all of the properties, in this case the formAction and formMethod properties must exist at the very least, but also scans for optional properties
               for (let attribute in configObj.formAttributes) {
+                //checks if the target attribute is even a valid attribute
                 if (!validationRefs.formAttributes.includes(attribute)) {
                   return `CONFIG VALIDATION ERROR: unrecognized form attribute within the formAttributes property object, received ${attribute}, `;
                 }
@@ -1353,8 +1362,82 @@ export function UserInfoFormModule() {
       return null;
     },
 
-    functionalityRules: function (configObj) {},
-    thirdPartyApiRules: function (configObj) {},
+    functionalityRules: function (configObj) {
+      //checks for the existence of the property, which is optional
+      if (configObj.functionalityRules) {
+        //checks if the data type of the value of this property is an object
+        if (typeof configObj.functionalityRules === "object") {
+          const functionalityRules = Object.keys(configObj.functionalityRules),
+            functionalityRulesRef = Object.keys(
+              validationRefs.functionalityRules
+            );
+
+          if (functionalityRules.length > 0) {
+            //iterates over all of the rules being targeted within the functionalityRules object
+            for (let rule in configObj.functionalityRules) {
+              if (!functionalityRulesRef.includes(rule)) {
+                //checks whether the rule is a valid rule to target
+                return `CONFIG VALIDATION ERROR: unrecognized targeted rule, received ${rule}, here is a list of valid rules to target "${functionalityRulesRef}"`;
+              } else if (
+                typeof configObj.functionalityRules[rule] ===
+                validationRefs.functionalityRules[rule]
+              ) {
+                //checks if the value of the target rule is valid or not, should be a boolean value
+                continue;
+              } else {
+                return `CONFIG VALIDATION ERROR: value of a specific rule within functionalityRules is not a valid data type, received ${configObj.functionalityRules[rule]}, should be a boolean`;
+              }
+            }
+          } else {
+            return `CONFIG VALIDATION ERROR: the functionalityRules property was declared, and its value is an object, but the object doesn't contain any functionality rules, here is a list of functionality rules to target '${Object.keys(
+              validationRefs.functionalityRules
+            )}'`;
+          }
+        } else {
+          return `CONFIG VALIDATION ERROR: the functionalityRules property was declared, but its value is not an object, this object should only contain valid functionality rules as properties and their allowed associated values`;
+        }
+      }
+      return null;
+    },
+    thirdPartyApiRules: function (configObj) {
+      //checks for the existence of the property, optional
+      if (configObj.thirdPartyApiRules) {
+        //checks if the value of the property is an object
+        if (typeof configObj.thirdPartyApiRules === "object") {
+          const thirdPartyApiRules = Object.keys(configObj.thirdPartyApiRules),
+            thirdPartyApiRulesRef = Object.keys(
+              validationRefs.thirdPartyApiRules
+            );
+
+          //checks if the object contains any properties that represent rules for specific apis
+          if (thirdPartyApiRules.length > 0) {
+            //iterates over the existing properties
+            for (let rule in configObj.thirdPartyApiRules) {
+              //if the target rule is an invalid rule to target
+              if (!thirdPartyApiRulesRef.includes(rule)) {
+                return `CONFIG VALIDATION ERROR: unrecognized rule detected, received ${rule} within thirdPartyApiRules, here is a list of valid rules to target, ${thirdPartyApiRulesRef}`;
+              }
+
+              if (
+                typeof configObj.thirdPartyApiRules[rule] ===
+                validationRefs.thirdPartyApiRules[rule]
+              ) {
+                //checks to see if the valid rule has a value in the correct data type, which it should be a boolean
+                continue;
+              } else {
+                return `CONFIG VALIDATION ERROR: value of a specific rule ${rule} within thirdPartyApiRules has an incorrect data type, should be a boolean`;
+              }
+            }
+          } else {
+            return `CONFIG VALIDATION ERROR: thirdPartyApiRules was declared, and its value is an object, but the object does not contain any rules, here are a list of rules you can target ${thirdPartyApiRulesRef}`;
+          }
+        } else {
+          return `ERROR: thirdPartyApiRules was declared, but the value of the property is not an object`;
+        }
+      }
+
+      return null;
+    },
   };
 
   const validationRefs = {
@@ -1434,7 +1517,13 @@ export function UserInfoFormModule() {
       listenOnInput: "boolean",
       listenOnSubmit: "boolean",
     },
-    thirdPartyApiRules: {},
+    thirdPartyApiRules: {
+      useZeroBounce: "boolean",
+      useGeoNames: "boolean",
+      useSmartyStreets: "boolean",
+      useStripe: "boolean",
+      useNumVerify: "boolean",
+    },
   };
 
   function validateConfig(config) {
@@ -1504,8 +1593,11 @@ export function UserInfoFormModule() {
 //      listenOnSubmit: true,
 //    },
 //    thirdPartyApiRules: {
-//      useGeoNamesAPI: true,
-//
+//      useZeroBounce: true,
+//      useGeoNames: true,
+//      useSmartyStreets: true,
+//      useStripe: true,
+//      useNumVerify: true,
 //    },
 //}
 //
