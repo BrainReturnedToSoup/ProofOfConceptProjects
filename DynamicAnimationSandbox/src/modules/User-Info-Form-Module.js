@@ -1088,8 +1088,10 @@ export function UserInfoFormModule() {
       return null;
     },
     applyDefaultValues: function (configObj) {
+      //checks for the existence of this property, optional, will be set to true in most cases by default or through a template
       if (configObj.applyDefaultValues) {
-        if (configObj.applyDefaultValues !== "boolean") {
+        //checks if the value of this property is a boolean
+        if (typeof configObj.applyDefaultValues !== "boolean") {
           return `CONFIG VALIDATION ERROR: applyDefaultValues property should have a boolean value, but it does not, received ${configObj.applyDefaultValues}`;
         }
       }
@@ -1098,9 +1100,10 @@ export function UserInfoFormModule() {
     type: function (configObj) {
       if (configObj.type) {
         //checks for existence of the type property, this property is mandatory to include in the config
-        if (configObj.type === "string") {
+        if (typeof configObj.type === "string") {
           //checks if the value of this property is a string
           const existingFormTemplates = Object.keys(formTemplates);
+
           if (
             configObj.type !== "custom" &&
             !existingFormTemplates.includes(configObj.type)
@@ -1127,6 +1130,10 @@ export function UserInfoFormModule() {
           //checks to see if there are any form attributes being defined within said object
           if (formAttributes.length > 0) {
             //checks to see if either of these mandatory properties are missing
+            const formAttributesRef = Object.keys(
+              validationRefs.formAttributes
+            );
+
             if (
               !formAttributes.includes("formAction") ||
               !formAttributes.includes("formMethod")
@@ -1136,7 +1143,7 @@ export function UserInfoFormModule() {
               //iterates over all of the properties, in this case the formAction and formMethod properties must exist at the very least, but also scans for optional properties
               for (let attribute in configObj.formAttributes) {
                 //checks if the target attribute is even a valid attribute
-                if (!validationRefs.formAttributes.includes(attribute)) {
+                if (!formAttributesRef.includes(attribute)) {
                   return `CONFIG VALIDATION ERROR: unrecognized form attribute within the formAttributes property object, received ${attribute}, `;
                 }
 
@@ -1185,62 +1192,56 @@ export function UserInfoFormModule() {
             configObj.formControlAttributes
           );
           //check for the existence of keys that represent specific form control elements
-          if (formControlElements.length !== 0) {
+          if (formControlElements.length > 0) {
             formControlElements.forEach((element) => {
               //checks if current element isn't a valid form control element to target
               if (!validationRefs.formControlElements.includes(element)) {
                 return `CONFIG VALIDATION ERROR: unrecognized form control element within the formControlAttributes property, received ${element}, here is a list of valid form control elements to use '${validationRefs.formControlElements}'`;
-              } else {
-                //checks if the value of the target form control element is a valid data type, that being an object
-                if (
-                  typeof configObj.formControlAttributes[element] === "object"
-                ) {
-                  //iterates over all of the existing properties within the specific targeted form control element, and validates the values
-                  //of each of these properties
-                  for (let property in configObj.formControlAttributes[
-                    element
-                  ]) {
+              }
+              //checks if the value of the target form control element is a valid data type, that being an object
+              if (
+                typeof configObj.formControlAttributes[element] === "object"
+              ) {
+                //iterates over all of the existing properties within the specific targeted form control element, and validates the values
+                //of each of these properties
+                for (let property in configObj.formControlAttributes[element]) {
+                  if (
+                    typeof configObj.formControlAttributes[element][
+                      property
+                    ] === validationRefs.formControlAttributes[property]
+                  ) {
+                    continue;
+                    //continue the loop if this condition is met, the specific property passed the validation
+                  } else if (
+                    validationRefs.formControlAttributes[property] === "regexp"
+                    //if the specific property should have a regular expression as its value, the value is tested to see if it becomes a valid regexp
+                  ) {
+                    try {
+                      new RegExp(
+                        configObj.formControlAttributes[element][property]
+                      );
+                    } catch {
+                      return `CONFIG VALIDATION ERROR: target property is supposed to be a valid regular expression, received ${configObj.formControlAttributes[element][property]} for ${property}, within ${element} of the property formControlAttributes`;
+                    }
+                  } else if (
+                    Array.isArray(
+                      validationRefs.formControlAttributes[property]
+                    )
+                  ) {
+                    //check for a match within the corresponding attribute value reference array on the specific property
                     if (
-                      typeof configObj.formControlAttributes[element][
-                        property
-                      ] === validationRefs.formControlAttributes[property]
-                    ) {
-                      continue;
-                      //continue the loop if this condition is met, the specific property passed the validation
-                    } else if (
-                      validationRefs.formControlAttributes[property] ===
-                      "regexp"
-                      //if the specific property should have a regular expression as its value, the value is tested to see if it becomes a valid regexp
-                    ) {
-                      try {
-                        new RegExp(
-                          configObj.formControlAttributes[element][property]
-                        );
-                      } catch {
-                        return `CONFIG VALIDATION ERROR: target property is supposed to be a valid regular expression, received ${configObj.formControlAttributes[element][property]} for ${property}, within ${element} of the property formControlAttributes`;
-                      }
-                    } else if (
-                      Array.isArray(
-                        validationRefs.formControlAttributes[property]
+                      !validationRefs.formControlAttributes[property].includes(
+                        configObj.formControlAttributes[element][property]
                       )
                     ) {
-                      //check for a match within the corresponding attribute value reference array on the specific property
-                      if (
-                        !validationRefs.formControlAttributes[
-                          property
-                        ].includes(
-                          configObj.formControlAttributes[element][property]
-                        )
-                      ) {
-                        return `CONFIG VALIDATION ERROR: value of a specific attribute is not a valid selection within formControlAttributes and ${element}, received ${configObj.formControlAttributes[element][property]}, here are a list of available corresponding property values`;
-                      }
-                    } else {
-                      return `CONFIG VALIDATION ERROR: a target attribute value either does not meet the requirements for either the data type or equal a valid possible value, received ${configObj.formControlAttributes[element][property]}, valid formats and or possible inputs for this attribute are ${validationRefs.formControlAttributes[property]}`;
+                      return `CONFIG VALIDATION ERROR: value of a specific attribute is not a valid selection within formControlAttributes and ${element}, received ${configObj.formControlAttributes[element][property]}, here are a list of available corresponding property values`;
                     }
+                  } else {
+                    return `CONFIG VALIDATION ERROR: a target attribute value either does not meet the requirements for either the data type or equal a valid possible value, received ${configObj.formControlAttributes[element][property]}, valid formats and or possible inputs for this attribute are ${validationRefs.formControlAttributes[property]}`;
                   }
-                } else {
-                  return `CONFIG VALIDATION ERROR: formControlAttributes was declared, and a correct form control element was targeted, but the value of said form control element property isn't an object, received ${element} and ${configObj.formControlAttributes[element]} as its value`;
                 }
+              } else {
+                return `CONFIG VALIDATION ERROR: formControlAttributes was declared, and a correct form control element was targeted, but the value of said form control element property isn't an object, received ${element} and ${configObj.formControlAttributes[element]} as its value`;
               }
             });
           }
@@ -1252,7 +1253,7 @@ export function UserInfoFormModule() {
       return null;
     },
     formControlElements: function (configObj) {
-      //checks if formControlElements property exists
+      //checks if formControlElements property exists, optional property
       if (configObj.formControlElements) {
         //checks if the property value is equal to an array
         if (Array.isArray(configObj.formControlElements)) {
@@ -1367,13 +1368,14 @@ export function UserInfoFormModule() {
       if (configObj.functionalityRules) {
         //checks if the data type of the value of this property is an object
         if (typeof configObj.functionalityRules === "object") {
-          const functionalityRules = Object.keys(configObj.functionalityRules),
-            functionalityRulesRef = Object.keys(
-              validationRefs.functionalityRules
-            );
+          const functionalityRules = Object.keys(configObj.functionalityRules);
 
           if (functionalityRules.length > 0) {
             //iterates over all of the rules being targeted within the functionalityRules object
+            const functionalityRulesRef = Object.keys(
+              validationRefs.functionalityRules
+            );
+
             for (let rule in configObj.functionalityRules) {
               if (!functionalityRulesRef.includes(rule)) {
                 //checks whether the rule is a valid rule to target
@@ -1404,14 +1406,15 @@ export function UserInfoFormModule() {
       if (configObj.thirdPartyApiRules) {
         //checks if the value of the property is an object
         if (typeof configObj.thirdPartyApiRules === "object") {
-          const thirdPartyApiRules = Object.keys(configObj.thirdPartyApiRules),
-            thirdPartyApiRulesRef = Object.keys(
-              validationRefs.thirdPartyApiRules
-            );
+          const thirdPartyApiRules = Object.keys(configObj.thirdPartyApiRules);
 
           //checks if the object contains any properties that represent rules for specific apis
           if (thirdPartyApiRules.length > 0) {
             //iterates over the existing properties
+            const thirdPartyApiRulesRef = Object.keys(
+              validationRefs.thirdPartyApiRules
+            );
+
             for (let rule in configObj.thirdPartyApiRules) {
               //if the target rule is an invalid rule to target
               if (!thirdPartyApiRulesRef.includes(rule)) {
@@ -1529,12 +1532,15 @@ export function UserInfoFormModule() {
   function validateConfig(config) {
     const allErrors = [];
 
+    //very first validation check, whether the argument is an object or not
     if (typeof config !== "object") {
       allErrors.push(
         `CONFIG VALIDATION ERROR: supplied config argument is not an object, received ${typeof config}`
       );
     }
 
+    //will iterate over every existing validation method, supply the config
+    //to it, and then catch every returned string and push it into the all errors array
     Object.keys(validationMethods).forEach((method) => {
       const validationString = validationMethods[method](config);
       if (typeof validationString === "string") {
@@ -1542,19 +1548,27 @@ export function UserInfoFormModule() {
       }
     });
 
+    //returns the array regardless if there is any errors or not within it
     return allErrors;
   }
 
   //check if the target data is in the correct format and a usable value
 
   function newClassInstance(config) {
+    //received the array that may have a single error as a string per element
     const allErrorStrings = validateConfig(config);
+
+    //if there are no elements, that means there aren't any errors, thus the config can be used without causing issue in the actual app
     if (allErrorStrings.length === 0) {
       return new Main_UserInfoForm(config);
     } else {
+      //if there are errors, map the array, converting every element from just a string into an actual error instance
+      //supplied with the individual string
       const allErrorInstances = allErrorStrings.map((errorString) => {
         return new Error(errorString);
       });
+      //throw the entire array full of individual error instances so that the user can see multiple errors
+      //at a time instead of a single error at a time
       throw allErrorInstances;
     }
   }
