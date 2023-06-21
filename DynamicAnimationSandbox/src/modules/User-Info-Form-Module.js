@@ -1081,11 +1081,12 @@ export function UserInfoFormModule() {
           return `CONFIG VALIDATION ERROR: uniqueIdentifier property either isn't a string or a valid string(cannot contain spaces or special characters besides a dash and or underscore)`;
         }
       } else {
-        return `CONFIG VALIDATION ERROR: uniqueIdentifier property doesn't exist`;
+        return `CONFIG VALIDATION ERROR: uniqueIdentifier property doesn't exist, this property is required as the information attached is required for the module to function and create a new form instance`;
       }
 
       return null;
     },
+    applyDefaultValues: function () {},
     type: function (configObj) {
       if (configObj.type) {
         //checks for existence of the type property, this property is mandatory to include in the config
@@ -1109,6 +1110,64 @@ export function UserInfoFormModule() {
       return null;
     },
     formAttributes: function (configObj) {
+      //checks for existence of the property, this property is mandatory
+      if (configObj.formAttributes) {
+        //checks if the property value equals that of an object
+        if (typeof configObj.formAttributes === "object") {
+          const formAttributes = Object.keys(configObj.formAttributes);
+
+          //checks to see if there are any form attributes being defined within said object
+          if (formAttributes.length > 0) {
+            //checks to see if either of these mandatory properties are missing
+            if (
+              !formAttributes.includes("formAction") ||
+              !formAttributes.includes("formMethod")
+            ) {
+              return `CONFIG VALIDATION ERROR: the formAttributes property was declared, and the value of this property is an object, but some required properties that should exist within this object are missing, the properties 'formAction' and 'formMethod' should be referenced and have a defined value attached to them in order for the module to create a new class instance`;
+            } else {
+              //iterates over all of the properties, in this case the formAction and formMethod properties must exist at the very least, but also scans for optional properties
+              for (let attribute in configObj.formAttributes) {
+                if (!validationRefs.formAttributes.includes(attribute)) {
+                  return `CONFIG VALIDATION ERROR: unrecognized form attribute within the formAttributes property object, received ${attribute}, `;
+                }
+
+                if (
+                  typeof configObj.formAttributes[attribute] ===
+                  validationRefs.formAttributes[attribute]
+                  //for the condition that the attribute value is constrained to a data type but not a fixed list of inputs, if it meets this condition, it passes
+                ) {
+                  continue;
+                } else if (
+                  Array.isArray(validationRefs.formAttributes[attribute])
+                  //for the condition that the attribute is supposed to be one of a set of inputs, which these inputs are stored within an array within the refs
+                ) {
+                  //if the value set for the corresponding attribute is not present in the array of allowed values for the corresponding attribute
+                  if (
+                    !validationRefs.formAttributes[attribute].includes(
+                      configObj.formAttributes[attribute]
+                    )
+                  ) {
+                    return `CONFIG VALIDATION ERROR: value for a specific attribute is not valid, received ${configObj.formAttributes[attribute]} for ${attribute}, here is a list of valid attributes to target '${validationRefs.formAttributes[attribute]}'`;
+                  }
+                } else {
+                  //fails the previous checks
+                  return `CONFIG VALIDATION ERROR: value for the ${attribute} attribute is not a valid data type, here is the data type to be expected ${validationRefs.formAttributes[attribute]}`;
+                }
+              }
+            }
+          } else {
+            return `CONFIG VALIDATION ERROR: the formAttributes property was declared, and the value of this property is an object, but this object doesn't contain any form attributes within it`;
+          }
+        } else {
+          return `CONFIG VALIDATION ERROR: required property formAttributes was declared, but the value associated with it is not the right data type, needs to be an object`;
+        }
+      } else {
+        return `CONFIG VALIDATION ERROR: formAttributes property must always be used because the information within it is required for the module to function and create a new form instance`;
+      }
+
+      return null;
+    },
+    formControlAttributes: function (configObj) {
       if (configObj.formControlAttributes) {
         //if the property exists, isn't mandatory
         //property must equal and object if it does though
@@ -1344,7 +1403,9 @@ export function UserInfoFormModule() {
       formnovalidate: null,
     },
     formAttributes: {
-      formtarget: ["_blank", "_self", "_parent", "_top"],
+      formAction: "string",
+      formMethod: "string",
+      formTarget: ["_blank", "_self", "_parent", "_top"],
       formenctype: [
         "application/x-www-form-urlencoded",
         "multipart/form-data",
@@ -1367,6 +1428,13 @@ export function UserInfoFormModule() {
         valueMissing: "string",
       },
     },
+    functionalityRules: {
+      validateInputs: "boolean",
+      useConstraintAPI: "boolean",
+      listenOnInput: "boolean",
+      listenOnSubmit: "boolean",
+    },
+    thirdPartyApiRules: {},
   };
 
   function validateConfig(config) {
@@ -1408,8 +1476,15 @@ export function UserInfoFormModule() {
 // configObj = {
 //    uniqueIdentifier: "",   (always required) (must be a string) (must match something that you would put within a class, because it's going to be used as a class tag)
 //    type: "",   (always required) (must be a string) (must match either 'custom' for a custom setup or one of the various presets)
-//    formAction: "", (always required, determines the form instance, action attribute)
-//    formMethod: "", (always required, determines the form instance, method attribute)
+//    formAttributes: {
+//        formAction: "",   (always required) (must be a string)
+//        formMethod: "",   (always required) (must be a string, and from the list of valid inputs)
+//        formTarget: "",   (optional) (must be a string, and from the list of valid inputs)
+//        formenctype: "", (optional) (must be a string, and from the list of valid inputs)
+//        "aria-label": "", (optional) (must be a string)
+//        "aria-labelledby": "",  (optional) (must be a string)
+//        "aria-describedby": "", (optional) (must be a string)
+//    }
 //    formControlElements = [],  (if type set to custom this property is required) (not necessary if type property isn't custom) (defines the form control elements to include) (each element must be a string and unique, also order counts but not critical) (can be stacked on top of a form template to include extra forms)
 //    applyDefaultValues: true,
 //    formControlAttributes: {
