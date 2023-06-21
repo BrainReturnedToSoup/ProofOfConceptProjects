@@ -1,6 +1,197 @@
 import { config } from "webpack";
 
 export function UserInfoFormModule() {
+  const DefaultValues = {
+    formControlText: {
+      email: {
+        labelText: "Email",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered not a valid email address",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid email address",
+        },
+      },
+
+      confirmEmail: {
+        labelText: "Confirm Email",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch:
+            "Value entered does not match the previous email address",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter the same email address",
+        },
+      },
+
+      address: {
+        labelText: "Address",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid street address",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid street address",
+        },
+      },
+
+      stateOrProvince: {
+        labelText: "State/Province",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid state or province",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid state or province",
+        },
+      },
+
+      country: {
+        labelText: "Country",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid country",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid country",
+        },
+      },
+
+      postalCode: {
+        labelText: "Postal Code",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid postal code",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort:
+            "Value entered fails to meet minimum character count required",
+          valueMissing: "Please enter a valid postal code",
+        },
+      },
+
+      password: {
+        labelText: "Password",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid password",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid password",
+        },
+      },
+
+      confirmPassword: {
+        labelText: "Confirm Password",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered not equal to password",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter the same password",
+        },
+      },
+
+      dateOfBirth: {
+        labelText: "Date Of Birth",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid birth date",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid birth date",
+        },
+      },
+
+      phoneNumber: {
+        labelText: "Phone Number",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid phone number",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid phone number",
+        },
+      },
+
+      creditCardType: {
+        labelText: "",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid card type",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid card type",
+        },
+      },
+
+      creditCardNumber: {
+        labelText: "Card Number",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid credit card number",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid credit card number",
+        },
+      },
+
+      creditCardExpDate: {
+        labelText: "Expiration Date",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid expiration date",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid expiration date",
+        },
+      },
+
+      creditCardSecurityNumber: {
+        labelText: "CVV",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid security number",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid security number",
+        },
+      },
+
+      subjectLine: {
+        labelText: "Subject",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid subject line",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter a valid subject line",
+        },
+      },
+
+      textBox: {
+        labelText: "",
+        instructionsText: "",
+        errorBoxText: {
+          patternMismatch: "Value entered is not a valid within this text box",
+          tooLong: "Value entered exceeds the maximum character count",
+          tooShort: "Value entered fails to meet minimum character count",
+          valueMissing: "Please enter valid information within this text box",
+        },
+      },
+    },
+    formControlAttributes: {},
+    formControlElements: [],
+    functionalityRules: {},
+    thirdPartyApiRules: {},
+  };
+
   const formTemplates = {
     newAccountBasic: {},
     newAccountFull: {},
@@ -665,220 +856,47 @@ export function UserInfoFormModule() {
   class Main_UserInfoForm {
     //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
     //the form and handle certain state data attached to such
-    init(parentElement) {}
+    init(parentElement) {
+      //used to append the entire form to a specific parent element
+    }
   }
-
-  const DefaultValues = {
-    formControlText: {
-      email: {
-        labelText: "Email",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered not a valid email address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid email address",
-        },
-      },
-
-      confirmEmail: {
-        labelText: "Confirm Email",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch:
-            "Value entered does not match the previous email address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter the same email address",
-        },
-      },
-
-      address: {
-        labelText: "Address",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid street address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid street address",
-        },
-      },
-
-      stateOrProvince: {
-        labelText: "State/Province",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid state or province",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid state or province",
-        },
-      },
-
-      country: {
-        labelText: "Country",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid country",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid country",
-        },
-      },
-
-      postalCode: {
-        labelText: "Postal Code",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid postal code",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid postal code",
-        },
-      },
-
-      password: {
-        labelText: "Password",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid password",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid password",
-        },
-      },
-
-      confirmPassword: {
-        labelText: "Confirm Password",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered not equal to password",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter the same password",
-        },
-      },
-
-      dateOfBirth: {
-        labelText: "Date Of Birth",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid birth date",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid birth date",
-        },
-      },
-
-      phoneNumber: {
-        labelText: "Phone Number",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid phone number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid phone number",
-        },
-      },
-
-      creditCardType: {
-        labelText: "",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid card type",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid card type",
-        },
-      },
-
-      creditCardNumber: {
-        labelText: "Card Number",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid credit card number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid credit card number",
-        },
-      },
-
-      creditCardExpDate: {
-        labelText: "Expiration Date",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid expiration date",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid expiration date",
-        },
-      },
-
-      creditCardSecurityNumber: {
-        labelText: "CVV",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid security number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid security number",
-        },
-      },
-
-      subjectLine: {
-        labelText: "Subject",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid subject line",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid subject line",
-        },
-      },
-
-      textBox: {
-        labelText: "",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid within this text box",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter valid information within this text box",
-        },
-      },
-    },
-    formControlAttributes: {},
-    formControlElements: [],
-    functionalityRules: {},
-    thirdPartyApiRules: {},
-  };
 
   class CreateFinalConfig {
     constructor(configObj) {
       //returns an object representing the final configuration that the other classes will use to determine their behavior
       //will only contain data that is necessary, and data that has been processed by the data merging hierarchy
-      if (configObj.applyDefaultValues) {
-        this.#stateData.applyDefaultValues = configObj.applyDefaultValues;
+      if (
+        configObj.applyDefaultValues &&
+        configObj.applyDefaultValues === false
+        //condition for defining the state of this class in the instance of a custom configuration by the user
+      ) {
+        this.#stateData.applyDefaultValues = false;
       } else if (
         configObj.type !== "custom" &&
-        Object.keys(formPresets).includes(configObj.type)
+        Object.keys(formTemplates).includes(configObj.type)
+        //condition for defining the state of this class in the instance of a template configuration by the user
       ) {
-        this.#stateData.applyDefaultValues =
-          formPresets[configObj.type].applyDefaultValues;
+        if (configObj.applyDefaultValues) {
+          //if the user put a custom value for this property in the config on top of choosing a template, prioritize the custom value over whatever the template designates
+          this.#stateData.applyDefaultValues = configObj.applyDefaultValues;
+        } else {
+          this.#stateData.applyDefaultValues =
+            formTemplates[configObj.type].applyDefaultValues;
+        }
+
         this.#stateData.applyTemplate = true;
         this.#stateData.templateName = configObj.type;
       }
 
+      //mandatory property, always from the user config
       this.uniqueIdentifier = configObj.uniqueIdentifier;
-      this.formAction = configObj.formAction;
-      this.formMethod = configObj.formMethod;
 
+      //these properties are given a value each representing the final value used for configuring the behavior of the other classes
+      //within the module, which the output of these methods will be influenced by the state of this class in order to generate
+      //their outputs
+      this.formAttributes = this.#dataMergingMethods.formAttributes(
+        configObj.formAttributes
+      );
       this.formControlElements = this.#dataMergingMethods.formControlElements(
         configObj.formControlElements
       );
@@ -908,15 +926,20 @@ export function UserInfoFormModule() {
       formControlElements: function (formControlElements) {
         const dataSetArr = [];
 
+        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.formControlElements);
         }
+        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formPresets[this.#stateData.templateName].formControlElements
           );
         }
-        dataSetArr.push(formControlElements);
+        //checks if the supplied user config property even exists or is undefined
+        if (formControlElements) {
+          dataSetArr.push(formControlElements);
+        }
 
         //merges all present data sets within dataSetArr into one large array, and creates a set in order to remove duplicates
         //the set then converted into an array, and the array is returned
@@ -927,30 +950,47 @@ export function UserInfoFormModule() {
           return dataSetArr[0];
         }
       },
+      formAttributes: function (formAttributes) {},
       formControlAttributes: function (formControlAttributes) {
         const dataSetArr = [];
         let finalConfig;
-
+        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.formControlAttributes);
         }
+        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formTemplates[this.#stateData.templateName].formControlAttributes
           );
         }
-        dataSetArr.push(formControlAttributes);
+        //checks if the supplied user config property even exists or is undefined
+        if (formControlAttributes) {
+          dataSetArr.push(formControlAttributes);
+        }
 
         //will set finalConfig equal to the first element in the data set, and then iterate through the other
         //data sets and update the individual properties that either aren't present from a lower hierarchy in the finalConfig accordingly
         //The nesting is needed in order to iterate over the dataSetArr, iterate over the existing formControlElements within
         //any of the data sets, and then iterate over the individual attributes within a specific form control element
         for (let i = 0; i < dataSetArr.length; i++) {
-          if (!dataSetArr[i]) break;
+          //if starting the loop, set finalConfig equal to the first target config element
           if (i === 0) {
             finalConfig = dataSetArr[i];
           } else {
+            //iterate over all of the targeted form control elements
             for (let formControlElement in dataSetArr[i]) {
+              //if the form control element being referenced from the target config element is not being referenced in the finalConfig,
+              //simply apply the entire form control rule to the finalConfig, and then continue to the next iteration of the loop immediately
+              if (!finalConfig[formControlElement]) {
+                finalConfig[formControlElement] =
+                  dataSetArr[i][formControlElement];
+                continue;
+              }
+
+              //if the form control element is being referenced in both config data sets, iterate
+              //through the attributes of the target config element form control element, and apply the existing values of existing properties
+              //from such to the finalConfig
               for (let attribute in dataSetArr[i][formControlElement]) {
                 finalConfig[formControlElement][attribute] =
                   dataSetArr[i][formControlElement][attribute];
@@ -965,27 +1005,49 @@ export function UserInfoFormModule() {
         const dataSetArr = [];
         let finalConfig;
 
+        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.formControlText);
         }
+        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(formTemplates[this.#stateData.templateName]);
         }
-        dataSetArr.push(formControlText);
+        //checks if the supplied user config property even exists or is undefined
+        if (formControlText) {
+          dataSetArr.push(formControlText);
+        }
 
         //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
         //and either adds missing properties or makes updates to existing ones.
         //The nesting is needed in order to iterate over the dataSetArr, then iterate over the existing
         //formControlElements, then iterate over the text properties within the corresponding form control element
         //and then iterate over the properties within the error text property if currently targeted
+
         for (let i = 0; i < dataSetArr.length; i++) {
-          if (!dataSetArr[i]) break;
+          //if first starting the loop, set the first element equal to the final config variable
           if (i === 0) {
             finalConfig = dataSetArr[i];
           } else {
+            //if not at the start of the loop, iterate through the properties of the current target config element
             for (let formControlElement in dataSetArr[i]) {
+              //if the target form control element is not referenced at all within the finalConfig, apply the
+              //property in its entirety to the finalConfig from the currently targeted config element,
+              //if this happens, continue to the next form control element immediately
+              if (!finalConfig[formControlElement]) {
+                finalConfig[formControlElement] =
+                  dataSetArr[i][formControlElement];
+                continue;
+              }
+
+              //if the target form control element exists within finalConfig, iterate over all of the properties
               for (let textProperty in dataSetArr[i][formControlElement]) {
-                if (textProperty === "errorBoxText") {
+                //special condition if the text property is errorBoxText, its value should be an object thus needs to be iterated over
+                //also checking for the existence of this property within final config at the same time
+                if (
+                  textProperty === "errorBoxText" &&
+                  finalConfig[formControlElement][textProperty]
+                ) {
                   for (let error in dataSetArr[i][
                     formControlElement[textProperty]
                   ]) {
@@ -993,6 +1055,7 @@ export function UserInfoFormModule() {
                       dataSetArr[i][formControlElement][textProperty][error];
                   }
                 } else {
+                  //if the property is a regular property that isn't equal to an object nor is it errorBoxText
                   finalConfig[formControlElement][textProperty] =
                     dataSetArr[i][formControlElement][textProperty];
                 }
@@ -1006,24 +1069,29 @@ export function UserInfoFormModule() {
       functionalityRules: function (functionalityRules) {
         const dataSetArr = [];
         let finalConfig;
-
+        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.functionalityRules);
         }
+        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formTemplates[this.#stateData.templateName].functionalityRules
           );
         }
-        dataSetArr.push(functionalityRules);
+        //checks if the supplied user config property even exists or is undefined
+        if (functionalityRules) {
+          dataSetArr.push(functionalityRules);
+        }
 
         //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
         //and either adds missing properties or makes updates to existing ones.
         for (let i = 0; i < dataSetArr.length; i++) {
-          if (!dataSetArr[i]) break;
+          //if first starting the loop, set finalConfig equal to the first element
           if (i === 0) {
             finalConfig = dataSetArr[0];
           } else {
+            //if not, iterate through the target config element and set the corresponding properties on the finalConfig equal to those found on the target config element
             for (let rule in dataSetArr[i]) {
               finalConfig[rule] = dataSetArr[i][rule];
             }
@@ -1035,24 +1103,29 @@ export function UserInfoFormModule() {
       thirdPartyApiRules: function (thirdPartyApiRules) {
         const dataSetArr = [];
         let finalConfig;
-
+        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.thirdPartyApiRules);
         }
+        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formTemplates[this.#stateData.templateName].thirdPartyApiRules
           );
         }
-        dataSetArr.push(thirdPartyApiRules);
+        //checks if the supplied user config property even exists or is undefined
+        if (thirdPartyApiRules) {
+          dataSetArr.push(thirdPartyApiRules);
+        }
 
         //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
         //and either adds missing properties or makes updates to existing ones.
         for (let i = 0; i < dataSetArr.length; i++) {
-          if (!dataSetArr[i]) break;
+          //if starting the loop, set finalConfig equal to the first element
           if (i === 0) {
             finalConfig = dataSetArr[i];
           } else {
+            //iterate through the rules that exist within the target config element and apply the data to the corresponding rules within finalConfig
             for (let rule in dataSetArr[i]) {
               finalConfig[rule] = dataSetArr[i][rule];
             }
