@@ -1,7 +1,5 @@
-import { config } from "webpack";
-
 export function UserInfoFormModule() {
-  const DefaultValues = {
+  const defaultValues = {
     formControlText: {
       email: {
         labelText: "Email",
@@ -951,7 +949,7 @@ export function UserInfoFormModule() {
       applyDefaultValues: true,
       applyTemplate: false,
       templateName: null,
-      defaultValues: DefaultValues,
+      defaultValues: defaultValues,
     };
 
     #dataMergingMethods = {
