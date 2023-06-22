@@ -980,15 +980,41 @@ export function UserInfoFormModule() {
           return dataSetArr[0];
         }
       },
-      formAttributes: function (formAttributes) {},
+      formAttributes: function (formAttributes) {
+        const dataSetArr = [];
+        let finalConfig;
+
+        if (this.#stateData.applyDefaultValues) {
+          dataSetArr.push(this.#stateData.defaultValues.formAttributes);
+        }
+        if (this.#stateData.applyTemplate) {
+          dataSetArr.push(
+            formTemplates[this.#stateData.templateName].formAttributes
+          );
+        }
+        //checks if the supplied user config property even exists or is undefined
+        if (formAttributes) {
+          dataSetArr.push(formControlElements);
+        }
+
+        for (let i = 0; i < dataSetArr.length; i++) {
+          if (i === 0) {
+            finalConfig = dataSetArr[i];
+          } else {
+            for (let attribute in dataSetArr[i]) {
+              finalConfig[attribute] = dataSetArr[i][attribute];
+            }
+          }
+        }
+
+        return finalConfig;
+      },
       formControlAttributes: function (formControlAttributes) {
         const dataSetArr = [];
         let finalConfig;
-        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.formControlAttributes);
         }
-        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formTemplates[this.#stateData.templateName].formControlAttributes
