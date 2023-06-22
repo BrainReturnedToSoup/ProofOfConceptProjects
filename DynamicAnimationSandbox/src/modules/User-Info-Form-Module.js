@@ -856,8 +856,41 @@ export function UserInfoFormModule() {
   class Main_UserInfoForm {
     //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
     //the form and handle certain state data attached to such
+    constructor(configObj) {
+      this.#stateData.configObj = new CreateFinalConfig(configObj); //creates final config
+      this.#stateData.formFragment = new FormFragmentConstructor(
+        this.#stateData.configObj
+      ).init(); //creates an entire form using the settings in the stored config
+      this.#stateData.elementCache = new ElementCacheManager(
+        this.#stateData.configObj,
+        this.#stateData.formFragment
+      ); //maps out all of the element references within the form created
+      this.#stateData.functionalityManager = new FunctionalityManager(
+        this.#stateData.configObj,
+        this.#stateData.elementCache
+      ); //applies functionality using the element references stored within the cache
+      this.#stateData.autoFillFields = new AutoFillFields(
+        this.#stateData.configObj,
+        this.#stateData.functionalityManager
+      ); //applies a specific functionality to autofill fields using event listeners from the functionality manager
+      this.#stateData.dynamicOptionsManager = new DynamicOptionsManager(
+        this.#stateData.configObj,
+        this.#stateData.functionalityManager,
+        this.#stateData.elementCache
+      ); //applies a specific functionality to auto generate options using event listeners from the functionality manager in conjunction with the element references stored
+    }
+
+    #stateData = {
+      configObj: null,
+      formFragment: null,
+      elementCache: null,
+      functionalityManager: null,
+      autoFillFields: null,
+      dynamicOptionsManager: null,
+    };
+
     init(parentElement) {
-      //used to append the entire form to a specific parent element
+      parentElement.append(this.#stateData.formFragment);
     }
   }
 
@@ -888,7 +921,6 @@ export function UserInfoFormModule() {
         this.#stateData.templateName = configObj.type;
       }
 
-      //mandatory property, always from the user config
       this.uniqueIdentifier = configObj.uniqueIdentifier;
 
       //these properties are given a value each representing the final value used for configuring the behavior of the other classes
@@ -926,14 +958,12 @@ export function UserInfoFormModule() {
       formControlElements: function (formControlElements) {
         const dataSetArr = [];
 
-        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.formControlElements);
         }
-        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
-            formPresets[this.#stateData.templateName].formControlElements
+            formTemplates[this.#stateData.templateName].formControlElements
           );
         }
         //checks if the supplied user config property even exists or is undefined
@@ -1005,11 +1035,9 @@ export function UserInfoFormModule() {
         const dataSetArr = [];
         let finalConfig;
 
-        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.formControlText);
         }
-        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(formTemplates[this.#stateData.templateName]);
         }
@@ -1069,11 +1097,9 @@ export function UserInfoFormModule() {
       functionalityRules: function (functionalityRules) {
         const dataSetArr = [];
         let finalConfig;
-        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.functionalityRules);
         }
-        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formTemplates[this.#stateData.templateName].functionalityRules
@@ -1103,11 +1129,9 @@ export function UserInfoFormModule() {
       thirdPartyApiRules: function (thirdPartyApiRules) {
         const dataSetArr = [];
         let finalConfig;
-        //checks whether to apply default values
         if (this.#stateData.applyDefaultValues) {
           dataSetArr.push(this.#stateData.defaultValues.thirdPartyApiRules);
         }
-        //checks whether to apply selected template values
         if (this.#stateData.applyTemplate) {
           dataSetArr.push(
             formTemplates[this.#stateData.templateName].thirdPartyApiRules
