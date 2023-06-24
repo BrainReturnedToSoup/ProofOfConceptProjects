@@ -217,7 +217,7 @@ export function UserInfoFormModule() {
         this.assembledForm = this.#buildCompleteForm(); //returns entire form fragment with all of the necessary form control elements within it
       } else {
         throw new Error(
-          `FATAL ERROR: within the scope of 'constructor' of class instance '${this.constructor.name}' : form fragment cannot be created, supplied config is not the correct data type, must be an object containing all of the necessary properties and references, received ${configObj}, Stack Trace: ${error.stack}`
+          `FATAL ERROR: within the scope of 'constructor' of class instance '${this.constructor.name}' : form fragment cannot be created, supplied config is not the correct data type, must be an object containing all of the necessary properties and references, received ${configObj}`
         );
       }
     }
@@ -241,30 +241,60 @@ export function UserInfoFormModule() {
           this.#config[property] = configObj[property];
         } else {
           throw new Error(
-            `FATAL ERROR: within scope of '#applyConfigToState' of class instance '${this.constructor.name}' : essential property missing from the final configuration object supplied, lacks ${property}, cannot create form fragment, check the default and or template configuration data if applicable, Stack Trace: ${error.stack}}`
+            `FATAL ERROR: within scope of '#applyConfigToState' of class instance '${this.constructor.name}' : essential property missing from the final configuration object supplied, lacks ${property}, cannot create form fragment, check the default and or template configuration data if applicable`
           );
         }
       }
     }
 
+    //produces the entire form as a fragment
     #buildCompleteForm() {
-      //build the actual form element, this will always be the same for any form creation instance
       const formElement = this.#buildFormElement();
 
       //create all of the corresponding form elements that are listed in the formControlElements array
       if (Array.isArray(this.#config.formControlElements)) {
         for (let formControlElement of this.#config.formControlElements) {
-          const createdFormControlFrag =
-            this.#formControlElementBuilders[formControlElement](); //invokes the corresponding method based on the current form control element
-          formElement.append(createdFormControlFrag);
+          const formControlFrag =
+            this.#formControlFragBuilder(formControlElement); //invokes the corresponding method based on the current form control element
+          formElement.append(formControlFrag);
         }
       } else {
         throw new Error(
-          `FATAL ERROR: within scope of '#initializeFormCreation' of class instance '${this.constructor.name}' : essential property 'this.#config.formControlElement' is not the correct data type, should be an array full of strings containing individual form control element references, check the default and or template configuration data if applicable, Stack Trace: ${error.stack}`
+          `FATAL ERROR: within scope of '#initializeFormCreation' of class instance '${this.constructor.name}' : essential property 'this.#config.formControlElement' is not the correct data type, should be an array full of strings containing individual form control element references, check the default and or template configuration data if applicable`
         );
       }
     }
 
+    #formControlsWithDataList = ["address", "stateOrProvince", "country"];
+
+    //for creating and assembling a complete input field fragment
+    #formControlFragBuilder = (formControlElement) => {
+      const components = {
+        mainShell:
+          this.#formControlElementComponents.mainShell(formControlElement),
+        label: this.#formControlElementComponents.label(formControlElement),
+        input: this.#formControlElementComponents.input(formControlElement),
+        instructions:
+          this.#formControlElementComponents.instructions(formControlElement),
+        errorFrag:
+          this.#formControlElementComponents.errorTextFrag(formControlElement),
+      };
+
+      if (this.#formControlsWithDataList.includes(formControlElement)) {
+        components["dataList"] =
+          this.#formControlElementComponents.dataList(formControlElement);
+      }
+
+      for (let component in components) {
+        if (component !== "mainShell" && component !== null) {
+          components.mainShell.append(components[component]);
+        }
+      }
+
+      return components.mainShell;
+    };
+
+    //for the <form> tag creation
     #buildFormElement() {
       const formElement = document.createElement("form"),
         {
@@ -342,30 +372,6 @@ export function UserInfoFormModule() {
       return formElement;
     }
 
-    #addUniqueIdentifier(element) {
-      const uniqueIdentifier = this.#config.uniqueIdentifier;
-
-      if (element.nodeType === Node.ELEMENT_NODE) {
-        //checks for single element
-        element.classList.contains(uniqueIdentifier)
-          ? null
-          : element.classList.add(uniqueIdentifier);
-      } else if (element.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-        //checks for DOM fragment
-        const descendants = element.querySelectorAll("*");
-
-        descendants.forEach((descElement) => {
-          descElement.classList.contains(uniqueIdentifier)
-            ? null
-            : descElement.classList.add(uniqueIdentifier);
-        });
-      } else {
-        throw new Error(
-          `FATAL ERROR: within '#addUniqueIdentifier' of class instance '${this.constructor.name}' : supplied argument fails to meet processing requirements, must be either an element or a fragment that contains elements, received ${element}, Stack Trace: ${error.stack}`
-        );
-      }
-    }
-
     //<div class="Form-Control-Container">
     //  <label></label>
     //  *<input></input>
@@ -378,6 +384,7 @@ export function UserInfoFormModule() {
     //methods for creating the corresponding form control element with all of the necessary properties applied to such
     //these will create entire fragments, and then return the fragments
 
+    //contains all of the necessary methods for creating each individual template element to make up a specific input field on the form
     #formControlElementComponents = {
       mainShell: (formControlElement) => {
         //<div class="Form-Control-Container-formControlElement uniqueIdentifier"></div>
@@ -408,7 +415,8 @@ export function UserInfoFormModule() {
             this.#config.formControlText[formControlElement].labelText.replace(
               / /g,
               ""
-            )
+            ) &&
+          this.#config.formControlText[formControlElement].labelText !== ""
           //checks for the corresponding property, whether its a string, and whether its an empty string or not
           //These need to exist in order to create a label, otherwise there is no point to creating the label
         ) {
@@ -418,12 +426,20 @@ export function UserInfoFormModule() {
             `Form-Control-Label-${formControlElement}`
           );
 
-          formControlLabel.setAttribute(
-            "for",
-            `Form-Control-${formControlElement}_${
-              this.#config.uniqueIdentifier
-            }`
-          );
+          //if a for attribute was explicitly set in the config, use that, otherwise set its default value
+          if (this.#config.formControlAttributes[formControlElement]["for"]) {
+            formControlLabel.setAttribute(
+              "for",
+              this.#config.formControlAttributes[formControlElement]["for"]
+            );
+          } else {
+            formControlLabel.setAttribute(
+              "for",
+              `Form-Control-${formControlElement}_${
+                this.#config.uniqueIdentifier
+              }`
+            );
+          }
 
           formControlLabel.innerText =
             this.#config.fragmentTextData[formControlElement].labelText;
@@ -484,95 +500,188 @@ export function UserInfoFormModule() {
           Object.keys(
             this.#config.formControlText[formControlElement].errorBoxText
           ).length > 0
-          //checks for use of the constraint api, whether the errorBoxText property exists, checks if said property is equal to an object, and whether the object contains any properties
+          //checks for use of the constraint api, the existence of the text properties for the specific form control element,
+          //whether the text properties includes error text, and whether their are individual error text properties within the parent property
         ) {
-          //will check the error types within the errorBoxText object and see if the various properties are valid in order to create the container
-          //along with the valid error text elements, append them to the container, and then return the entire fragment
-          let errorTextFrag;
-          makeContainer = false;
-          for (let errorType in this.#config.fragmentTextData[
+          const container =
+              this.#validationFailureComponents.container(formControlElement),
+            errorTextElements = [];
+
+          for (let uniqueError in this.#config.formControlText[
             formControlElement
           ].errorBoxText) {
-            if (this.#typesOfErrors.includes(errorType)) {
-              if (!makeContainer) {
-                //if a property is valid, initialized the container first
-                const errorTextContainer = document.createElement("div");
-                errorTextContainer.classList.add(
-                  `Form-Control-Error-Text-Container-${formControlElement}`
-                );
-                this.#addUniqueIdentifier(errorTextContainer);
-                errorTextFrag = errorTextContainer;
-                makeContainer = !makeContainer;
-              }
+            const errorTextElement = this.#validationFailureComponents.text(
+              formControlElement,
+              uniqueError
+            );
 
-              const errorTextElement = document.createElement("div");
-              errorTextElement.classList.add(
-                `Form-Control-Error-Text-${formControlElement}`
-              );
-              this.#addUniqueIdentifier(errorTextElement);
-              errorTextElement.innerText =
-                this.#config.fragmentTextData[formControlElement].errorBoxText[
-                  errorType
-                ];
-              if (makeContainer && errorTextFrag !== undefined) {
-                errorTextFrag.append(errorTextElement);
-              }
+            if (
+              errorTextElement &&
+              errorTextElement.nodeType === Node.ELEMENT_NODE
+            ) {
+              errorTextElements.push(errorTextElement);
             }
           }
-          if (makeContainer && errorTextFrag !== undefined) {
-            return errorTextFrag;
+
+          if (errorTextElements.length > 0) {
+            errorTextElements.forEach((element) => {
+              container.append(element);
+            });
+            return container;
+          } else {
+            return null;
           }
         }
       },
+      input: (formControlElement) => {
+        if (this.#config.formControlAttributes[formControlElement]) {
+          //if the data for the attributes of said specific form control exists, apply the built in default values and mandatory values,
+          const input = document.createElement("input");
+
+          input.classList.add(`Form-Control-${formControlElement}`);
+
+          //sets default id value
+          input.setAttribute(
+            "id",
+            `Form-Control-${formControlElement}_${
+              this.#config.uniqueIdentifier
+            }`
+          );
+
+          //sets default name attribute value
+          input.setAttribute(
+            "name",
+            `Form-Control-${formControlElement}_${
+              this.#config.uniqueIdentifier
+            }_Var`
+          );
+
+          this.#addUniqueIdentifier(input);
+
+          //iterates through all of the attributes for the specific form control, applies/overrides attributes that are references within the config
+          for (let attribute in this.#config.formControlAttributes[
+            formControlElement
+          ]) {
+            if (attribute !== "for") {
+              input.setAttribute(
+                attribute,
+                this.#config.formControlAttributes[formControlElement][
+                  attribute
+                ]
+              );
+            }
+          }
+        } else {
+          throw new Error(
+            `FATAL ERROR: within the scope 'input' of class instance '${this.constructor.name}' : input element of a specific type of form control, that being ${formControlElement}, could not be created, as there lacks a reference for its own attributes within 'this.#config.formAttributes', Stack Trace: ${error.stack} `
+          );
+        }
+      },
+      //needs to be used in conjunction with an input tag, and match the id value of such
+      dataList: (formControlElement) => {
+        const dataList = document.createElement("datalist");
+
+        dataList.classList.add(`Form-Control-${formControlElement}`);
+
+        dataList.setAttribute(
+          "id",
+          `Form-Control-${formControlElement}_${this.#config.uniqueIdentifier}`
+        );
+
+        if (this.#config.formControlAttributes[formControlElement]) {
+          if (
+            this.#config.formControlAttributes[formControlElement].id &&
+            typeof this.#config.formControlAttributes[formControlElement].id ===
+              "string"
+          ) {
+            dataList.setAttribute(
+              "id",
+              this.#config.formControlAttributes[formControlElement].id
+            );
+          }
+          if (
+            this.#config.formControlAttributes[formControlElement].title &&
+            typeof this.#config.formControlAttributes[formControlElement]
+              .title === "string"
+          ) {
+            dataList.setAttribute(
+              "title",
+              this.#config.formControlAttributes[formControlElement].title
+            );
+          }
+        }
+
+        this.#addUniqueIdentifier(dataList);
+
+        return dataList;
+      },
     };
 
-    #errorFragmentComponents = {
-      container: () => {},
-      text: () => {},
+    //for creating the components that make up the validation failure display when using the constraint api
+    #validationFailureComponents = {
+      container: (formControlElement) => {
+        const container = document.createElement("div");
+
+        container.classList.add(
+          `Form-Control-Validation-Failure-Text-Container-${formControlElement}`
+        );
+
+        this.#addUniqueIdentifier(container);
+
+        if (this.#elementCache && this.#elementCache !== null) {
+          this.#elementCache.addElement(
+            `Form-Control-Validation-Failure-Text-Container-${formControlElement}`,
+            container
+          );
+        }
+
+        return container;
+      },
+      text: (formControlElement, uniqueError) => {
+        const errorText = document.createElement("div");
+
+        errorText.classList.add(
+          `Form-Control-Error-Text-${formControlElement}`
+        );
+
+        errorText.classList.add(`${uniqueError}`);
+
+        this.#addUniqueIdentifier(errorText);
+
+        if (this.#elementCache && this.#elementCache !== null) {
+          this.#elementCache.addElement(
+            `Form-Control-Error-Text-${formControlElement}-${uniqueError}`
+          );
+        }
+
+        return errorText;
+      },
     };
 
-    //will be for creating the entire form control, will reference the generic template builders, but will
-    //append the correct form control input element themselves, they will return an entire form control fragment ready to be
-    //appended to the form element
-    #formControlElementBuilders = {
-      email: () => {},
+    //every created element will have the defined unique identifier attached to its class
+    #addUniqueIdentifier(element) {
+      const uniqueIdentifier = this.#config.uniqueIdentifier;
 
-      confirmEmail: () => {},
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        //checks for single element, applies unique identifier to such
+        element.classList.contains(uniqueIdentifier)
+          ? null
+          : element.classList.add(uniqueIdentifier);
+      } else if (element.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        //checks for DOM fragment, applies unique identifier to every existing element
+        const descendants = element.querySelectorAll("*");
 
-      address: () => {},
-
-      stateOrProvince: () => {},
-
-      country: () => {},
-
-      postalCode: () => {},
-
-      password: () => {},
-
-      confirmPassword: () => {},
-
-      dateOfBirth: () => {},
-
-      phoneNumber: () => {},
-
-      creditCardType: () => {},
-
-      creditCardNumber: () => {},
-
-      creditCardExpDate: () => {},
-
-      creditCardSecurityNumber: () => {},
-
-      subjectLineOne: () => {},
-
-      subjectLineTwo: () => {},
-
-      textBoxOne: () => {},
-
-      textBoxTwo: () => {},
-
-      fileUpload: () => {},
-    };
+        descendants.forEach((descElement) => {
+          descElement.classList.contains(uniqueIdentifier)
+            ? null
+            : descElement.classList.add(uniqueIdentifier);
+        });
+      } else {
+        throw new Error(
+          `FATAL ERROR: within '#addUniqueIdentifier' of class instance '${this.constructor.name}' : supplied argument fails to meet processing requirements, must be either an element or a fragment that contains elements, received ${element}, Stack Trace: ${error.stack}`
+        );
+      }
+    }
   }
 
   class DynamicOptionsManager {
@@ -1368,10 +1477,38 @@ export function UserInfoFormModule() {
       autocomplete: ["on", "off"],
       autocorrect: ["on", "off"],
       autocapitalize: ["none", "sentences", "words", "characters"],
+      autofill: ["on", "off"],
       spellcheck: "boolean",
       size: "number",
       tabindex: "number",
       formnovalidate: null,
+      type: ["text", "email", "password", "number", "date"],
+      list: "string",
+      form: "string",
+      accept: [
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".bmp",
+        ".pdf",
+        ".doc",
+        ".docx",
+        ".txt",
+        ".rtf",
+        ".xls",
+        ".xlsx",
+        ".csv",
+        ".ppt",
+        ".pptx",
+        ".zip",
+        ".rar",
+        ".tar",
+        ".gz",
+      ],
+      id: "string",
+      for: "string",
+      title: "string",
     },
     formAttributes: {
       action: "string",
