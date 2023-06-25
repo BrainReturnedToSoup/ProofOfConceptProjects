@@ -306,6 +306,7 @@ export function UserInfoFormModule() {
 
     //for the <form> tag creation
     #buildFormElement() {
+      //<form action="action" method="method" novalidate*></form>
       const formElement = document.createElement("form"),
         {
           action,
@@ -515,6 +516,7 @@ export function UserInfoFormModule() {
         }
       },
       validationFailure: (formControlElement) => {
+        //<div class="Form-Control-Error-Box-formControlElement uniqueIdentifier"></div>
         if (
           this.#config.useConstraintAPI &&
           formControlElement in this.#config.formControlText &&
@@ -548,6 +550,7 @@ export function UserInfoFormModule() {
         }
       },
       input: (formControlElement) => {
+        //<input class="Form-Control-formControlElement uniqueIdentifier" id="Form-Control-formControlElement_uniqueIdentifier" name="Form-Control-formControlElement_uniqueIdentifier_Var">
         if (formControlElement in this.#config.formControlAttributes) {
           //if the data for the attributes of said specific form control exists, apply the built in default values and mandatory values,
           const input = document.createElement("input");
@@ -621,6 +624,7 @@ export function UserInfoFormModule() {
       },
       //needs to be used in conjunction with an input tag, and match the id value of such
       dataList: (formControlElement) => {
+        //<datalist class="Form-Control-Data-List-formControlElement uniqueIdentifier" id="Form-Control-Data-List-formControlElement_uniqueIdentifier"></datalist>
         if (
           "dataList" in
             this.#config.formControlAttributes[formControlElement] &&
