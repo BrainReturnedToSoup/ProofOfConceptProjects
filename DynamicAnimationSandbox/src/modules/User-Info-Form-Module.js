@@ -562,16 +562,24 @@ export function UserInfoFormModule() {
 
           this.#addUniqueIdentifier(input);
 
-          //iterates through all of the attributes for the specific form control, applies/overrides attributes that are references within the config
+          //iterates through all of the attributes for the specific form control, applies/overrides attributes that are references within the config,
+          //will ignore the for attribute, but will check to see if a datalist was defined as an attribute and add the necessary properties
           for (let attribute in this.#config.formControlAttributes[
             formControlElement
           ]) {
-            if (attribute !== "for") {
+            if (attribute !== "for" && attribute !== "dataList") {
               input.setAttribute(
                 attribute,
                 this.#config.formControlAttributes[formControlElement][
                   attribute
                 ]
+              );
+            } else if (attribute === "dataList") {
+              input.setAttribute(
+                "list",
+                `Form-Control-Data-List-${formControlElement}_${
+                  this.#config.uniqueIdentifier
+                }`
               );
             }
           }
@@ -585,34 +593,25 @@ export function UserInfoFormModule() {
       dataList: (formControlElement) => {
         const dataList = document.createElement("datalist");
 
-        dataList.classList.add(`Form-Control-${formControlElement}`);
+        dataList.classList.add(`Form-Control-Data-List-${formControlElement}`);
 
         dataList.setAttribute(
           "id",
-          `Form-Control-${formControlElement}_${this.#config.uniqueIdentifier}`
+          `Form-Control-Data-List-${formControlElement}_${
+            this.#config.uniqueIdentifier
+          }`
         );
 
-        if (this.#config.formControlAttributes[formControlElement]) {
-          if (
-            this.#config.formControlAttributes[formControlElement].id &&
-            typeof this.#config.formControlAttributes[formControlElement].id ===
-              "string"
-          ) {
-            dataList.setAttribute(
-              "id",
-              this.#config.formControlAttributes[formControlElement].id
-            );
-          }
-          if (
-            this.#config.formControlAttributes[formControlElement].title &&
-            typeof this.#config.formControlAttributes[formControlElement]
-              .title === "string"
-          ) {
-            dataList.setAttribute(
-              "title",
-              this.#config.formControlAttributes[formControlElement].title
-            );
-          }
+        if (
+          this.#config.formControlAttributes[formControlElement] &&
+          this.#config.formControlAttributes[formControlElement].title &&
+          typeof this.#config.formControlAttributes[formControlElement]
+            .title === "string"
+        ) {
+          dataList.setAttribute(
+            "title",
+            this.#config.formControlAttributes[formControlElement].title
+          );
         }
 
         this.#addUniqueIdentifier(dataList);
