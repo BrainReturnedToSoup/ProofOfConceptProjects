@@ -1,3 +1,5 @@
+import { config } from "webpack";
+
 export function UserInfoFormModule() {
   const defaultValues = {
     formControlText: {
@@ -265,8 +267,6 @@ export function UserInfoFormModule() {
       }
     }
 
-    #formControlsWithDataList = ["address", "stateOrProvince", "country"];
-
     //for creating and assembling a complete input field fragment
     #formControlFragBuilder = (formControlElement) => {
       const components = {
@@ -412,7 +412,7 @@ export function UserInfoFormModule() {
       label: (formControlElement) => {
         //<label class="Form-Control-Label-formControlElement uniqueIdentifier" for="Form-Control-formControlElement_uniqueIdentifier">labelText</label>
         if (
-          this.#config.formControlText[formControlElement].labelText &&
+          "labelText" in this.#config.formControlText[formControlElement] &&
           typeof this.#config.formControlText[formControlElement].labelText ===
             "string" &&
           this.#config.formControlText[formControlElement].labelText ===
@@ -431,7 +431,7 @@ export function UserInfoFormModule() {
           );
 
           //if a for attribute was explicitly set in the config, use that, otherwise set its default value
-          if (this.#config.formControlAttributes[formControlElement]["for"]) {
+          if ("for" in this.#config.formControlAttributes[formControlElement]) {
             formControlLabel.setAttribute(
               "for",
               this.#config.formControlAttributes[formControlElement]["for"]
@@ -450,7 +450,7 @@ export function UserInfoFormModule() {
 
           this.#addUniqueIdentifier(formControlLabel);
 
-          if (this.#elementCache && this.#elementCache !== null) {
+          if (this.#elementCache) {
             this.#elementCache.addElement(
               `Form-Control-Label-${formControlElement}`,
               formControlLabel
@@ -458,13 +458,16 @@ export function UserInfoFormModule() {
           }
 
           return formControlLabel;
+        } else {
+          return null;
         }
       },
       instructions: (formControlElement) => {
         //<div class="Form-Control-Instructions-formControlElement uniqueIdentifier">instructionsText</div>
         if (
           this.#config.useConstraintAPI &&
-          this.#config.fragmentTextData[formControlElement].instructionsText &&
+          "instructionsText" in
+            this.#config.fragmentTextData[formControlElement] &&
           typeof this.#config.fragmentTextData[formControlElement]
             .instructionsText === "string" &&
           this.#config.fragmentTextData[formControlElement].instructionsText ===
@@ -492,13 +495,15 @@ export function UserInfoFormModule() {
           }
 
           return formControlInstructions;
+        } else {
+          return null;
         }
       },
       errorTextFrag: (formControlElement) => {
         if (
           this.#config.useConstraintAPI &&
-          this.#config.formControlText[formControlElement] &&
-          this.#config.formControlText[formControlElement].errorBoxText &&
+          formControlElement in this.#config.formControlText &&
+          "errorBoxText" in this.#config.formControlText[formControlElement] &&
           typeof this.#config.formControlText[formControlElement]
             .errorBoxText === "object" &&
           Object.keys(
@@ -527,18 +532,17 @@ export function UserInfoFormModule() {
             }
           }
 
-          if (errorTextElements.length > 0) {
-            errorTextElements.forEach((element) => {
-              container.append(element);
-            });
-            return container;
-          } else {
-            return null;
-          }
+          errorTextElements.forEach((element) => {
+            container.append(element);
+          });
+
+          return container;
+        } else {
+          return null;
         }
       },
       input: (formControlElement) => {
-        if (this.#config.formControlAttributes[formControlElement]) {
+        if (formControlElement in this.#config.formControlAttributes) {
           //if the data for the attributes of said specific form control exists, apply the built in default values and mandatory values,
           const input = document.createElement("input");
 
@@ -560,8 +564,6 @@ export function UserInfoFormModule() {
             }_Var`
           );
 
-          this.#addUniqueIdentifier(input);
-
           //iterates through all of the attributes for the specific form control, applies/overrides attributes that are references within the config,
           //will ignore the for attribute, but will check to see if a datalist was defined as an attribute and add the necessary properties
           for (let attribute in this.#config.formControlAttributes[
@@ -574,7 +576,11 @@ export function UserInfoFormModule() {
                   attribute
                 ]
               );
-            } else if (attribute === "dataList") {
+            } else if (
+              attribute === "dataList" &&
+              this.#config.formControlAttributes[formControlElement]
+                .dataList === true
+            ) {
               input.setAttribute(
                 "list",
                 `Form-Control-Data-List-${formControlElement}_${
@@ -583,6 +589,17 @@ export function UserInfoFormModule() {
               );
             }
           }
+
+          this.#addUniqueIdentifier(input);
+
+          if (this.#elementCache) {
+            this.#elementCache.addElement(
+              `Form-Control-${formControlElement}`,
+              input
+            );
+          }
+
+          return input;
         } else {
           throw new Error(
             `FATAL ERROR: within the scope 'input' of class instance '${this.constructor.name}' : input element of a specific type of form control, that being ${formControlElement}, could not be created, as there lacks a reference for its own attributes within 'this.#config.formAttributes', Stack Trace: ${error.stack} `
@@ -591,32 +608,47 @@ export function UserInfoFormModule() {
       },
       //needs to be used in conjunction with an input tag, and match the id value of such
       dataList: (formControlElement) => {
-        const dataList = document.createElement("datalist");
-
-        dataList.classList.add(`Form-Control-Data-List-${formControlElement}`);
-
-        dataList.setAttribute(
-          "id",
-          `Form-Control-Data-List-${formControlElement}_${
-            this.#config.uniqueIdentifier
-          }`
-        );
-
         if (
-          this.#config.formControlAttributes[formControlElement] &&
-          this.#config.formControlAttributes[formControlElement].title &&
-          typeof this.#config.formControlAttributes[formControlElement]
-            .title === "string"
+          "dataList" in
+            this.#config.formControlAttributes[formControlElement] &&
+          this.#config.formControlAttributes[formControlElement].dataList ===
+            true
         ) {
-          dataList.setAttribute(
-            "title",
-            this.#config.formControlAttributes[formControlElement].title
+          const dataList = document.createElement("datalist");
+
+          dataList.classList.add(
+            `Form-Control-Data-List-${formControlElement}`
           );
+
+          dataList.setAttribute(
+            "id",
+            `Form-Control-Data-List-${formControlElement}_${
+              this.#config.uniqueIdentifier
+            }`
+          );
+
+          if (
+            "title" in this.#config.formControlAttributes[formControlElement] &&
+            typeof this.#config.formControlAttributes[formControlElement]
+              .title === "string"
+          ) {
+            dataList.setAttribute(
+              "title",
+              this.#config.formControlAttributes[formControlElement].title
+            );
+          }
+
+          this.#addUniqueIdentifier(dataList);
+
+          if (this.#elementCache) {
+            this.#elementCache.addElement(
+              `Form-Control-Data-List-${formControlElement}`,
+              dataList
+            );
+          }
+
+          return dataList;
         }
-
-        this.#addUniqueIdentifier(dataList);
-
-        return dataList;
       },
     };
 
@@ -631,7 +663,7 @@ export function UserInfoFormModule() {
 
         this.#addUniqueIdentifier(container);
 
-        if (this.#elementCache && this.#elementCache !== null) {
+        if (this.#elementCache) {
           this.#elementCache.addElement(
             `Form-Control-Validation-Failure-Text-Container-${formControlElement}`,
             container
@@ -651,9 +683,10 @@ export function UserInfoFormModule() {
 
         this.#addUniqueIdentifier(errorText);
 
-        if (this.#elementCache && this.#elementCache !== null) {
+        if (this.#elementCache) {
           this.#elementCache.addElement(
-            `Form-Control-Error-Text-${formControlElement}-${uniqueError}`
+            `Form-Control-Error-Text-${formControlElement}-${uniqueError}`,
+            errorText
           );
         }
 
@@ -665,23 +698,20 @@ export function UserInfoFormModule() {
     #addUniqueIdentifier(element) {
       const uniqueIdentifier = this.#config.uniqueIdentifier;
 
-      if (element.nodeType === Node.ELEMENT_NODE) {
-        //checks for single element, applies unique identifier to such
-        element.classList.contains(uniqueIdentifier)
-          ? null
-          : element.classList.add(uniqueIdentifier);
-      } else if (element.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
-        //checks for DOM fragment, applies unique identifier to every existing element
-        const descendants = element.querySelectorAll("*");
+      if (
+        element.nodeType === Node.ELEMENT_NODE ||
+        element.nodeType === Node.DOCUMENT_FRAGMENT_NODE
+      ) {
+        const allElements = element.querySelectorAll("*");
 
-        descendants.forEach((descElement) => {
-          descElement.classList.contains(uniqueIdentifier)
+        allElements.forEach((currElement) => {
+          currElement.classList.contains(uniqueIdentifier)
             ? null
-            : descElement.classList.add(uniqueIdentifier);
+            : currElement.classList.add(uniqueIdentifier);
         });
       } else {
         throw new Error(
-          `FATAL ERROR: within '#addUniqueIdentifier' of class instance '${this.constructor.name}' : supplied argument fails to meet processing requirements, must be either an element or a fragment that contains elements, received ${element}, Stack Trace: ${error.stack}`
+          `FATAL ERROR: within '#addUniqueIdentifier' of class instance '${this.constructor.name}' : supplied argument fails to meet processing requirements, must be either an element or a fragment that contains elements and there must be a unique identifier to use, received ${element} as the received element and ${uniqueIdentifier} as the unique identifier, Stack Trace: ${error.stack}`
         );
       }
     }
@@ -764,7 +794,9 @@ export function UserInfoFormModule() {
     };
 
     init(parentElement) {
-      parentElement.append(this.#stateData.formFragment);
+      if (this.#stateData.formFragment.nodeType === Node.ELEMENT_NODE) {
+        parentElement.append(this.#stateData.formFragment);
+      }
     }
   }
 
@@ -773,11 +805,11 @@ export function UserInfoFormModule() {
       //returns an object representing the final configuration that the other classes will use to determine their behavior
       //will only contain data that is necessary, and data that has been processed by the data merging hierarchy
       if (
-        configObj.applyDefaultValues &&
-        configObj.applyDefaultValues === false
+        "applyDefaultValues" in configObj &&
+        typeof configObj.applyDefaultValues === "boolean"
         //condition for defining the state of this class in the instance of a custom configuration by the user
       ) {
-        this.#stateData.applyDefaultValues = false;
+        this.#stateData.applyDefaultValues = configObj.applyDefaultValues;
       } else if (
         configObj.type !== "custom" &&
         Object.keys(formTemplates).includes(configObj.type)
@@ -840,13 +872,10 @@ export function UserInfoFormModule() {
             formTemplates[this.#stateData.templateName].formControlElements
           );
         }
-        //checks if the supplied user config property even exists or is undefined
         if (formControlElements) {
           dataSetArr.push(formControlElements);
         }
 
-        //merges all present data sets within dataSetArr into one large array, and creates a set in order to remove duplicates
-        //the set then converted into an array, and the array is returned
         if (dataSetArr.length > 1) {
           const finalConfig = Array.from(new Set([].concat(...dataSetArr)));
           return finalConfig;
@@ -866,7 +895,6 @@ export function UserInfoFormModule() {
             formTemplates[this.#stateData.templateName].formAttributes
           );
         }
-        //checks if the supplied user config property even exists or is undefined
         if (formAttributes) {
           dataSetArr.push(formControlElements);
         }
@@ -894,33 +922,22 @@ export function UserInfoFormModule() {
             formTemplates[this.#stateData.templateName].formControlAttributes
           );
         }
-        //checks if the supplied user config property even exists or is undefined
         if (formControlAttributes) {
           dataSetArr.push(formControlAttributes);
         }
 
-        //will set finalConfig equal to the first element in the data set, and then iterate through the other
-        //data sets and update the individual properties that either aren't present from a lower hierarchy in the finalConfig accordingly
-        //The nesting is needed in order to iterate over the dataSetArr, iterate over the existing formControlElements within
-        //any of the data sets, and then iterate over the individual attributes within a specific form control element
         for (let i = 0; i < dataSetArr.length; i++) {
-          //if starting the loop, set finalConfig equal to the first target config element
           if (i === 0) {
             finalConfig = dataSetArr[i];
           } else {
-            //iterate over all of the targeted form control elements
             for (let formControlElement in dataSetArr[i]) {
-              //if the form control element being referenced from the target config element is not being referenced in the finalConfig,
-              //simply apply the entire form control rule to the finalConfig, and then continue to the next iteration of the loop immediately
               if (!finalConfig[formControlElement]) {
                 finalConfig[formControlElement] =
                   dataSetArr[i][formControlElement];
+
                 continue;
               }
 
-              //if the form control element is being referenced in both config data sets, iterate
-              //through the attributes of the target config element form control element, and apply the existing values of existing properties
-              //from such to the finalConfig
               for (let attribute in dataSetArr[i][formControlElement]) {
                 finalConfig[formControlElement][attribute] =
                   dataSetArr[i][formControlElement][attribute];
@@ -946,32 +963,20 @@ export function UserInfoFormModule() {
           dataSetArr.push(formControlText);
         }
 
-        //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
-        //and either adds missing properties or makes updates to existing ones.
-        //The nesting is needed in order to iterate over the dataSetArr, then iterate over the existing
-        //formControlElements, then iterate over the text properties within the corresponding form control element
-        //and then iterate over the properties within the error text property if currently targeted
-
         for (let i = 0; i < dataSetArr.length; i++) {
-          //if first starting the loop, set the first element equal to the final config variable
           if (i === 0) {
             finalConfig = dataSetArr[i];
           } else {
-            //if not at the start of the loop, iterate through the properties of the current target config element
             for (let formControlElement in dataSetArr[i]) {
-              //if the target form control element is not referenced at all within the finalConfig, apply the
-              //property in its entirety to the finalConfig from the currently targeted config element,
-              //if this happens, continue to the next form control element immediately
               if (!finalConfig[formControlElement]) {
                 finalConfig[formControlElement] =
                   dataSetArr[i][formControlElement];
+
                 continue;
               }
 
               //if the target form control element exists within finalConfig, iterate over all of the properties
               for (let textProperty in dataSetArr[i][formControlElement]) {
-                //special condition if the text property is errorBoxText, its value should be an object thus needs to be iterated over
-                //also checking for the existence of this property within final config at the same time
                 if (
                   textProperty === "errorBoxText" &&
                   finalConfig[formControlElement][textProperty]
@@ -983,7 +988,6 @@ export function UserInfoFormModule() {
                       dataSetArr[i][formControlElement][textProperty][error];
                   }
                 } else {
-                  //if the property is a regular property that isn't equal to an object nor is it errorBoxText
                   finalConfig[formControlElement][textProperty] =
                     dataSetArr[i][formControlElement][textProperty];
                 }
@@ -1005,19 +1009,14 @@ export function UserInfoFormModule() {
             formTemplates[this.#stateData.templateName].functionalityRules
           );
         }
-        //checks if the supplied user config property even exists or is undefined
         if (functionalityRules) {
           dataSetArr.push(functionalityRules);
         }
 
-        //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
-        //and either adds missing properties or makes updates to existing ones.
         for (let i = 0; i < dataSetArr.length; i++) {
-          //if first starting the loop, set finalConfig equal to the first element
           if (i === 0) {
             finalConfig = dataSetArr[0];
           } else {
-            //if not, iterate through the target config element and set the corresponding properties on the finalConfig equal to those found on the target config element
             for (let rule in dataSetArr[i]) {
               finalConfig[rule] = dataSetArr[i][rule];
             }
@@ -1037,19 +1036,14 @@ export function UserInfoFormModule() {
             formTemplates[this.#stateData.templateName].thirdPartyApiRules
           );
         }
-        //checks if the supplied user config property even exists or is undefined
         if (thirdPartyApiRules) {
           dataSetArr.push(thirdPartyApiRules);
         }
 
-        //sets the first element of the dataSetArr as the finalConfig, then iterates over every individual property
-        //and either adds missing properties or makes updates to existing ones.
         for (let i = 0; i < dataSetArr.length; i++) {
-          //if starting the loop, set finalConfig equal to the first element
           if (i === 0) {
             finalConfig = dataSetArr[i];
           } else {
-            //iterate through the rules that exist within the target config element and apply the data to the corresponding rules within finalConfig
             for (let rule in dataSetArr[i]) {
               finalConfig[rule] = dataSetArr[i][rule];
             }
@@ -1065,7 +1059,7 @@ export function UserInfoFormModule() {
   const validationMethods = {
     uniqueIdentifier: function (configObj) {
       //checks for existence of the uniqueIdentifier property, and whether its value is a string that doesn't contain any special characters or spaces, aside from dashes and underscores
-      if (configObj.uniqueIdentifier) {
+      if ("uniqueIdentifier" in configObj) {
         const cleanedIdentifier = configObj.uniqueIdentifier.replace(
           /[\s~`!@#$%^&*()\=+[{\]}\\|;:'",<.>/?]/g,
           ""
@@ -1086,7 +1080,7 @@ export function UserInfoFormModule() {
     },
     applyDefaultValues: function (configObj) {
       //checks for the existence of this property, optional, will be set to true in most cases by default or through a template
-      if (configObj.applyDefaultValues) {
+      if ("applyDefaultValues" in configObj) {
         //checks if the value of this property is a boolean
         if (typeof configObj.applyDefaultValues !== "boolean") {
           return `CONFIG VALIDATION ERROR: applyDefaultValues property should have a boolean value, but it does not, received ${configObj.applyDefaultValues}, Stack Trace: ${error.stack}`;
@@ -1095,7 +1089,7 @@ export function UserInfoFormModule() {
       return null;
     },
     type: function (configObj) {
-      if (configObj.type) {
+      if ("type" in configObj) {
         //checks for existence of the type property, this property is mandatory to include in the config
         if (typeof configObj.type === "string") {
           //checks if the value of this property is a string
@@ -1119,7 +1113,7 @@ export function UserInfoFormModule() {
     },
     formAttributes: function (configObj) {
       //checks for existence of the property, this property is mandatory
-      if (configObj.formAttributes) {
+      if ("formAttributes" in configObj) {
         //checks if the property value equals that of an object
         if (typeof configObj.formAttributes === "object") {
           const formAttributes = Object.keys(configObj.formAttributes);
@@ -1181,7 +1175,7 @@ export function UserInfoFormModule() {
       return null;
     },
     formControlAttributes: function (configObj) {
-      if (configObj.formControlAttributes) {
+      if ("formControlAttributes" in configObj) {
         //if the property exists, isn't mandatory
         //property must equal and object if it does though
         if (typeof configObj.formControlAttributes === "object") {
@@ -1251,7 +1245,7 @@ export function UserInfoFormModule() {
     },
     formControlElements: function (configObj) {
       //checks if formControlElements property exists, optional property
-      if (configObj.formControlElements) {
+      if ("formControlElements" in configObj) {
         //checks if the property value is equal to an array
         if (Array.isArray(configObj.formControlElements)) {
           //checks if said array contains any elements within it
@@ -1274,7 +1268,7 @@ export function UserInfoFormModule() {
     },
     formControlText: function (configObj) {
       //checks for the existence of the property
-      if (configObj.formControlText) {
+      if ("formControlText" in configObj) {
         //checks if the value of the property is an object
         if (typeof configObj.formControlText === "object") {
           const formControlElements = Object.keys(configObj.formControlText);
@@ -1362,7 +1356,7 @@ export function UserInfoFormModule() {
 
     functionalityRules: function (configObj) {
       //checks for the existence of the property, which is optional
-      if (configObj.functionalityRules) {
+      if ("functionalityRules" in configObj) {
         //checks if the data type of the value of this property is an object
         if (typeof configObj.functionalityRules === "object") {
           const functionalityRules = Object.keys(configObj.functionalityRules);
@@ -1400,7 +1394,7 @@ export function UserInfoFormModule() {
     },
     thirdPartyApiRules: function (configObj) {
       //checks for the existence of the property, optional
-      if (configObj.thirdPartyApiRules) {
+      if ("thirdPartyApiRules" in configObj) {
         //checks if the value of the property is an object
         if (typeof configObj.thirdPartyApiRules === "object") {
           const thirdPartyApiRules = Object.keys(configObj.thirdPartyApiRules);
@@ -1566,12 +1560,11 @@ export function UserInfoFormModule() {
         }`
       );
     }
-
     //will iterate over every existing validation method, supply the config
     //to it, and then catch every returned string and push it into the all errors array
     Object.keys(validationMethods).forEach((method) => {
-      const validationString = validationMethods[method](config);
-      if (typeof validationString === "string") {
+      const validationResult = validationMethods[method](config);
+      if (typeof validationResult === "string") {
         allErrors.push(validationString);
       }
     });
