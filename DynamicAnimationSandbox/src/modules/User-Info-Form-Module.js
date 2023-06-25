@@ -269,6 +269,8 @@ export function UserInfoFormModule() {
 
     //for creating and assembling a complete input field fragment
     #formControlFragBuilder = (formControlElement) => {
+      //holds all of the element pieces to make a complete form control element, the dataList property is null since the data list
+      //is situational
       const components = {
         mainShell:
           this.#formControlElementComponents.mainShell(formControlElement),
@@ -281,14 +283,16 @@ export function UserInfoFormModule() {
           this.#formControlElementComponents.errorTextFrag(formControlElement),
       };
 
+      //checks for its existence as an attribute and checks its boolean value
       if (
-        this.#config.formAttributes[formControlElement].dataList &&
+        "dataList" in this.#config.formAttributes[formControlElement] &&
         this.#config.formAttributes[formControlElement].dataList === true
       ) {
         components.dataList =
           this.#formControlElementComponents.dataList(formControlElement);
       }
 
+      //assemble the entire piece
       for (let component in components) {
         if (component !== "mainShell" && components[component] !== null) {
           components.mainShell.append(components[component]);
@@ -394,6 +398,7 @@ export function UserInfoFormModule() {
         //<div class="Form-Control-Container-formControlElement uniqueIdentifier"></div>
         const formControlContainer = document.createElement("div");
 
+        //general class tag
         formControlContainer.classList.add(
           `Form-Control-Container-${formControlElement}`
         );
@@ -426,6 +431,7 @@ export function UserInfoFormModule() {
         ) {
           const formControlLabel = document.createElement("label");
 
+          //general class tag
           formControlLabel.classList.add(
             `Form-Control-Label-${formControlElement}`
           );
@@ -445,6 +451,7 @@ export function UserInfoFormModule() {
             );
           }
 
+          //defines the text of the label
           formControlLabel.innerText =
             this.#config.fragmentTextData[formControlElement].labelText;
 
@@ -478,10 +485,12 @@ export function UserInfoFormModule() {
         ) {
           const formControlInstructions = document.createElement("div");
 
+          //general class tag
           formControlInstructions.classList.add(
             `Form-Control-Instructions-${formControlElement}`
           );
 
+          //defines the inner text of the element representing the instructions
           formControlInstructions.innerText =
             this.#config.fragmentTextData[formControlElement].instructionsText;
 
@@ -519,22 +528,16 @@ export function UserInfoFormModule() {
           for (let uniqueError in this.#config.formControlText[
             formControlElement
           ].errorBoxText) {
+            //create each element for every unique error instance
             const errorTextElement = this.#validationFailureComponents.text(
               formControlElement,
               uniqueError
             );
 
-            if (
-              errorTextElement &&
-              errorTextElement.nodeType === Node.ELEMENT_NODE
-            ) {
-              errorTextElements.push(errorTextElement);
+            if (errorTextElement.nodeType === Node.ELEMENT_NODE) {
+              container.append(errorTextElement);
             }
           }
-
-          errorTextElements.forEach((element) => {
-            container.append(element);
-          });
 
           return container;
         } else {
@@ -569,6 +572,7 @@ export function UserInfoFormModule() {
           for (let attribute in this.#config.formControlAttributes[
             formControlElement
           ]) {
+            //if its an inline attribute for the input tag
             if (attribute !== "for" && attribute !== "dataList") {
               input.setAttribute(
                 attribute,
@@ -577,6 +581,9 @@ export function UserInfoFormModule() {
                 ]
               );
             } else if (
+              //a unique attribute for instances of using a datalist for the input, this just
+              //adds the necessary attributes to the input tag such as the list attribute to link
+              //it to the datalist
               attribute === "dataList" &&
               this.#config.formControlAttributes[formControlElement]
                 .dataList === true
@@ -616,10 +623,12 @@ export function UserInfoFormModule() {
         ) {
           const dataList = document.createElement("datalist");
 
+          //general class tag
           dataList.classList.add(
             `Form-Control-Data-List-${formControlElement}`
           );
 
+          //default id
           dataList.setAttribute(
             "id",
             `Form-Control-Data-List-${formControlElement}_${
@@ -627,6 +636,7 @@ export function UserInfoFormModule() {
             }`
           );
 
+          //apply title property if present
           if (
             "title" in this.#config.formControlAttributes[formControlElement] &&
             typeof this.#config.formControlAttributes[formControlElement]
@@ -648,6 +658,8 @@ export function UserInfoFormModule() {
           }
 
           return dataList;
+        } else {
+          return null;
         }
       },
     };
@@ -657,6 +669,7 @@ export function UserInfoFormModule() {
       container: (formControlElement) => {
         const container = document.createElement("div");
 
+        //general class tag
         container.classList.add(
           `Form-Control-Validation-Failure-Text-Container-${formControlElement}`
         );
@@ -675,11 +688,17 @@ export function UserInfoFormModule() {
       text: (formControlElement, uniqueError) => {
         const errorText = document.createElement("div");
 
+        //general class tag
         errorText.classList.add(
           `Form-Control-Error-Text-${formControlElement}`
         );
 
+        //add the specific error as a separate class tag
         errorText.classList.add(`${uniqueError}`);
+
+        //adds the text for the corresponding error
+        errorText.innerText =
+          this.#config.formControlText[formControlElement][uniqueError];
 
         this.#addUniqueIdentifier(errorText);
 
@@ -704,6 +723,7 @@ export function UserInfoFormModule() {
       ) {
         const allElements = element.querySelectorAll("*");
 
+        //makes sure to apply the unique identifier to the element and all of its descendants
         allElements.forEach((currElement) => {
           currElement.classList.contains(uniqueIdentifier)
             ? null
@@ -736,21 +756,44 @@ export function UserInfoFormModule() {
     //on the situation automatically, also it prevents multiple queries of the same elements.
     //Thinking about adding an API that allows this class to emit all of it's references to a global DOM refs cache.
     addElement(key, element) {
-      if (!this.#refsCache.has(key)) {
-        this.#refsCache.set(key, element);
-      } else if (this.#refsCache.has(key)) {
-        //if the corresponding key already has been used, meaning a specific element has already been stored within the map, it wouldn't make sense to redeclare the key to different vale
-        if (this.#refsCache.get(key) !== element) {
-          throw new Error(
-            `MODERATE ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' `
-          );
+      //has to be an element of course
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        if (!this.#refsCache.has(key)) {
+          this.#refsCache.set(key, element);
+        } else if (this.#refsCache.has(key)) {
+          //if the corresponding key already has been used, meaning a specific element has already been stored within the map, it wouldn't make sense to redeclare the key to different vale
+          if (this.#refsCache.get(key) !== element) {
+            throw new Error(
+              `MODERATE ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' : element reference with the same key already exists within the cache manager, received ${key} as the supplied key to add, Stack Trace: ${error.stack}`
+            );
+          }
         }
+      } else {
+        throw new Error(
+          `MINOR ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' : failed to add reference to element cache manager, value is not an element, received ${element} as the supplied element, received ${key}, as the supplied key as well, Stack Trace: ${error.stack}`
+        );
       }
     }
 
-    removeElement(key) {}
+    removeElement(key) {
+      if (!this.#refsCache.has(key)) {
+        this.#refsCache.delete(key);
+        return `DELETED`;
+      } else {
+        throw new Error(
+          `MODERATE ERROR: within the scope 'removeElement' of class instance '${this.constructor.name}' : failed to remove a target key value pair because the key supplied does not exist within the map, received ${key}, Stack Trace: ${error.stack}`
+        );
+      }
+    }
 
-    retrieveElement(key) {}
+    retrieveElement(key) {
+      if (!this.#refsCache.has(key)) {
+        const element = this.#refsCache.get(key);
+        return element;
+      } else {
+        return null;
+      }
+    }
   }
 
   class FunctionalityManager {
