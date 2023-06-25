@@ -260,6 +260,8 @@ export function UserInfoFormModule() {
             this.#formControlFragBuilder(formControlElement); //invokes the corresponding method based on the current form control element
           formElement.append(formControlFrag);
         }
+
+        return formElement;
       } else {
         throw new Error(
           `FATAL ERROR: within scope of '#initializeFormCreation' of class instance '${this.constructor.name}' : essential property 'this.#config.formControlElement' is not the correct data type, should be an array full of strings containing individual form control element references, check the default and or template configuration data if applicable`
@@ -318,7 +320,7 @@ export function UserInfoFormModule() {
       formElement.classList.add("Form-Element"); //add the general identifier as the first tag for all form elements and associated elements
 
       //these conditions below check for the existence of mandatory properties, as well as their value data types
-      if (action && typeof action === "string") {
+      if (typeof action === "string") {
         formElement.setAttribute("action", action);
       } else {
         throw new Error(
@@ -326,7 +328,7 @@ export function UserInfoFormModule() {
         );
       }
 
-      if (method && typeof method === "string") {
+      if (typeof method === "string") {
         formElement.setAttribute("method", method);
       } else {
         throw new Error(
@@ -335,7 +337,7 @@ export function UserInfoFormModule() {
       }
 
       //these conditions below check for the existence of optional properties, as well as their value data types in the case they are used
-      if (target && typeof target === "string") {
+      if (typeof target === "string") {
         formElement.setAttribute("target", target);
       } else if (target && typeof target !== "string") {
         throw new Error(
@@ -343,7 +345,7 @@ export function UserInfoFormModule() {
         );
       }
 
-      if (enctype && typeof enctype === "string") {
+      if (typeof enctype === "string") {
         formElement.setAttribute("enctype", enctype);
       } else if (enctype && typeof enctype !== "string") {
         throw new Error(
@@ -351,7 +353,7 @@ export function UserInfoFormModule() {
         );
       }
 
-      if (ariaLabel && typeof ariaLabel === "string") {
+      if (typeof ariaLabel === "string") {
         formElement.setAttribute("aria-label", ariaLabel);
       } else if (ariaLabel && typeof ariaLabel !== "string") {
         throw new Error(
@@ -359,7 +361,7 @@ export function UserInfoFormModule() {
         );
       }
 
-      if (ariaLabelledBy && typeof ariaLabelledBy === "string") {
+      if (typeof ariaLabelledBy === "string") {
         formElement.setAttribute("aria-labelledby", ariaLabelledBy);
       } else if (ariaLabelledBy && typeof ariaLabelledBy !== "string") {
         throw new Error(
@@ -367,12 +369,16 @@ export function UserInfoFormModule() {
         );
       }
 
-      if (ariaDescribedBy && typeof ariaDescribedBy === "string") {
+      if (typeof ariaDescribedBy === "string") {
         formElement.setAttribute("aria-describedby", ariaDescribedBy);
       } else if (ariaDescribedBy && typeof ariaDescribedBy !== "string") {
         throw new Error(
           `MINOR ERROR: within the scope of '#buildFormElement' of class instance '${this.constructor.name}' : optional property 'this.#config.formAttributes['aria-describedby']' was declared, but cannot be applied to the form as its value is the wrong data type, must be a string, received ${ariaDescribedBy}, Stack Trace: ${error.stack}`
         );
+      }
+
+      if ("novalidate" in this.#config.formAttributes) {
+        formElement.setAttribute("novalidate", "");
       }
 
       this.#addUniqueIdentifier(formElement);
@@ -508,11 +514,12 @@ export function UserInfoFormModule() {
           return null;
         }
       },
-      errorTextFrag: (formControlElement) => {
+      validationFailure: (formControlElement) => {
         if (
           this.#config.useConstraintAPI &&
           formControlElement in this.#config.formControlText &&
-          "errorBoxText" in this.#config.formControlText[formControlElement] &&
+          "validationFailure" in
+            this.#config.formControlText[formControlElement] &&
           typeof this.#config.formControlText[formControlElement]
             .errorBoxText === "object" &&
           Object.keys(
@@ -521,25 +528,21 @@ export function UserInfoFormModule() {
           //checks for use of the constraint api, the existence of the text properties for the specific form control element,
           //whether the text properties includes error text, and whether their are individual error text properties within the parent property
         ) {
-          const container =
-              this.#validationFailureComponents.container(formControlElement),
-            errorTextElements = [];
+          const errorBox = document.createElement("div");
 
-          for (let uniqueError in this.#config.formControlText[
-            formControlElement
-          ].errorBoxText) {
-            //create each element for every unique error instance
-            const errorTextElement = this.#validationFailureComponents.text(
-              formControlElement,
-              uniqueError
+          errorBox.classList.add(
+            `Form-Control-Error-Box-${formControlElement}`
+          );
+
+          this.#addUniqueIdentifier(errorBox);
+
+          if (this.#elementCache) {
+            this.#elementCache.addElement(
+              `Form-Control-Error-Box-${formControlElement}`
             );
-
-            if (errorTextElement.nodeType === Node.ELEMENT_NODE) {
-              container.append(errorTextElement);
-            }
           }
 
-          return container;
+          return errorBox;
         } else {
           return null;
         }
@@ -594,6 +597,9 @@ export function UserInfoFormModule() {
                   this.#config.uniqueIdentifier
                 }`
               );
+            } else if (attribute === null) {
+              //sets purely inline attributes to the input
+              input.setAttribute(attribute, "");
             }
           }
 
@@ -664,55 +670,6 @@ export function UserInfoFormModule() {
       },
     };
 
-    //for creating the components that make up the validation failure display when using the constraint api
-    #validationFailureComponents = {
-      container: (formControlElement) => {
-        const container = document.createElement("div");
-
-        //general class tag
-        container.classList.add(
-          `Form-Control-Validation-Failure-Text-Container-${formControlElement}`
-        );
-
-        this.#addUniqueIdentifier(container);
-
-        if (this.#elementCache) {
-          this.#elementCache.addElement(
-            `Form-Control-Validation-Failure-Text-Container-${formControlElement}`,
-            container
-          );
-        }
-
-        return container;
-      },
-      text: (formControlElement, uniqueError) => {
-        const errorText = document.createElement("div");
-
-        //general class tag
-        errorText.classList.add(
-          `Form-Control-Error-Text-${formControlElement}`
-        );
-
-        //add the specific error as a separate class tag
-        errorText.classList.add(`${uniqueError}`);
-
-        //adds the text for the corresponding error
-        errorText.innerText =
-          this.#config.formControlText[formControlElement][uniqueError];
-
-        this.#addUniqueIdentifier(errorText);
-
-        if (this.#elementCache) {
-          this.#elementCache.addElement(
-            `Form-Control-Error-Text-${formControlElement}-${uniqueError}`,
-            errorText
-          );
-        }
-
-        return errorText;
-      },
-    };
-
     //every created element will have the defined unique identifier attached to its class
     #addUniqueIdentifier(element) {
       const uniqueIdentifier = this.#config.uniqueIdentifier;
@@ -743,11 +700,6 @@ export function UserInfoFormModule() {
     //in instances such as rendering in options based on the data set being dynamic, such as countries, or card payment
     //types, as well as render in options based on already selected options, such as relevant states to the selected country.
     //This class will use various geocoding API's in order to facilitate this dynamic rendering
-  }
-
-  class AutoFillFields {
-    //will be used to autofill fields if the user allows such, this includes allowing access to ones location,
-    //or allowing browser apis to autofill common form fields etc
   }
 
   class ElementCacheManager {
@@ -799,6 +751,52 @@ export function UserInfoFormModule() {
   class FunctionalityManager {
     //will append all necessary functionality to the created HTML form fragment, including the validation
     //and actual submission logic if necessary
+    constructor(configObj, elementCache) {
+      if (elementCache) {
+        this.#elementCache = elementCache;
+      } else {
+        throw new Error(
+          `FATAL ERROR: within scope of 'constructor' of class instance '${this.constructor.name}' : `
+        );
+      }
+    }
+
+    #applyFunctionality() {
+      //check for all existing form control elements, query for their necesary elements, and then apply them to either the input or submit event listener logic
+    }
+
+    #config = {
+      useConstraintAPI: null,
+      formControlElements: null,
+      formControlAttributes: null,
+      formAttributes: null,
+      functionalityRules: null,
+      thirdPartyApiRules: null,
+    };
+
+    #dataSets = {
+      countries: null,
+      states: null,
+    };
+
+    #elementCache = null;
+
+    #localElementCache = {};
+
+    #findSpecificElements(key) {
+      if (this.#elementCache) {
+        return this.#elementCache.get(key);
+      }
+    }
+
+    #formControlElementFunctionalities = {};
+
+    #constraintApiEntryPoint = {
+      input: () => {},
+      submit: () => {},
+    };
+
+    #thirdPartyApiFunctionality = {};
   }
 
   class Main_UserInfoForm {
@@ -810,16 +808,11 @@ export function UserInfoFormModule() {
       this.#stateData.formFragment = new FormFragmentConstructor(
         this.#stateData.configObj,
         this.#stateData.elementCache
-      ).init(); //creates an entire form using the settings in the stored config
+      ).assembledForm; //creates an entire form using the settings in the stored config
       this.#stateData.functionalityManager = new FunctionalityManager(
         this.#stateData.configObj,
         this.#stateData.elementCache
       ); //applies functionality using the element references stored within the cache
-      this.#stateData.autoFillFields = new AutoFillFields(
-        this.#stateData.configObj,
-        this.#stateData.functionalityManager,
-        this.#stateData.elementCache
-      ); //applies a specific functionality to autofill fields using event listeners from the functionality manager
       this.#stateData.dynamicOptionsManager = new DynamicOptionsManager(
         this.#stateData.configObj,
         this.#stateData.functionalityManager,
@@ -837,8 +830,17 @@ export function UserInfoFormModule() {
     };
 
     init(parentElement) {
-      if (this.#stateData.formFragment.nodeType === Node.ELEMENT_NODE) {
+      if (
+        this.#stateData.formFragment.nodeType === Node.ELEMENT_NODE &&
+        parentElement.nodeType === Node.ELEMENT_NODE
+      ) {
         parentElement.append(this.#stateData.formFragment);
+      } else {
+        throw new Error(
+          `FATAL ERROR: within the scope 'init' of 'Main_UserInfoForm' : could not append form to parent element because either the form fragment received is not an element or the target parent element is not actually and element, received ${
+            this.#stateData.formFragment
+          } as the form element, and ${parentElement} as the target parent element`
+        );
       }
     }
   }
@@ -1521,7 +1523,6 @@ export function UserInfoFormModule() {
       spellcheck: "boolean",
       size: "number",
       tabindex: "number",
-      formnovalidate: null,
       type: ["text", "email", "password", "number", "date"],
       list: "string",
       form: "string",
@@ -1563,6 +1564,7 @@ export function UserInfoFormModule() {
       "aria-label": "string",
       "aria-labelledby": "string",
       "aria-describedby": "string",
+      novalidate: null,
     },
     formControlText: {
       label: "string",
