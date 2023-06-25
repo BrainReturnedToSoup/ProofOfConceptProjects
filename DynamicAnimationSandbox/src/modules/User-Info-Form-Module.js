@@ -208,7 +208,7 @@ export function UserInfoFormModule() {
   class FormFragmentConstructor {
     constructor(configObj, elementCache) {
       //optional, since element caching wouldn't be used in the case of not using the constraint API and third party API's
-      if (elementCache !== undefined) {
+      if (elementCache) {
         this.#elementCache = elementCache;
       }
 
@@ -274,19 +274,23 @@ export function UserInfoFormModule() {
           this.#formControlElementComponents.mainShell(formControlElement),
         label: this.#formControlElementComponents.label(formControlElement),
         input: this.#formControlElementComponents.input(formControlElement),
+        dataList: null,
         instructions:
           this.#formControlElementComponents.instructions(formControlElement),
         errorFrag:
           this.#formControlElementComponents.errorTextFrag(formControlElement),
       };
 
-      if (this.#formControlsWithDataList.includes(formControlElement)) {
-        components["dataList"] =
+      if (
+        this.#config.formAttributes[formControlElement].dataList &&
+        this.#config.formAttributes[formControlElement].dataList === true
+      ) {
+        components.dataList =
           this.#formControlElementComponents.dataList(formControlElement);
       }
 
       for (let component in components) {
-        if (component !== "mainShell" && component !== null) {
+        if (component !== "mainShell" && components[component] !== null) {
           components.mainShell.append(components[component]);
         }
       }
@@ -1509,6 +1513,7 @@ export function UserInfoFormModule() {
       id: "string",
       for: "string",
       title: "string",
+      dataList: "boolean",
     },
     formAttributes: {
       action: "string",
@@ -1636,7 +1641,8 @@ export function UserInfoFormModule() {
 //        spellcheck: "boolean",
 //        size: "number",
 //        tabindex: "number",
-//        formnovalidate: null,               (inline property, doesn't need a value)
+//        formnovalidate: null,          (inline property, doesn't need a value)
+//        dataList: "boolean"
 //        },                                          (used to define specific inline attributes on specific elements, this is for defining say the name for a specific form control input etc)
 //        specificFormControl2: {...properties},      (optional, if not used then default values will be used in place, but an error will throw if you disable default value use and fail to define attribute values)
 //        ...,                                        (can use a mixture of default properties and custom properties if you wanted to this way, custom properties have a higher hierarchy and will be applied over default ones)
