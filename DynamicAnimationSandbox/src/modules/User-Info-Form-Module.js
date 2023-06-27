@@ -306,7 +306,7 @@ export function UserInfoFormModule() {
 
     //for the <form> tag creation
     #buildFormElement() {
-      //<form action="action" method="method" novalidate*></form>
+      //<form class="Form-Element uniqueIdentifier" action="action" method="method"></form>
       const formElement = document.createElement("form"),
         {
           action,
@@ -382,22 +382,16 @@ export function UserInfoFormModule() {
         formElement.setAttribute("novalidate", "");
       }
 
+      if (this.#elementCache) {
+        this.#elementCache.addElement(`Form-Element`, formElement);
+      }
+
       this.#addUniqueIdentifier(formElement);
 
       return formElement;
     }
 
-    //<div class="Form-Control-Container">
-    //  <label></label>
-    //  *<input></input>
-    //  *<div class="Form-Control-Instructions"></div>
-    //  *<div class="Form-Control-Error-Text-Container">
-    //
-    //   </div>
-    //</div>
-
     //methods for creating the corresponding form control element with all of the necessary properties applied to such
-    //these will create entire fragments, and then return the fragments
 
     //contains all of the necessary methods for creating each individual template element to make up a specific input field on the form
     #formControlElementComponents = {
@@ -523,28 +517,28 @@ export function UserInfoFormModule() {
           "validationFailure" in
             this.#config.formControlText[formControlElement] &&
           typeof this.#config.formControlText[formControlElement]
-            .errorBoxText === "object" &&
+            .validationFailure === "object" &&
           Object.keys(
-            this.#config.formControlText[formControlElement].errorBoxText
+            this.#config.formControlText[formControlElement].validationFailure
           ).length > 0
           //checks for use of the constraint api, the existence of the text properties for the specific form control element,
           //whether the text properties includes error text, and whether their are individual error text properties within the parent property
         ) {
-          const errorBox = document.createElement("div");
+          const validationFailure = document.createElement("div");
 
-          errorBox.classList.add(
-            `Form-Control-Error-Box-${formControlElement}`
+          validationFailure.classList.add(
+            `Form-Control-Validation-Failure-${formControlElement}`
           );
 
-          this.#addUniqueIdentifier(errorBox);
+          this.#addUniqueIdentifier(validationFailure);
 
           if (this.#elementCache) {
             this.#elementCache.addElement(
-              `Form-Control-Error-Box-${formControlElement}`
+              `Form-Control-Validation-Failure-${formControlElement}`
             );
           }
 
-          return errorBox;
+          return validationFailure;
         } else {
           return null;
         }
@@ -752,6 +746,17 @@ export function UserInfoFormModule() {
     }
   }
 
+  // general class tags
+  //  form tag: 'Form-Element'
+  //  form control container element "Form-Control-Container-${}"
+  //  form control label element "Form-Control-Label-${}"
+  //  form control instructions element "Form-Control-Instructions-${}"
+  //  form control element "Form-Control-${}"
+  //  form control data list element "Form-Control-Data-List-${}"
+  //  form control validation failure element "Form-Control-Validation-Failure-${}"
+  //
+  //
+
   class FunctionalityManager {
     //will append all necessary functionality to the created HTML form fragment, including the validation
     //and actual submission logic if necessary
@@ -760,17 +765,38 @@ export function UserInfoFormModule() {
         this.#elementCache = elementCache;
       } else {
         throw new Error(
-          `FATAL ERROR: within scope of 'constructor' of class instance '${this.constructor.name}' : `
+          `FATAL ERROR: within scope of 'constructor' of class instance '${this.constructor.name}' : cannot apply functionality to the form created, as there lacks a defined element cache to reference from, Stack Trace: ${error.stack}`
         );
       }
-    }
 
-    #applyFunctionality() {
-      //check for all existing form control elements, query for their necesary elements, and then apply them to either the input or submit event listener logic
+      if ("useConstraintAPI" in configObj) {
+        this.#config.useConstraintAPI = configObj.useConstraintAPI;
+      }
+
+      if ("formControlElements" in configObj && this.#config.useConstraintAPI) {
+        this.#config.formControlElements = configObj.formControlElements;
+      }
+
+      if ("formControlAttributes" in configObj) {
+        this.#config.formControlAttributes = configObj.formControlAttributes;
+      }
+
+      if ("formAttributes" in configObj) {
+        this.#config.formAttributes = configObj.formAttributes;
+      }
+
+      if ("functionalityRules" in configObj) {
+        this.#config.functionalityRules = configObj.functionalityRules;
+      }
+
+      if ("thirdPartyApiRules" in configObj) {
+        this.#config.thirdPartyApiRules = configObj.thirdPartyApiRules;
+      }
+      this.#fetchElementRefs();
     }
 
     #config = {
-      useConstraintAPI: null,
+      useConstraintAPI: true,
       formControlElements: null,
       formControlAttributes: null,
       formAttributes: null,
@@ -778,29 +804,170 @@ export function UserInfoFormModule() {
       thirdPartyApiRules: null,
     };
 
-    #dataSets = {
-      countries: null,
-      states: null,
-    };
-
     #elementCache = null;
 
     #localElementCache = {};
 
-    #findSpecificElements(key) {
-      if (this.#elementCache) {
-        return this.#elementCache.get(key);
+    //fetch the refs for the input, instructions, and validation failure elements for each existing element within formControlElements, and do so using the element cache
+    #fetchElementRefs() {
+      if (Array.isArray(this.#config.formControlElements)) {
+        //for every element that is present, make a local cache for referencing only the necessary elements to facilitate the constraint api validation process
+        for (let element of this.#config.formControlElements) {
+          //retrieves the stored references from the main element cache
+          const retrievedRefs = {
+            input: this.#elementCache.retrieveElement(
+              `Form-Control-${element}`
+            ),
+            instructions: this.#elementCache.retrieveElement(
+              `Form-Control-Instructions-${element}`
+            ),
+            validationFailure: this.#elementCache.retrieveElement(
+              `Form-Control-Instructions-${element}`
+            ),
+            dataList: this.#elementCache.retrieveElement(
+              `Form-Control-Data-List-${element}`
+            ),
+          };
+
+          let existingRefs = {};
+
+          //stores non null values
+          for (let ref in retrievedRefs) {
+            if (retrievedRefs[ref] !== null) {
+              existingRefs[ref] = retrievedRefs[ref];
+            }
+          }
+
+          //only stores the retrieved refs if there are any non null values
+          if (Object.keys(existingRefs) > 0) {
+            this.#localElementCache[element] = existingRefs;
+          } else {
+            throw new Error(
+              `MODERATE ERROR: within scope of '#fetchNeededRefs' of class instance '${this.constructor.name}' : failed to fetch valid references to a corresponding form control element, as they all came back null, meaning the central element cache does not possess any of the important references to the target, received ${element} as the target element, Stack Trace: ${error.stack} `
+            );
+          }
+        }
+      } else {
+        throw new Error(
+          `MODERATE ERROR: within scope '#fetchNeededRefs' of class instance ${
+            this.constructor.name
+          } : value of 'this.#config.formControlElements' could not be used to fetch references since it is an invalid data type, needs to be an array, received ${
+            this.#config.formControlElements
+          }, Stack Trace: ${error.stack}`
+        );
       }
     }
 
-    #formControlElementFunctionalities = {};
+    //will be the method used to add any type of functionality to the event functionality objects, the keys have to be a valid type of form control element, and their function has to take no arguments
+    #addEventFunctionality(eventType, formControlElement, funcKey, func) {
+      const validEventTypes = Object.keys(this.#eventFunctionality);
+      if (
+        validEventTypes.includes(eventType) &&
+        this.#config.formControlElements.includes(formControlElement) &&
+        typeof funcKey === "string" &&
+        typeof func === "function"
+      ) {
+        if (formControlElement in this.#eventFunctionality[eventType]) {
+          if (
+            !this.#eventFunctionality[formControlElement].hasOwnProperty(
+              funcKey
+            )
+          ) {
+            this.#eventFunctionality[eventType][formControlElement][funcKey] =
+              func;
+          } else {
+            throw new Error(
+              `MINOR ERROR: within scope '#addEventFunctionality' of class instance ${this.constructor.name} : attempting to add a specific functionality with a key that matches an already existing property, received ${funcKey} as the received key and ${func} as the associated function that is trying to be added to ${formControlElement} in the event type ${eventType}, Stack Trace: ${error.stack}`
+            );
+          }
+        } else {
+          this.#eventFunctionality[eventType][formControlElement] = {};
+          this.#eventFunctionality[eventType][formControlElement][funcKey] =
+            func;
+        }
+      } else {
+        throw new Error(
+          `MINOR ERROR: within scope '#addEventFunctionality' of class instance '${
+            this.constructor.name
+          }' : failed to add an event functionality, either the event type is not valid, an invalid form control element was used, the value of funcKey is not a string, and the value of func is not a function, or a combination of these requirements, received ${eventType} as the event type, ${this.#config.formControlElements.includes(
+            formControlElement
+          )} as the boolean for the valid form control element check, ${funcKey} as the supplied function key, and ${func} as the supplied function, Stack Trace: ${
+            error.stack
+          }`
+        );
+      }
+    }
 
-    #constraintApiEntryPoint = {
-      input: () => {},
-      submit: () => {},
+    #eventFunctionality = {
+      focus: {},
+      blur: {},
+      input: {},
+      submit: {},
     };
 
-    #thirdPartyApiFunctionality = {};
+    #currentTargets = {
+      focus: null,
+      blur: null,
+      input: null,
+      submit: null,
+    };
+
+    #eventListenerEntryPoint(event, eventType) {
+      const eventData = {
+        validEventTypes: Object.keys(this.#eventFunctionality),
+        targetFormControlElement: this.#detectInput(event.target),
+      };
+
+      //if the event type is valid, and the event target is valid, that being some sort of input
+      if (
+        eventData.validEventTypes.includes(eventType) &&
+        eventData.targetFormControlElement.nodeType === Node.ELEMENT_NODE
+      ) {
+        //find the corresponding form control element based on the target form control received
+
+        for (let formControlElement in this.#eventFunctionality[eventType]) {
+          if (eventData.targetFormControlElement === formControlElement) {
+            //execute every function within the corresponding form control element object that exists within the corresponding event type property
+            const existingFuncs = Object.keys(
+              this.#eventFunctionality[eventType][formControlElement]
+            );
+
+            if (existingFuncs.length > 0) {
+              for (let func in this.#eventFunctionality[eventType][
+                formControlElement
+              ]) {
+                this.#eventFunctionality[eventType][formControlElement][func]();
+              }
+            }
+
+            break;
+          }
+        }
+      } else {
+        throw new Error(
+          `MODERATE ERROR: within scope '#eventListenerEntryPoint' of class instance '${this.constructor.name}' : failed to execute corresponding event functionality, either the supplied event type or the target form control element is invalid, received ${eventType} for the event type and ${eventData.targetFormControlElement} for the target form control element, Stack Trace: ${error.stack}`
+        );
+      }
+    }
+
+    #detectInput(targetElement) {
+      const formControlElementKeys = Object.keys(this.#localElementCache);
+      if (formControlElementKeys.length > 0) {
+        for (let formControlElement in this.#localElementCache) {
+          if (
+            this.#localElementCache[formControlElement].input === targetElement
+          ) {
+            return formControlElement;
+          }
+        }
+
+        return null;
+      } else {
+        throw new Error(
+          `MODERATE ERROR: within scope '#detectInput' of class instance '${this.constructor.name}' : failed to retrieve a corresponding form control element, as there aren't any form control elements to reference from within the local element cache, received ${targetElement} as the target element, Stack Trace: ${error.stack}`
+        );
+      }
+    }
   }
 
   class Main_UserInfoForm {
