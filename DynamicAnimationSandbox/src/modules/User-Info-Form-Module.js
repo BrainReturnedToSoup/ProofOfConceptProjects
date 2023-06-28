@@ -777,41 +777,36 @@ export function UserInfoFormModule() {
         this.#config.formControlElements = configObj.formControlElements;
       }
 
-      if ("formControlAttributes" in configObj) {
-        this.#config.formControlAttributes = configObj.formControlAttributes;
-      }
-
-      if ("formAttributes" in configObj) {
-        this.#config.formAttributes = configObj.formAttributes;
-      }
-
-      if ("functionalityRules" in configObj) {
-        this.#config.functionalityRules = configObj.functionalityRules;
-      }
-
-      if ("thirdPartyApiRules" in configObj) {
-        this.#config.thirdPartyApiRules = configObj.thirdPartyApiRules;
-      }
       this.#fetchElementRefs();
     }
 
+    //configuration data that is pulled from the supplied config object in the constructor in order to determine configurable behaviors within the module
     #config = {
       useConstraintAPI: true,
       formControlElements: null,
-      formControlAttributes: null,
-      formAttributes: null,
-      functionalityRules: null,
-      thirdPartyApiRules: null,
     };
 
+    //will reference an outside element reference cache if defined
     #elementCache = null;
 
+    //will be used to hold only the necessary element references to facilitate the functionality of the form
     #localElementCache = {};
 
     //fetch the refs for the input, instructions, and validation failure elements for each existing element within formControlElements, and do so using the element cache
     #fetchElementRefs() {
       if (Array.isArray(this.#config.formControlElements)) {
         //for every element that is present, make a local cache for referencing only the necessary elements to facilitate the constraint api validation process
+        const formElement = this.#elementCache.retrieveElement(`Form-Element`),
+          existingRefs = {};
+
+        if (formElement === null) {
+          throw new Error(
+            `FATAL ERROR: within scope '#fetchElementRefs' of class instance '${this.constructor.name}' : failed to fetch reference to the form tag from the element reference cache, without this reference event listeners cannot be appended to the form and thus the form will lack some functionality, Stack Trace: ${error.stack}`
+          );
+        } else {
+          existingRefs[`Form-Element`] = formElement;
+        }
+
         for (let element of this.#config.formControlElements) {
           //retrieves the stored references from the main element cache
           const retrievedRefs = {
@@ -822,14 +817,12 @@ export function UserInfoFormModule() {
               `Form-Control-Instructions-${element}`
             ),
             validationFailure: this.#elementCache.retrieveElement(
-              `Form-Control-Instructions-${element}`
+              `Form-Control-Validation-Failure-${element}`
             ),
             dataList: this.#elementCache.retrieveElement(
               `Form-Control-Data-List-${element}`
             ),
           };
-
-          let existingRefs = {};
 
           //stores non null values
           for (let ref in retrievedRefs) {
@@ -838,8 +831,8 @@ export function UserInfoFormModule() {
             }
           }
 
-          //only stores the retrieved refs if there are any non null values
-          if (Object.keys(existingRefs) > 0) {
+          //only stores the retrieved refs if there are any non null values, which existingRefs is an object with key value pairs for specific form control element refs
+          if (Object.keys(existingRefs).length > 0) {
             this.#localElementCache[element] = existingRefs;
           } else {
             throw new Error(
@@ -858,46 +851,120 @@ export function UserInfoFormModule() {
       }
     }
 
-    //will be the method used to add any type of functionality to the event functionality objects, the keys have to be a valid type of form control element, and their function has to take no arguments
-    #addEventFunctionality(eventType, formControlElement, funcKey, func) {
-      const validEventTypes = Object.keys(this.#eventFunctionality);
-      if (
-        validEventTypes.includes(eventType) &&
-        this.#config.formControlElements.includes(formControlElement) &&
-        typeof funcKey === "string" &&
-        typeof func === "function"
-      ) {
-        if (formControlElement in this.#eventFunctionality[eventType]) {
+    //entrypoint to use for adding functions to execute within either a specific form control element within an event type, or all existing form control elements within an event type
+    //all within the eventFunctionality object
+    addEventFunctionality = {
+      specificFCE: (formControlElement, eventType, funcKey, func) => {},
+      allExistingFCEs: (eventType, funcKey, func) => {},
+    };
+
+    //entrypoint to use for removing functions to execute within either a specific form control element within an event type, or all existing form control elements within an event type
+    //all within the eventFunctionality object
+    removeEventFunctionality = {
+      specificFCE: (formControlElement, eventType, funcKey) => {},
+      allExistingFCEs: (eventType, funcKey) => {},
+    };
+
+    //interface to interact with the eventFunctionality object
+    #eventFunctionalityDataManagement = {
+      //creates a new key value pair representing a specific form control element, where the form control element is the key, and an empty object is the value
+      initFormControlKeyValue: (formControlElement, eventType) => {
+        const validEventTypes = Object.keys(this.#eventFunctionality),
+          validFormControlElements = this.#config.formControlElements;
+
+        if (
+          validEventTypes.includes(eventType) &&
+          validFormControlElements.includes(formControlElement)
+        ) {
+          this.#eventFunctionality[eventType][formControlElement] = {};
+        }
+      },
+      //adds a key value pair for a function within the target form control element object that exists within the corresponding event type object
+      addFunctionality: (formControlElement, eventType, funcKey, func) => {
+        const validEventTypes = Object.keys(this.#eventFunctionality),
+          validFormControlElements = this.#config.formControlElements;
+
+        if (
+          validEventTypes.includes(eventType) &&
+          validFormControlElements.includes(formControlElement)
+        ) {
+          //checks for valid event types and form control elements
           if (
-            !this.#eventFunctionality[formControlElement].hasOwnProperty(
-              funcKey
-            )
+            formControlElement in this.#eventFunctionality[eventType] &&
+            typeof this.#eventFunctionality[eventType][formControlElement] ===
+              "object"
           ) {
-            this.#eventFunctionality[eventType][formControlElement][funcKey] =
-              func;
+            //checks for whether the target form control element was initialized within the target event type object
+            const invalidFuncKeys = Object.keys(
+              this.#eventFunctionality[eventType][formControlElement]
+            );
+
+            if (
+              typeof funcKey === "string" &&
+              !invalidFuncKeys.includes(funcKey) &&
+              typeof func === "function"
+            ) {
+              //checks the values of funcKey, making sure it can be used as a key, as well as the value of func making sure that its a function that will be the value in this key value pair
+              //if both are true, add the pair to the corresponding form control element in the specific event type
+              this.#eventFunctionality[eventType][formControlElement][funcKey] =
+                func;
+            } else {
+              throw new Error(
+                `MINOR ERROR: within scope 'addFunctinoality' of class instance '${this.constructor.name}' : failed to add functionality to a specific form control element because the function key supplied is already in use on another function, received ${funcKey} as the function key, Stack Trace: ${error.stack}`
+              );
+            }
           } else {
             throw new Error(
-              `MINOR ERROR: within scope '#addEventFunctionality' of class instance ${this.constructor.name} : attempting to add a specific functionality with a key that matches an already existing property, received ${funcKey} as the received key and ${func} as the associated function that is trying to be added to ${formControlElement} in the event type ${eventType}, Stack Trace: ${error.stack}`
+              `MINOR ERROR: within scope 'addFunctionality' of class instance '${this.constructor.name}' : failed to add functionality to a specific form control element because either the form element was not initialized within the corresponding event type value structure, or the value of the target form control element within event type value structure is not a valid data type, needs to be an object, received ${formControlElement} as the form control element, Stack Trace: ${error.stack}`
             );
           }
         } else {
-          this.#eventFunctionality[eventType][formControlElement] = {};
-          this.#eventFunctionality[eventType][formControlElement][funcKey] =
-            func;
+          throw new Error(
+            `MODERATE ERROR: within scope of 'addFunctionality' of class instance '${this.constructor.name}' : failed to add functionality to a specific form control element within its specific event type, either the event type or the form control element received as arguments are invalid, received ${formControlElement} as the form control element and ${eventType} as the event type, Stack Trace: ${error.stack}`
+          );
         }
-      } else {
-        throw new Error(
-          `MINOR ERROR: within scope '#addEventFunctionality' of class instance '${
-            this.constructor.name
-          }' : failed to add an event functionality, either the event type is not valid, an invalid form control element was used, the value of funcKey is not a string, and the value of func is not a function, or a combination of these requirements, received ${eventType} as the event type, ${this.#config.formControlElements.includes(
-            formControlElement
-          )} as the boolean for the valid form control element check, ${funcKey} as the supplied function key, and ${func} as the supplied function, Stack Trace: ${
-            error.stack
-          }`
-        );
-      }
-    }
+      },
+      //removes a key value pair for a function within the target form control element object that exists within the corresponding event type object
+      removeFunctionality: (formControlElement, eventType, funcKey) => {
+        const validEventTypes = Object.keys(this.#eventFunctionality),
+          validFormControlElements = this.#config.formControlElements;
 
+        if (
+          validEventTypes.includes(eventType) &&
+          validFormControlElements.includes(formControlElement)
+        ) {
+          //checks for valid event type as well as form control element type
+
+          if (formControlElement in this.#eventFunctionality[eventType]) {
+            //if the target form control element has been initialized within a specific event type object
+            if (
+              funcKey in this.#eventFunctionality[eventType][formControlElement]
+            ) {
+              //if the function key within the target form control element within the target event type exists, and if it does, delete the key value pair
+              delete this.#eventFunctionality[eventType][formControlElement][
+                funcKey
+              ];
+            } else {
+              throw new Error(
+                `MINOR ERROR: within scope of 'removeFunctionality' of class instance '${this.constructor.name}' : failed to remove functionality from a specific form control element that exists within a specific event type, because the supplied key for the corresponding function does not exist, received ${funcKey} as the function key within the form control element ${formControlElement} of the event type ${eventType}, Stack Trace: ${error.stack}`
+              );
+            }
+          } else {
+            throw new Error(
+              `MINOR ERROR: within scope of 'removeFunctionality' of class instance '${this.constructor.name}' : failed to remove functionality from a specific form control element that exists within a specific event type, because the form control element key value pair does not exist within the corresponding event type object, received ${formControlElement} as the target form control element for the event type ${eventType}, Stack Trace: ${error.stack} `
+            );
+          }
+        } else {
+          throw new Error(
+            `MODERATE ERROR: within scope of 'removeFunctionality' of class instance '${this.constructor.name}' : failed to remove functionality from a specific form control element within its specific event type, either the event type or the form control element received as arguments are invalid, received ${formControlElement} as the form control element and ${eventType} as the event type, Stack Trace: ${error.stack}`
+          );
+        }
+      },
+    };
+
+    //each key within this object represents a type of event, at which the values of these properties are objects
+    //that will contain key value pairs where the key is a specific form control element, and the value is another
+    //object that itself contains key value pairs to functions to execute on the form control element within that specific event
     #eventFunctionality = {
       focus: {},
       blur: {},
@@ -905,13 +972,79 @@ export function UserInfoFormModule() {
       submit: {},
     };
 
-    #currentTargets = {
-      focus: null,
-      blur: null,
-      input: null,
-      submit: null,
+    //holds valuable information in order to give more tools to supplied event functionalities so they can execute more complex functionalities that need to utilize more than one
+    //event state to do so, also holds information on what event listeners have been initialized and are pulling from the functionality pool
+    #eventStateData = {
+      currentTargets: {
+        focus: null,
+        blur: null,
+        input: null,
+        submit: null,
+      },
+      activeEventListeners: {
+        focus: false,
+        blur: false,
+        input: false,
+        submit: false,
+      },
     };
 
+    //initializes corresponding event listeners based on the type of event they listen for, each instance can only be invoked once
+    //as the functionality of the form depends on event bubbling to execute functionality as opposed to individual event listeners on
+    //every form control element
+    addEventListeners = {
+      focus: () => {
+        if (
+          !this.#eventStateData.activeEventListeners.focus &&
+          "Form-Element" in this.#localElementCache
+        ) {
+          const formElement = this.#localElementCache[`Form-Element`];
+
+          formElement.addEventListener("focus", (e) => {
+            this.#eventListenerEntryPoint(e, "focus");
+          });
+        }
+      },
+      blur: () => {
+        if (
+          !this.#eventStateData.activeEventListeners.blur &&
+          "Form-Element" in this.#localElementCache
+        ) {
+          const formElement = this.#localElementCache[`Form-Element`];
+
+          formElement.addEventListener("blur", (e) => {
+            this.#eventListenerEntryPoint(e, "blur");
+          });
+        }
+      },
+      input: () => {
+        if (
+          !this.#eventStateData.activeEventListeners.input &&
+          "Form-Element" in this.#localElementCache
+        ) {
+          const formElement = this.#localElementCache[`Form-Element`];
+
+          formElement.addEventListener("input", (e) => {
+            this.#eventListenerEntryPoint(e, "input");
+          });
+        }
+      },
+      submit: () => {
+        if (
+          !this.#eventStateData.activeEventListeners.submit &&
+          "Form-Element" in this.#localElementCache
+        ) {
+          const formElement = this.#localElementCache[`Form-Element`];
+
+          formElement.addEventListener("submit", (e) => {
+            this.#eventListenerEntryPoint(e, "submit");
+          });
+        }
+      },
+    };
+
+    //acts as the generic event listener entry point in order to execute the corresponding functionality based on the
+    //type of event
     #eventListenerEntryPoint(event, eventType) {
       const eventData = {
         validEventTypes: Object.keys(this.#eventFunctionality),
@@ -933,10 +1066,12 @@ export function UserInfoFormModule() {
             );
 
             if (existingFuncs.length > 0) {
-              for (let func in this.#eventFunctionality[eventType][
+              for (let funcKey in this.#eventFunctionality[eventType][
                 formControlElement
               ]) {
-                this.#eventFunctionality[eventType][formControlElement][func]();
+                this.#eventFunctionality[eventType][formControlElement][
+                  funcKey
+                ](event);
               }
             }
 
@@ -950,6 +1085,7 @@ export function UserInfoFormModule() {
       }
     }
 
+    //used to find the corresponding form control element based on the event target, which the event target has to be an actual input element
     #detectInput(targetElement) {
       const formControlElementKeys = Object.keys(this.#localElementCache);
       if (formControlElementKeys.length > 0) {
