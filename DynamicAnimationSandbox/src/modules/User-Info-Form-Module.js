@@ -1,211 +1,303 @@
 import { config } from "webpack";
 
 export function UserInfoFormModule() {
-  const defaultValues = {
-    formControlText: {
-      email: {
-        labelText: "Email",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered not a valid email address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid email address",
+  const moduleData = {
+    defaultValues: {
+      formControlText: {
+        email: {
+          labelText: "Email",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered not a valid email address",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort:
+              "Value entered fails to meet minimum character count required",
+            valueMissing: "Please enter a valid email address",
+          },
         },
-      },
 
-      confirmEmail: {
-        labelText: "Confirm Email",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch:
-            "Value entered does not match the previous email address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter the same email address",
+        confirmEmail: {
+          labelText: "Confirm Email",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch:
+              "Value entered does not match the previous email address",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort:
+              "Value entered fails to meet minimum character count required",
+            valueMissing: "Please enter the same email address",
+          },
         },
-      },
 
-      address: {
-        labelText: "Address",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid street address",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid street address",
+        address: {
+          labelText: "Address",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid street address",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort:
+              "Value entered fails to meet minimum character count required",
+            valueMissing: "Please enter a valid street address",
+          },
         },
-      },
 
-      stateOrProvince: {
-        labelText: "State/Province",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid state or province",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid state or province",
+        stateOrProvince: {
+          labelText: "State/Province",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid state or province",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort:
+              "Value entered fails to meet minimum character count required",
+            valueMissing: "Please enter a valid state or province",
+          },
         },
-      },
 
-      country: {
-        labelText: "Country",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid country",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid country",
+        country: {
+          labelText: "Country",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid country",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort:
+              "Value entered fails to meet minimum character count required",
+            valueMissing: "Please enter a valid country",
+          },
         },
-      },
 
-      postalCode: {
-        labelText: "Postal Code",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid postal code",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort:
-            "Value entered fails to meet minimum character count required",
-          valueMissing: "Please enter a valid postal code",
+        postalCode: {
+          labelText: "Postal Code",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid postal code",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort:
+              "Value entered fails to meet minimum character count required",
+            valueMissing: "Please enter a valid postal code",
+          },
         },
-      },
 
-      password: {
-        labelText: "Password",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid password",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid password",
+        password: {
+          labelText: "Password",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid password",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid password",
+          },
         },
-      },
 
-      confirmPassword: {
-        labelText: "Confirm Password",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered not equal to password",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter the same password",
+        confirmPassword: {
+          labelText: "Confirm Password",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered not equal to password",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter the same password",
+          },
         },
-      },
 
-      dateOfBirth: {
-        labelText: "Date Of Birth",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid birth date",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid birth date",
+        dateOfBirth: {
+          labelText: "Date Of Birth",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid birth date",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid birth date",
+          },
         },
-      },
 
-      phoneNumber: {
-        labelText: "Phone Number",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid phone number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid phone number",
+        phoneNumber: {
+          labelText: "Phone Number",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid phone number",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid phone number",
+          },
         },
-      },
 
-      creditCardType: {
-        labelText: "",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid card type",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid card type",
+        creditCardType: {
+          labelText: "",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid card type",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid card type",
+          },
         },
-      },
 
-      creditCardNumber: {
-        labelText: "Card Number",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid credit card number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid credit card number",
+        creditCardNumber: {
+          labelText: "Card Number",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid credit card number",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid credit card number",
+          },
         },
-      },
 
-      creditCardExpDate: {
-        labelText: "Expiration Date",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid expiration date",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid expiration date",
+        creditCardExpDate: {
+          labelText: "Expiration Date",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid expiration date",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid expiration date",
+          },
         },
-      },
 
-      creditCardSecurityNumber: {
-        labelText: "CVV",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid security number",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid security number",
+        creditCardSecurityNumber: {
+          labelText: "CVV",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid security number",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid security number",
+          },
         },
-      },
 
-      subjectLine: {
-        labelText: "Subject",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid subject line",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter a valid subject line",
+        subjectLine: {
+          labelText: "Subject",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch: "Value entered is not a valid subject line",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter a valid subject line",
+          },
         },
-      },
 
-      textBox: {
-        labelText: "",
-        instructionsText: "",
-        errorBoxText: {
-          patternMismatch: "Value entered is not a valid within this text box",
-          tooLong: "Value entered exceeds the maximum character count",
-          tooShort: "Value entered fails to meet minimum character count",
-          valueMissing: "Please enter valid information within this text box",
+        textBox: {
+          labelText: "",
+          instructionsText: "",
+          errorBoxText: {
+            patternMismatch:
+              "Value entered is not a valid within this text box",
+            tooLong: "Value entered exceeds the maximum character count",
+            tooShort: "Value entered fails to meet minimum character count",
+            valueMissing: "Please enter valid information within this text box",
+          },
         },
       },
+      formControlAttributes: {},
+      formControlElements: [],
+      functionalityRules: {},
+      thirdPartyApiRules: {},
     },
-    formControlAttributes: {},
-    formControlElements: [],
-    functionalityRules: {},
-    thirdPartyApiRules: {},
+
+    formTemplates: {
+      newAccountBasic: {},
+      newAccountFull: {},
+      paymentBasic: {},
+      paymentFull: {},
+      login: {},
+      passwordReset: {},
+      subscriptionBasic: {},
+      contactBasic: {},
+    },
+    uniqueInstances: [],
   };
 
-  const formTemplates = {
-    newAccountBasic: {},
-    newAccountFull: {},
-    paymentBasic: {},
-    paymentFull: {},
-    login: {},
-    passwordReset: {},
-    subscriptionBasic: {},
-    contactBasic: {},
-  };
+  class Main_UserInfoForm {
+    //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
+    //the form and handle certain state data attached to such
+    constructor(configObj) {
+      this.#stateData.configObj = new CreateFinalConfig(configObj); //creates final config
+      this.#stateData.elementCache = new ElementCacheManager(); //maps out all of the element references within the form created
+      this.#stateData.formFragment = new FormFragmentConstructor(
+        this.#stateData.configObj,
+        this.#stateData.elementCache
+      ).assembledForm; //creates an entire form using the settings in the stored config
+      this.#stateData.functionalityManager = new FunctionalityManager(
+        this.#stateData.configObj,
+        this.#stateData.elementCache
+      ); //applies functionality using the element references stored within the cache
+      this.#stateData.dynamicOptionsManager = new DynamicOptionsManager(
+        this.#stateData.configObj,
+        this.#stateData.functionalityManager,
+        this.#stateData.elementCache
+      ); //applies a specific functionality to auto generate options using event listeners from the functionality manager in conjunction with the element references stored
+    }
 
-  function addPreset(presetsObj) {}
+    #stateData = {
+      configObj: null,
+      formFragment: null,
+      elementCache: null,
+      functionalityManager: null,
+      autoFillFields: null,
+      dynamicOptionsManager: null,
+    };
 
-  const uniqueInstances = [];
+    init(parentElement) {
+      if (
+        this.#stateData.formFragment.nodeType === Node.ELEMENT_NODE &&
+        parentElement.nodeType === Node.ELEMENT_NODE
+      ) {
+        parentElement.append(this.#stateData.formFragment);
+      } else {
+        throw new Error(
+          `FATAL ERROR: within the scope 'init' of 'Main_UserInfoForm' : could not append form to parent element because either the form fragment received is not an element or the target parent element is not actually and element, received ${
+            this.#stateData.formFragment
+          } as the form element, and ${parentElement} as the target parent element`
+        );
+      }
+    }
+  }
+
+  class ElementCacheManager {
+    #refsCache = new Map();
+    //will be used to manage all element references created in the form instance, this way it makes it easier to target specific elements based
+    //on the situation automatically, also it prevents multiple queries of the same elements.
+    //Thinking about adding an API that allows this class to emit all of it's references to a global DOM refs cache.
+    addElement(key, element) {
+      //has to be an element of course
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        if (!this.#refsCache.has(key)) {
+          this.#refsCache.set(key, element);
+        } else if (this.#refsCache.has(key)) {
+          //if the corresponding key already has been used, meaning a specific element has already been stored within the map, it wouldn't make sense to redeclare the key to different vale
+          if (this.#refsCache.get(key) !== element) {
+            throw new Error(
+              `MODERATE ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' : element reference with the same key already exists within the cache manager, received ${key} as the supplied key to add, Stack Trace: ${error.stack}`
+            );
+          }
+        }
+      } else {
+        throw new Error(
+          `MINOR ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' : failed to add reference to element cache manager, value is not an element, received ${element} as the supplied element, received ${key}, as the supplied key as well, Stack Trace: ${error.stack}`
+        );
+      }
+    }
+
+    removeElement(key) {
+      if (!this.#refsCache.has(key)) {
+        this.#refsCache.delete(key);
+        return `DELETED`;
+      } else {
+        throw new Error(
+          `MODERATE ERROR: within the scope 'removeElement' of class instance '${this.constructor.name}' : failed to remove a target key value pair because the key supplied does not exist within the map, received ${key}, Stack Trace: ${error.stack}`
+        );
+      }
+    }
+
+    retrieveElement(key) {
+      if (!this.#refsCache.has(key)) {
+        const element = this.#refsCache.get(key);
+        return element;
+      } else {
+        return null;
+      }
+    }
+  }
 
   class FormFragmentConstructor {
     constructor(configObj, elementCache) {
@@ -692,72 +784,14 @@ export function UserInfoFormModule() {
     }
   }
 
-  class DynamicOptionsManager {
-    //a mixture between the form fragment constructor and the main functionality manager as it will
-    //create and render specific input elements such as options for data lists dynamically, this will be used
-    //in instances such as rendering in options based on the data set being dynamic, such as countries, or card payment
-    //types, as well as render in options based on already selected options, such as relevant states to the selected country.
-    //This class will use various geocoding API's in order to facilitate this dynamic rendering
-  }
-
-  class ElementCacheManager {
-    #refsCache = new Map();
-    //will be used to manage all element references created in the form instance, this way it makes it easier to target specific elements based
-    //on the situation automatically, also it prevents multiple queries of the same elements.
-    //Thinking about adding an API that allows this class to emit all of it's references to a global DOM refs cache.
-    addElement(key, element) {
-      //has to be an element of course
-      if (element.nodeType === Node.ELEMENT_NODE) {
-        if (!this.#refsCache.has(key)) {
-          this.#refsCache.set(key, element);
-        } else if (this.#refsCache.has(key)) {
-          //if the corresponding key already has been used, meaning a specific element has already been stored within the map, it wouldn't make sense to redeclare the key to different vale
-          if (this.#refsCache.get(key) !== element) {
-            throw new Error(
-              `MODERATE ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' : element reference with the same key already exists within the cache manager, received ${key} as the supplied key to add, Stack Trace: ${error.stack}`
-            );
-          }
-        }
-      } else {
-        throw new Error(
-          `MINOR ERROR: within the scope 'addElement' of class instance '${this.constructor.name}' : failed to add reference to element cache manager, value is not an element, received ${element} as the supplied element, received ${key}, as the supplied key as well, Stack Trace: ${error.stack}`
-        );
-      }
-    }
-
-    removeElement(key) {
-      if (!this.#refsCache.has(key)) {
-        this.#refsCache.delete(key);
-        return `DELETED`;
-      } else {
-        throw new Error(
-          `MODERATE ERROR: within the scope 'removeElement' of class instance '${this.constructor.name}' : failed to remove a target key value pair because the key supplied does not exist within the map, received ${key}, Stack Trace: ${error.stack}`
-        );
-      }
-    }
-
-    retrieveElement(key) {
-      if (!this.#refsCache.has(key)) {
-        const element = this.#refsCache.get(key);
-        return element;
-      } else {
-        return null;
-      }
-    }
-  }
-
-  // general class tags
-  //  form tag: 'Form-Element'
-  //  form control container element "Form-Control-Container-${}"
-  //  form control label element "Form-Control-Label-${}"
-  //  form control instructions element "Form-Control-Instructions-${}"
-  //  form control element "Form-Control-${}"
-  //  form control data list element "Form-Control-Data-List-${}"
-  //  form control validation failure element "Form-Control-Validation-Failure-${}"
-  //
-  //
-
   class FunctionalityManager {
+    //to add a functionality to the functionality event class, refer to the apis 'addEventFunctionality' and 'removeEventFunctionality' in order to add and subtract specific functions to execute corresponding
+    //to the event type and the corresponding form control element, or perhaps all existing form control element references within a specific event type.
+    //You can also add and remove specific type of event listeners using the 'addEventListeners' and 'removeEventListeners' apis based on the specific needs.
+    //The class manages various important state data points in order to give the most flexibility when it comes to implementing a desired functionality, especially if
+    //said functionality depends on multiple types of events combined.
+    //One thing to note, the functions that are added through the api have to accept only an event as its only parameter in order to use this class correctly
+
     //will append all necessary functionality to the created HTML form fragment, including the validation
     //and actual submission logic if necessary
     constructor(configObj, elementCacheClass) {
@@ -1253,54 +1287,12 @@ export function UserInfoFormModule() {
     }
   }
 
-  //to add a functionality to the functionality event class, refer to the apis 'addEventFunctionality' and 'removeEventFunctionality' in order to add and subtract specific functions to execute corresponding
-  //to the event type and the corresponding form control element, or perhaps all existing form control element references within a specific event type.
-  //
-
-  class Main_UserInfoForm {
-    //will incorporate all of the other class intances, as this class will act as the main hub that encompasses all of the functionality of
-    //the form and handle certain state data attached to such
-    constructor(configObj) {
-      this.#stateData.configObj = new CreateFinalConfig(configObj); //creates final config
-      this.#stateData.elementCache = new ElementCacheManager(); //maps out all of the element references within the form created
-      this.#stateData.formFragment = new FormFragmentConstructor(
-        this.#stateData.configObj,
-        this.#stateData.elementCache
-      ).assembledForm; //creates an entire form using the settings in the stored config
-      this.#stateData.functionalityManager = new FunctionalityManager(
-        this.#stateData.configObj,
-        this.#stateData.elementCache
-      ); //applies functionality using the element references stored within the cache
-      this.#stateData.dynamicOptionsManager = new DynamicOptionsManager(
-        this.#stateData.configObj,
-        this.#stateData.functionalityManager,
-        this.#stateData.elementCache
-      ); //applies a specific functionality to auto generate options using event listeners from the functionality manager in conjunction with the element references stored
-    }
-
-    #stateData = {
-      configObj: null,
-      formFragment: null,
-      elementCache: null,
-      functionalityManager: null,
-      autoFillFields: null,
-      dynamicOptionsManager: null,
-    };
-
-    init(parentElement) {
-      if (
-        this.#stateData.formFragment.nodeType === Node.ELEMENT_NODE &&
-        parentElement.nodeType === Node.ELEMENT_NODE
-      ) {
-        parentElement.append(this.#stateData.formFragment);
-      } else {
-        throw new Error(
-          `FATAL ERROR: within the scope 'init' of 'Main_UserInfoForm' : could not append form to parent element because either the form fragment received is not an element or the target parent element is not actually and element, received ${
-            this.#stateData.formFragment
-          } as the form element, and ${parentElement} as the target parent element`
-        );
-      }
-    }
+  class DynamicOptionsManager {
+    //a mixture between the form fragment constructor and the main functionality manager as it will
+    //create and render specific input elements such as options for data lists dynamically, this will be used
+    //in instances such as rendering in options based on the data set being dynamic, such as countries, or card payment
+    //types, as well as render in options based on already selected options, such as relevant states to the selected country.
+    //This class will use various geocoding API's in order to facilitate this dynamic rendering
   }
 
   class CreateFinalConfig {
@@ -2076,7 +2068,7 @@ export function UserInfoFormModule() {
     return allErrors;
   }
 
-  //check if the target data is in the correct format and a usable value
+  function addPreset(presetsObj) {}
 
   function newClassInstance(config) {
     //received the array that may have a single error as a string per element
