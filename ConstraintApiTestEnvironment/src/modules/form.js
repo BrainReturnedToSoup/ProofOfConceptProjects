@@ -205,6 +205,8 @@ export class Form {
     },
   };
 
+  //holds data that is generated dynamically, based mainly on the form control element array
+  //supplied to the init method
   #stateData = {
     elementRefs: {},
     formControlElements: null,
