@@ -11,7 +11,7 @@ class FormValidator {
       this.#configData.formControlElementArr = formControlElementArr;
     } else {
       throw new Error(
-        `ERROR: FAILED TO INITIALIZE FORM VALIDATION ON TARGET FOR : EITHER OF THE RECEIVED ARGUMENTS ARE INVALID : 'formControlElementArr' MUST BE AN ARRAY WITH ELEMENTS AND 'elementRefManager' MUST BE AN INSTANCE OF THE CLASS 'ElementRefManager' : RECEIVED ${formControlElementArr} AND ${elementRefManager} : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO INITIALIZE FORM VALIDATION ON TARGET FOR : EITHER OF THE RECEIVED ARGUMENTS ARE INVALID : 'formControlElementArr' MUST BE AN ARRAY WITH ELEMENTS AND 'elementRefManager' MUST BE AN INSTANCE OF THE CLASS 'ElementRefManager' : RECEIVED ${formControlElementArr} AND ${elementRefManager}`
       );
     }
   }
@@ -37,10 +37,27 @@ class FormValidator {
   //holds the text data relating to a specific validation failure based on the corresponding form control element, which will
   //be used mainly by the check validity method in order to facilitate the basic validity check using the constraint api
   #validationFailureText = {
-    email: {},
-    zipCode: {},
-    password: {},
-    confirmPassword: {},
+    email: {
+      valueMissing: "Please enter a valid email address.",
+      typeMismatch:
+        "The supplied information for this field is not a valid email address.",
+    },
+    zipCode: {
+      valueMissing: "Please enter a valid ZIP Code.",
+      patternMismatch:
+        "The supplied information for this field is not a valid ZIP Code.",
+      tooLong:
+        "The supplied information for this field is not a valid ZIP Code.",
+      tooShort:
+        "The supplied information for this field is not a valid ZIP Code.",
+    },
+    password: {
+      valueMissing: "Please enter your password.",
+    },
+    confirmPassword: {
+      valueMissing: "Please repeat your password.",
+      customError: "These passwords do not match.",
+    },
   };
 
   #fetchRequiredElementRefs() {
@@ -67,7 +84,23 @@ class FormValidator {
   #eventFunctionalities = {
     input: {
       email: () => {
+        //checks for the existence of the retrieved property, if the property was retrieved,
+        //the associated functionality can commence
         if ("email" in this.#refData.retrievedElementRefs) {
+          const emailInput =
+              this.#refData.retrievedElementRefs.email.querySelector("input"),
+            validationFailureTextElement = emailInput.nextElementSibling;
+
+          //display the validation failure message or delete all of the text if the input passed
+          if (emailInput.validity.valid === false) {
+            const validationFailureMessage = this.#getValidationFailureMessage(
+              "email",
+              emailInput.validity
+            );
+            validationFailureTextElement.textContent = validationFailureMessage;
+          } else {
+            validationFailureTextElement.textContent = "";
+          }
         }
       },
       zipCode: () => {
@@ -165,8 +198,7 @@ class FormValidator {
           //the corresponding message due to this specific failure. Otherwise pass the confirm password
           //field if it's the same value as the password field
           if (confirmPasswordInput.value !== passwordInput.value) {
-            confirmPasswordInput.validity.valid = false;
-
+            confirmPasswordInput.setCustomValidity();
             const validationFailureMessage = this.#getValidationFailureMessage(
               "confirmPassword",
               confirmPasswordInput.validity
@@ -174,9 +206,27 @@ class FormValidator {
 
             validationFailureTextElement.textContent = validationFailureMessage;
           } else {
-            confirmPasswordInput.validity.valid = true;
-
             validationFailureTextElement.textContent = "";
+          }
+        }
+      },
+    },
+    submit: {
+      checkFormValidity: (event) => {
+        //do one last check on the validity of individual input fields
+        for (let functionality of Object.values(
+          this.#eventFunctionalities.input
+        )) {
+          functionality();
+        }
+
+        //if a specific form control element fails to be valid, prevent the submission of the form
+        for (let formControlElement of Object.values(
+          this.#refData.retrievedElementRefs
+        )) {
+          const inputElement = formControlElement.querySelector("input");
+          if (!inputElement.checkValidity()) {
+            event.preventDefault();
           }
         }
       },
@@ -185,14 +235,8 @@ class FormValidator {
 
   #eventListenersInitializers = {
     input: (targetElement) => {
-      //check that the target is an element t least, the functionality
-      //method key is a string, and that it is an existing property
-      //within the functionality object
-      if (
-        targetElement instanceof Element &&
-        typeof functionalityMethodKey === "string" &&
-        functionalityMethodKey in this.#constraintApi.functionality
-      ) {
+      //check that the argument supplied is an element to append the event listener to
+      if (targetElement instanceof Element) {
         //append the event listener to the target that will read for input events
         targetElement.addEventListener(
           "input",
@@ -200,14 +244,24 @@ class FormValidator {
         );
       } else {
         throw new Error(
-          `ERROR: FAILED TO APPEND INPUT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement} : Stack Trace: ${error.stack}`
+          `ERROR: FAILED TO APPEND INPUT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement}`
         );
       }
     },
-    submit: (targetElement) => {},
+    submit: (targetElement) => {
+      if (targetElement instanceof Element) {
+        targetElement.addEventListener("submit", (e) => {
+          this.#executeEventFunctionality("submit", e);
+        });
+      } else {
+        throw new Error(
+          `ERROR: FAILED TO APPEND SUBMIT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement}`
+        );
+      }
+    },
   };
 
-  #executeEventFunctionality(eventType) {
+  #executeEventFunctionality(eventType, event) {
     const functionalities = this.#eventFunctionalities;
 
     if (
@@ -215,21 +269,69 @@ class FormValidator {
       Object.values(functionalities).length > 0
       //check for existing properties and methods before attempting to execute anything
     ) {
-      //execute all methods found within the corresponding event type functionality
-      for (let formControlMethod of functionalities[eventType]) {
-        formControlMethod();
+      //check if the event was supplied and execute the methods with the event supplied as the arg,
+      //otherwise just execute the methods
+      if (event) {
+        //execute all methods found within the corresponding event type functionality
+        for (let formControlMethod of Object.values(
+          functionalities.eventType
+        )) {
+          formControlMethod(event);
+        }
+      } else {
+        //execute all methods found within the corresponding event type functionality
+        for (let formControlMethod of Object.values(
+          functionalities.eventType
+        )) {
+          formControlMethod();
+        }
       }
     } else {
       throw new Error(
-        `ERROR: FAILED TO EXECUTE ALL FUNCTIONALITY ASSOCIATED WITH THE SUPPLIED EVENT TYPE : VALUE SUPPLIED FOR THE EVENT TYPE DOES NOT EXIST WITHIN THE FUNCTIONALITY OBJECT : RECEIVED ${eventType} : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO EXECUTE ALL FUNCTIONALITY ASSOCIATED WITH THE SUPPLIED EVENT TYPE : VALUE SUPPLIED FOR THE EVENT TYPE DOES NOT EXIST WITHIN THE FUNCTIONALITY OBJECT : RECEIVED ${eventType}`
       );
     }
   }
 
   #getValidationFailureMessage(formControlElementString, validityStateObj) {
-    //takes the form control element string as the corresponding identifier, and then reads the properties that
-    //caused the validation of a specific input element to fail, and then return the corresponding text
-    //that represents the specific failure
+    //checks for the existence of the corresponding form control element within validationFailureText,
+    //as well as whether validityStateObj is in fact an object
+    //Then it checks all properties within the validityStateObj and checks for any true boolean value on
+    //the various validation failure properties, if this happens, return the corresponding text to represent
+    //the validation failure message to the user
+    if (
+      formControlElementString in this.#validationFailureText &&
+      typeof validityStateObj === "object"
+    ) {
+      switch (true) {
+        case validityStateObj.valueMissing:
+          return this.#validationFailureText[formControlElementString]
+            .valueMissing;
+        case validityStateObj.typeMismatch:
+          return this.#validationFailureText[formControlElementString]
+            .typeMismatch;
+        case validityStateObj.patternMismatch:
+          return this.#validationFailureText[formControlElementString]
+            .patternMismatch;
+        case validityStateObj.tooLong:
+          return this.#validationFailureText[formControlElementString].tooLong;
+        case validityStateObj.tooShort:
+          return this.#validationFailureText[formControlElementString].tooShort;
+        case validityStateObj.rangeOverflow:
+          return this.#validationFailureText[formControlElementString]
+            .rangeOverflow;
+        case validityStateObj.stepMismatch:
+          return this.#validationFailureText[formControlElementString]
+            .stepMismatch;
+        case validityStateObj.customError:
+          return this.#validationFailureText[formControlElementString]
+            .customError;
+      }
+    } else {
+      throw new Error(
+        `ERROR: FAILED TO RETRIEVE VALIDATION FAILURE MESSAGE DATA FOR THE CORRESPONDING : TARGET FORM CONTROL ELEMENT DOES NOT EXIST WITHIN THE '#validationFailureText' OBJECT : RECEIVED ${formControlElementString}`
+      );
+    }
   }
 
   init() {
@@ -238,6 +340,9 @@ class FormValidator {
     //initialize the event listener that is already configured to the necessary functionality for input events in the context of the form, and append it to the form tag itself,
     //this way the event functionality uses event bubbling to facilitate the functionality attached to the specific event type.
     this.#eventListenersInitializers.input(
+      this.#refData.retrievedElementRefs["formElement"]
+    );
+    this.#eventListenersInitializers.submit(
       this.#refData.retrievedElementRefs["formElement"]
     );
   }
@@ -258,7 +363,7 @@ class ElementRefManager {
       this.#refCache.set(key, element);
     } else {
       throw new Error(
-        `ERROR: FAILED TO ADD KEY VALUE PAIR FOR AN ELEMENT REFERENCE TO REFERENCE CACHE : ARGUMENTS FAILED TO MEET REQUIREMENTS TO BE VALID : RECEIVED ${key} AS THE KEY AND ${element} AS THE ELEMENT : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO ADD KEY VALUE PAIR FOR AN ELEMENT REFERENCE TO REFERENCE CACHE : ARGUMENTS FAILED TO MEET REQUIREMENTS TO BE VALID : RECEIVED ${key} AS THE KEY AND ${element} AS THE ELEMENT`
       );
     }
   }
@@ -269,7 +374,7 @@ class ElementRefManager {
       this.#refCache.delete(key);
     } else {
       throw new Error(
-        `ERROR: FAILED TO DELETE KEY VALUE PAIR FOR AN ELEMENT REFERENCE IN REFERENCE CACHE : TARGET KEY DOES NOT EXIST : RECEIVED ${key} : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO DELETE KEY VALUE PAIR FOR AN ELEMENT REFERENCE IN REFERENCE CACHE : TARGET KEY DOES NOT EXIST : RECEIVED ${key}`
       );
     }
   }
@@ -302,7 +407,7 @@ class FormConstructor {
       this.#configData.formControlElementArr = formControlElementArr;
     } else {
       throw new Error(
-        `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'formControlElementArr' MUST BE AN ARRAY AND CONTAIN ELEMENTS : RECEIVED ${formControlElementArr} : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'formControlElementArr' MUST BE AN ARRAY AND CONTAIN ELEMENTS : RECEIVED ${formControlElementArr}`
       );
     }
 
@@ -310,7 +415,7 @@ class FormConstructor {
       this.#configData.action = action;
     } else {
       throw new Error(
-        `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'action' MUST BE A STRING : RECEIVED ${action} : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'action' MUST BE A STRING : RECEIVED ${action}`
       );
     }
 
@@ -318,7 +423,7 @@ class FormConstructor {
       this.#configData.method = method;
     } else {
       throw new Error(
-        `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'method' MUST BE A STRING : RECEIVED ${method} : Stack Trace: ${error.stack}`
+        `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'method' MUST BE A STRING : RECEIVED ${method}`
       );
     }
   }
@@ -343,28 +448,28 @@ class FormConstructor {
     email: `
     <div class="email-input-container">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email">
+        <input type="email" id="email" name="email" required>
         <div class="email-validation-failure"></div>
     </div>
     `,
     zipCode: `
     <div class="zipcode-input-container">
-        <label for="email">Zip Code</label>
-        <input type="text" id="zipcode" name="zipcode" pattern="[0-9]{5}">
+        <label for="email">ZIP Code</label>
+        <input type="text" id="zipcode" name="zipcode" pattern="[0-9]{5}" inputmode="numeric" maxlength="5" required>
         <div class="zipcode-validation-failure"></div>
     </div>
     `,
     password: ` 
     <div class="password-input-container">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password">
+        <input type="password" id="password" name="password" required>
         <div class="password-validation-failure"></div>
     </div>
     `,
     confirmPassword: `
     <div class="confirm-password-input-container">
         <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirmPassword" disabled="true">
+        <input type="password" id="confirm-password" name="confirmPassword" disabled="true" required>
         <div class="confirm-password-validation-failure"></div>
     </div>
     `,
@@ -425,7 +530,7 @@ class FormConstructor {
         return containerRef;
       } else {
         throw new Error(
-          `ERROR: COULD NOT CONSTRUCT FORM CONTROL ELEMENT : SUPPLIED FORM CONTROL ELEMENT NOT FOUND WITHIN TEMPLATE DATA : RECEIVED ${formControlElement} : Stack Trace: ${error.stack}`
+          `ERROR: COULD NOT CONSTRUCT FORM CONTROL ELEMENT : SUPPLIED FORM CONTROL ELEMENT NOT FOUND WITHIN TEMPLATE DATA : RECEIVED ${formControlElement}`
         );
       }
     },
@@ -506,7 +611,7 @@ export class Form {
       parentElement.append(formElement); //append the form to a target parent element
     } else {
       throw new Error(
-        `ERROR: COULD NOT APPEND FORM TO TARGET ELEMENT : VALUE SUPPLIED AS THE PARENT ELEMENT IS NOT AN ELEMENT : RECEIVED ${parentElement} : Stack Trace: ${error.stack}`
+        `ERROR: COULD NOT APPEND FORM TO TARGET ELEMENT : VALUE SUPPLIED AS THE PARENT ELEMENT IS NOT AN ELEMENT : RECEIVED ${parentElement}`
       );
     }
   }
