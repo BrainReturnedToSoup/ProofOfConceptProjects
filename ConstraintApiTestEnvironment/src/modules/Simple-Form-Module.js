@@ -46,13 +46,11 @@ class FormValidator {
       valueMissing: "Please enter a valid ZIP Code.",
       patternMismatch:
         "The supplied information for this field is not a valid ZIP Code.",
-      tooLong:
-        "The supplied information for this field is not a valid ZIP Code.",
-      tooShort:
-        "The supplied information for this field is not a valid ZIP Code.",
     },
     password: {
       valueMissing: "Please enter your password.",
+      patternMismatch:
+        "The supplied information for this field is not a valid password.",
     },
     confirmPassword: {
       valueMissing: "Please repeat your password.",
@@ -321,9 +319,6 @@ class FormValidator {
         case validityStateObj.typeMismatch:
           return this.#validationFailureText[formControlElementString]
             .typeMismatch;
-        case validityStateObj.patternMismatch:
-          return this.#validationFailureText[formControlElementString]
-            .patternMismatch;
         case validityStateObj.tooLong:
           return this.#validationFailureText[formControlElementString].tooLong;
         case validityStateObj.tooShort:
@@ -334,6 +329,9 @@ class FormValidator {
         case validityStateObj.stepMismatch:
           return this.#validationFailureText[formControlElementString]
             .stepMismatch;
+        case validityStateObj.patternMismatch:
+          return this.#validationFailureText[formControlElementString]
+            .patternMismatch;
         case validityStateObj.customError:
           return this.#validationFailureText[formControlElementString]
             .customError;
@@ -478,21 +476,21 @@ class FormConstructor {
     zipCode: `
     <div class="zipcode-input-container">
         <label for="zipcode">ZIP Code</label>
-        <input type="text" id="zipcode" name="zipcode" pattern="[0-9]{5}" inputmode="numeric" maxlength="5" required>
+        <input type="text" id="zipcode" name="zipcode" pattern="[0-9]{5}" inputmode="numeric" minlength="5" maxlength="5" required>
         <div class="zipcode-validation-failure"></div>
     </div>
     `,
     password: ` 
     <div class="password-input-container">
         <label for="password">Password</label>
-        <input type="password" id="password" name="password" required>
+        <input type="password" id="password" name="password" pattern="^[^\\s]*$" required>
         <div class="password-validation-failure"></div>
     </div>
     `,
     confirmPassword: `
     <div class="confirm-password-input-container">
         <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirmPassword" required>
+        <input type="password" id="confirm-password" name="confirmPassword" disabled="true" required>
         <div class="confirm-password-validation-failure"></div>
     </div>
     `,
