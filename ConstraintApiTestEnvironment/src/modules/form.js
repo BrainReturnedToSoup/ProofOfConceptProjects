@@ -64,10 +64,10 @@ class FormValidator {
     //iterates over every element in the supplied form control element array, and retrieves their corresponding
     //reference in the element ref manager
     const retrievedForm =
-      this.#helperClasses.elementRefManager.retrieveRef("formData"); //for retrieving the form tag reference so to speak
+      this.#helperClasses.elementRefManager.retrieveRef("formElement"); //for retrieving the form tag reference so to speak
 
     if (retrievedForm !== null) {
-      this.#refData.retrievedElementRefs["formData"] = retrievedForm; //stores it in the local cache if successfully retrieved
+      this.#refData.retrievedElementRefs["formElement"] = retrievedForm; //stores it in the local cache if successfully retrieved
     }
 
     for (let element of this.#configData.formControlElementArr) {
@@ -198,7 +198,15 @@ class FormValidator {
           //the corresponding message due to this specific failure. Otherwise pass the confirm password
           //field if it's the same value as the password field
           if (confirmPasswordInput.value !== passwordInput.value) {
-            confirmPasswordInput.setCustomValidity();
+            //have to use setCustomValidity with a non empty string to
+            //toggle the property customError as a true value, otherwise,
+            //that property is read only and I cant directly modify it
+            if (!confirmPasswordInput.validity.customError) {
+              confirmPasswordInput.setCustomValidity(
+                "placeholder to toggle customError validity property"
+              );
+            }
+
             const validationFailureMessage = this.#getValidationFailureMessage(
               "confirmPassword",
               confirmPasswordInput.validity
@@ -206,6 +214,9 @@ class FormValidator {
 
             validationFailureTextElement.textContent = validationFailureMessage;
           } else {
+            if (confirmPasswordInput.validity.customError) {
+              confirmPasswordInput.setCustomValidity("");
+            }
             validationFailureTextElement.textContent = "";
           }
         }
@@ -238,10 +249,9 @@ class FormValidator {
       //check that the argument supplied is an element to append the event listener to
       if (targetElement instanceof Element) {
         //append the event listener to the target that will read for input events
-        targetElement.addEventListener(
-          "input",
-          this.#executeEventFunctionality("input")
-        );
+        targetElement.addEventListener("input", () => {
+          this.#executeEventFunctionality("input");
+        });
       } else {
         throw new Error(
           `ERROR: FAILED TO APPEND INPUT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement}`
@@ -271,17 +281,18 @@ class FormValidator {
     ) {
       //check if the event was supplied and execute the methods with the event supplied as the arg,
       //otherwise just execute the methods
+      console.log("checking for input event");
       if (event) {
         //execute all methods found within the corresponding event type functionality
         for (let formControlMethod of Object.values(
-          functionalities.eventType
+          functionalities[eventType]
         )) {
           formControlMethod(event);
         }
       } else {
         //execute all methods found within the corresponding event type functionality
         for (let formControlMethod of Object.values(
-          functionalities.eventType
+          functionalities[eventType]
         )) {
           formControlMethod();
         }
@@ -342,6 +353,7 @@ class FormValidator {
     this.#eventListenersInitializers.input(
       this.#refData.retrievedElementRefs["formElement"]
     );
+    console.log(this.#refData.retrievedElementRefs["formElement"]);
     this.#eventListenersInitializers.submit(
       this.#refData.retrievedElementRefs["formElement"]
     );
@@ -469,7 +481,7 @@ class FormConstructor {
     confirmPassword: `
     <div class="confirm-password-input-container">
         <label for="confirm-password">Confirm Password</label>
-        <input type="password" id="confirm-password" name="confirmPassword" disabled="true" required>
+        <input type="password" id="confirm-password" name="confirmPassword" required>
         <div class="confirm-password-validation-failure"></div>
     </div>
     `,
@@ -496,6 +508,8 @@ class FormConstructor {
       } else {
         formElement.setAttribute("method", "get");
       }
+
+      formElement.setAttribute("novalidate", "");
 
       //stores it as a reference in the ref manager if such is being used
       //Defines explicitly the key of the pair since its not pulled from a template name
@@ -550,10 +564,10 @@ class FormConstructor {
     for (let formControlElement of formControlElementArr) {
       //if the current form control element listed in the config array exists within the templates, create it and append it to the form element
       if (formControlElement in this.#formControlElementTemplates) {
-        const formControlElement =
+        const builtformControlElement =
           this.#elementBuilders.formControl(formControlElement);
 
-        formElement.append(formControlElement);
+        formElement.append(builtformControlElement);
       }
     }
 
@@ -600,7 +614,7 @@ export class Form {
     formValidator: null,
   };
 
-  init(parentElement) {
+  appendForm(parentElement) {
     if (parentElement instanceof Element) {
       //checks that the supplied parent element is actually an element so the form can be appended to it
 

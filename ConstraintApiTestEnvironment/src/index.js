@@ -2,14 +2,16 @@ import { Form } from "./modules/form";
 
 class App {
   start() {
-    for (let module of Object.values(modules)) {
-      module.init();
-    }
+    modules.form.appendForm(document.body);
   }
 }
 
 const modules = {
-    form: new Form(),
+    form: new Form(
+      ["email", "zipCode", "password", "confirmPassword"],
+      "#",
+      "GET"
+    ),
   },
   myApp = new App();
 
