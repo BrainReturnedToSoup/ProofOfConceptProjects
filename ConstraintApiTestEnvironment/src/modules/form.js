@@ -1,48 +1,111 @@
 class FormValidator {
   constructor(formControlElementArr, elementRefManager) {
     if (
-      elementRefCache instanceof ElementRefManager &&
+      elementRefManager instanceof ElementRefManager &&
       Array.isArray(formControlElementArr) &&
       formControlElementArr.length > 0
     ) {
-      //pass args into state
+      //adds supplied arguments as values to specific configuration properties and helper classes within the class instance if they meet the following:
+      //formControlElementArr must be an array that contains elements of some sort, and elementRefManager must be an instance from the class ElementRefManager
+      this.#helperClasses.elementRefManager = elementRefManager;
+      this.#configData.formControlElementArr = formControlElementArr;
     } else {
-      throw new Error(``);
+      throw new Error(
+        `ERROR: FAILED TO INITIALIZE FORM VALIDATION ON TARGET FOR : EITHER OF THE RECEIVED ARGUMENTS ARE INVALID : 'formControlElementArr' MUST BE AN ARRAY WITH ELEMENTS AND 'elementRefManager' MUST BE AN INSTANCE OF THE CLASS 'ElementRefManager' : RECEIVED ${formControlElementArr} AND ${elementRefManager} : Stack Trace: ${error.stack}`
+      );
     }
   }
 
+  //holds data pertaining to configuring the behavior of this class
+  //which is supplied by the constructor arguments mostly
   #configData = {
-    retrievedElementRefs: {},
-    formControlElements: null,
+    formControlElementArr: null,
   };
 
+  //holds data that is important to facilitate the functionality of this class
+  //but is not necessarily derived directly from the constructor arguments
+  #refData = {
+    retrievedElementRefs: {},
+  };
+
+  //holds values to important class instances that help facilitate specific functionality within the class
+  //through their interfaces
   #helperClasses = {
     elementRefManager: null,
   };
 
-  checkInputValidity(inputElement, formControlElement) {
-    //takes an input element reference, and the corresponding form control element it represents
+  //holds the text data relating to a specific validation failure based on the corresponding form control element, which will
+  //be used mainly by the check validity method in order to facilitate the basic validity check using the constraint api
+  #validationFailureText = {
+    email: {},
+    zipCode: {},
+    password: {},
+    confirmPassword: {},
+  };
+
+  #fetchRequiredElementRefs() {
+    //iterates over every element in the supplied form control element array, and retrieves their corresponding
+    //reference in the element ref manager
+    const retrievedForm =
+      this.#helperClasses.elementRefManager.retrieveRef("formData"); //for retrieving the form tag reference so to speak
+
+    if (retrievedForm !== null) {
+      this.#refData.retrievedElementRefs["formData"] = retrievedForm; //stores it in the local cache if successfully retrieved
+    }
+
+    for (let element of this.#configData.formControlElementArr) {
+      const retrievedElement =
+        this.#helperClasses.elementRefManager.retrieveRef(element);
+
+      //if a form control element reference is successfully retrieved, add it to the retrievedElementRefs property in the config data
+      if (retrievedElement !== null) {
+        this.#refData.retrievedElementRefs[element] = retrievedElement;
+      }
+    }
   }
 
   #eventFunctionalities = {
     input: {
-      email: (event) => {},
-      zipCode: (event) => {},
-      password: (event) => {
-        //check for the existence of a confirm password field, if the field is present and already possesses
-        //a value for its input, disable the ability to interact with the regular password field
-        if (this.#stateData.formControlElements.includes("password")) {
-          const passwordInput =
-            this.#stateData.elementRefs.password.querySelector("input");
+      email: () => {
+        if ("email" in this.#refData.retrievedElementRefs) {
+        }
+      },
+      zipCode: () => {
+        //checks for the existence of the retrieved property, if the property was retrieved,
+        //the associated functionality can commence
+        if ("zipCode" in this.#refData.retrievedElementRefs) {
+          const zipCodeInput =
+              this.#refData.retrievedElementRefs.zipCode.querySelector("input"),
+            validationFailureTextElement = zipCodeInput.nextElementSibling;
 
-          if (this.#stateData.formControlElements.includes("confirmPassword")) {
+          //display the validation failure message or delete all of the text if the input passed
+          if (zipCodeInput.validity.valid === false) {
+            const validationFailureMessage = this.#getValidationFailureMessage(
+              "zipCode",
+              zipCodeInput.validity
+            );
+            validationFailureTextElement.textContent = validationFailureMessage;
+          } else {
+            validationFailureTextElement.textContent = "";
+          }
+        }
+      },
+      password: () => {
+        //checks for the existence of the retrieved property, if the property was retrieved,
+        //the associated functionality can commence
+        if ("password" in this.#refData.retrievedElementRefs) {
+          const passwordInput =
+            this.#refData.retrievedElementRefs.password.querySelector("input");
+
+          //check if there is also a retrieved confirm password, if so activate the specific functionality
+          //that exists when there is also a confirm password field, which essentially disables the
+          //password field if you are adding data to the confirm password field
+          if ("confirmPassword" in this.#refData.retrievedElementRefs) {
             const confirmPasswordInput =
-              this.#stateData.elementRefs.confirmPassword.querySelector(
+              this.#refData.retrievedElementRefs.confirmPassword.querySelector(
                 "input"
               );
 
-            //block the regular password field from being editted if
-            //the confirm password field has data within it,
             if (confirmPasswordInput.value !== "") {
               passwordInput.disabled = true;
               return;
@@ -51,61 +114,76 @@ class FormValidator {
             }
           }
 
-          //get some data about the validity of the specific input, if it fails
-          //the validation, then the return on this method will also include a
-          //validity message pertaining to the input specs
-          const passwordValidationData = this.#constraintApi.checkInputValidity(
-              passwordInput,
-              "password"
-            ),
-            validationFailureElement = passwordInput.nextElementSibling;
+          //retrieve the reference to the validation failure element that will display the relevant messages
+          //to the user on what caused the failure, and then check the validity of the target form control element
+          const validationFailureTextElement = passwordInput.nextElementSibling;
 
-          //if it's not valid, display the message, if it's otherwise valid, remove any text from within the element
-          if (passwordValidationData.valid === false) {
-            validationFailureElement.textContent = validationData.message;
+          //display the validation failure message or delete all of the text if the input passed
+          if (passwordInput.validity.valid === false) {
+            const validationFailureMessage = this.#getValidationFailureMessage(
+              "password",
+              passwordInput.validity
+            );
+            validationFailureTextElement.textContent = validationFailureMessage;
           } else {
-            validationFailureElement.textContent = "";
+            validationFailureTextElement.textContent = "";
           }
         }
       },
-      confirmPassword: (event) => {
-        //check for the existence of a confirm password field, if the field is present and already possesses
-        //a value for its input, disable the ability to interact with the regular password field
-        if (this.#stateData.formControlElements.includes("password")) {
+      confirmPassword: () => {
+        if (
+          "password" in this.#refData.retrievedElementRefs &&
+          "confirmPassword" in this.#refData.retrievedElementRefs
+        ) {
+          //only activates the functionality if a password and confirm password reference was successfully retrieved
           const passwordInput =
-            this.#stateData.elementRefs.password.querySelector("input");
-
-          if (this.#stateData.formControlElements.includes("confirmPassword")) {
-            const confirmPasswordInput =
-                this.#stateData.elementRefs.confirmPassword.querySelector(
-                  "input"
-                ),
-              passwordValidationData = this.#constraintApi.checkInputValidity(
-                passwordInput,
-                "password"
+              this.#refData.retrievedElementRefs.password.querySelector(
+                "input"
+              ),
+            confirmPasswordInput =
+              this.#refData.retrievedElementRefs.confirmPassword.querySelector(
+                "input"
               );
 
-            //check if the password field has some sort of value and passes
-            //its own input validation before enabling the ability to
-            //confirm the password
-            if (
-              passwordInput.value === "" ||
-              passwordValidationData.valid === false
-            ) {
-              confirmPasswordInput.disabled = true;
-              return;
-            } else {
-              confirmPasswordInput.disabled = false;
-            }
+          //if the password field either doesn't possess a value within it or fails its own validation check,
+          //keep the confirm password field disabled, otherwise enable the user to add info to such
+          if (
+            passwordInput.value === "" ||
+            passwordInput.validity.valid === false
+          ) {
+            confirmPasswordInput.disabled = true;
+            return;
+          } else {
+            confirmPasswordInput.disabled = false;
           }
 
-          //logic for comparing the value between the password and confirm password fields go here
+          const validationFailureTextElement =
+            confirmPasswordInput.nextElementSibling;
+
+          //if the confirm password input value does not match the regular password input,
+          //make it manually fail validation, change its validity state manually, and display
+          //the corresponding message due to this specific failure. Otherwise pass the confirm password
+          //field if it's the same value as the password field
+          if (confirmPasswordInput.value !== passwordInput.value) {
+            confirmPasswordInput.validity.valid = false;
+
+            const validationFailureMessage = this.#getValidationFailureMessage(
+              "confirmPassword",
+              confirmPasswordInput.validity
+            );
+
+            validationFailureTextElement.textContent = validationFailureMessage;
+          } else {
+            confirmPasswordInput.validity.valid = true;
+
+            validationFailureTextElement.textContent = "";
+          }
         }
       },
     },
   };
 
-  #eventListeners = {
+  #eventListenersInitializers = {
     input: (targetElement) => {
       //check that the target is an element t least, the functionality
       //method key is a string, and that it is an existing property
@@ -116,31 +194,30 @@ class FormValidator {
         functionalityMethodKey in this.#constraintApi.functionality
       ) {
         //append the event listener to the target that will read for input events
-        targetElement.addEventListener("input", (e) => {
-          this.#constraintApi.eventListening.parseEventTypeFunctionality(
-            "input",
-            e
-          );
-        });
+        targetElement.addEventListener(
+          "input",
+          this.#executeEventFunctionality("input")
+        );
       } else {
         throw new Error(
           `ERROR: FAILED TO APPEND INPUT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement} : Stack Trace: ${error.stack}`
         );
       }
     },
+    submit: (targetElement) => {},
   };
 
-  #executeEventFunctionality(eventType, event) {
-    const functionality = this.#constraintApi.functionality;
+  #executeEventFunctionality(eventType) {
+    const functionalities = this.#eventFunctionalities;
 
     if (
-      eventType in functionality &&
-      Object.values(functionality).length > 0
+      eventType in functionalities &&
+      Object.values(functionalities).length > 0
       //check for existing properties and methods before attempting to execute anything
     ) {
       //execute all methods found within the corresponding event type functionality
-      for (let formControlMethod of functionality[eventType]) {
-        formControlMethod(event);
+      for (let formControlMethod of functionalities[eventType]) {
+        formControlMethod();
       }
     } else {
       throw new Error(
@@ -148,28 +225,76 @@ class FormValidator {
       );
     }
   }
+
+  #getValidationFailureMessage(formControlElementString, validityStateObj) {
+    //takes the form control element string as the corresponding identifier, and then reads the properties that
+    //caused the validation of a specific input element to fail, and then return the corresponding text
+    //that represents the specific failure
+  }
+
+  init() {
+    //get the refs of the form element and the corresponding form control elements being used in the supplied instance
+    this.#fetchRequiredElementRefs();
+    //initialize the event listener that is already configured to the necessary functionality for input events in the context of the form, and append it to the form tag itself,
+    //this way the event functionality uses event bubbling to facilitate the functionality attached to the specific event type.
+    this.#eventListenersInitializers.input(
+      this.#refData.retrievedElementRefs["formElement"]
+    );
+  }
 }
 
 class ElementRefManager {
-  #cache = new Map();
+  //holds unique key value pairs representing specific form element references
+  #refCache = new Map();
 
   addRef(key, element) {
-    if (typeof key === "string" && element instanceof Element) {
+    if (
+      typeof key === "string" &&
+      !this.#refCache.has(key) &&
+      element instanceof Element
+    ) {
+      //adds a key value pair representing an element ref within the class cache if the arguments follow these requirements:
+      //the supplied key is a string, the ref cache doesn't already have a key value pair with said key, and the value is an element
+      this.#refCache.set(key, element);
+    } else {
+      throw new Error(
+        `ERROR: FAILED TO ADD KEY VALUE PAIR FOR AN ELEMENT REFERENCE TO REFERENCE CACHE : ARGUMENTS FAILED TO MEET REQUIREMENTS TO BE VALID : RECEIVED ${key} AS THE KEY AND ${element} AS THE ELEMENT : Stack Trace: ${error.stack}`
+      );
     }
   }
 
-  removeRef(key) {}
+  removeRef(key) {
+    if (this.#refCache.has(key)) {
+      //removes the key value pair if the target key exists within the ref cache
+      this.#refCache.delete(key);
+    } else {
+      throw new Error(
+        `ERROR: FAILED TO DELETE KEY VALUE PAIR FOR AN ELEMENT REFERENCE IN REFERENCE CACHE : TARGET KEY DOES NOT EXIST : RECEIVED ${key} : Stack Trace: ${error.stack}`
+      );
+    }
+  }
 
-  retrieveRef(key) {}
+  retrieveRef(key) {
+    if (this.#refCache.has(key)) {
+      //retrieves the reference value if the target key has been declared within the ref cache
+      const retrievedRef = this.#refCache.get(key);
+      return retrievedRef;
+    } else {
+      //will return null if the specific reference couldn't be retrieved, as opposed to throwing an error as I do not want the thread of execution stopping here
+      //which making this method this way opens more possibilities in terms of what can be done whenever another class uses this class instance
+      return null;
+    }
+  }
 }
 
 class FormConstructor {
   constructor(formControlElementArr, action, method, elementRefManager) {
-    //stores the valid supplied arguments in the state data, and throw error for invalid supplied arguments
     if (elementRefManager instanceof ElementRefManager) {
-      this.#helperClasses.elementRefManager = elementRefManager;
+      this.#helperClasses.elementRefManager = elementRefManager; //add the element ref manager class instance to the state of the class
     }
 
+    //add necessary properties supplied by the constructor argument to the configuration data of this class
+    //This will make the class create the form desired based on the supplied configuration so to speak
     if (
       Array.isArray(formControlElementArr) &&
       formControlElementArr.length > 0
@@ -198,17 +323,22 @@ class FormConstructor {
     }
   }
 
-  //holds important data that is used by the builder methods to create the desired form element
+  //configuration data that the builder methods reference when executing
   #configData = {
     formControlElementArr: null,
     action: null,
     method: null,
   };
 
+  //contains references to class instances that will help this class
+  //facilitate its functionality in some way
   #helperClasses = {
     elementRefManager: null,
   };
 
+  //contains predefined templates in order to make the creation of specific form control
+  //elements straight forward through the script, as well as easy to maintain and add more
+  //templates
   #formControlElementTemplates = {
     email: `
     <div class="email-input-container">
@@ -240,6 +370,9 @@ class FormConstructor {
     `,
   };
 
+  //holds methods that are capable of building all of the necessary elements
+  //within a form, which can be configured to include specific form control elements
+  //of choice
   #elementBuilders = {
     form: (action, method) => {
       const formElement = document.createElement("form"); //create the form tag itself
@@ -259,26 +392,46 @@ class FormConstructor {
         formElement.setAttribute("method", "get");
       }
 
+      //stores it as a reference in the ref manager if such is being used
+      //Defines explicitly the key of the pair since its not pulled from a template name
+      //rather its created explicitly itself
+      if (this.#helperClasses.elementRefManager !== null) {
+        this.#helperClasses.elementRefManager.addRef(
+          "formElement",
+          formElement
+        );
+      }
+
       return formElement;
     },
     formControl: (formControlElement) => {
       if (formControlElement in this.#formControlElementTemplates) {
-        //create the corresponding form control element fragment
+        //create the corresponding form control element fragment if an existing template is found
         const range = document.createRange(),
           elementFrag = range.createContextualFragment(
             this.#formControlElementTemplates[formControlElement]
           ),
           containerRef = elementFrag.firstElementChild;
 
-        //add the container to element reference cache based on the created form control element
-        this.#stateData.elementRefs[formControlElement] = containerRef;
+        //stores it as a reference in the ref manager if such is being used
+        //Uses the ref of the container element in the value of the saved key value pair
+        if (this.#helperClasses.elementRefManager !== null) {
+          this.#helperClasses.elementRefManager.addRef(
+            formControlElement,
+            containerRef
+          );
+        }
 
         return containerRef;
       } else {
         throw new Error(
-          `ERROR: COULD NOT CONSTRUCT FORM CONTROL ELEMENT : SUPPLIED FORM CONTROL ELEMENT NOT FOUND : RECEIVED ${formControlElement} : Stack Trace: ${error.stack}`
+          `ERROR: COULD NOT CONSTRUCT FORM CONTROL ELEMENT : SUPPLIED FORM CONTROL ELEMENT NOT FOUND WITHIN TEMPLATE DATA : RECEIVED ${formControlElement} : Stack Trace: ${error.stack}`
         );
       }
+    },
+    submitButton: () => {
+      const submitButton = document.createElement("button");
+      return submitButton;
     },
   };
 
@@ -286,7 +439,7 @@ class FormConstructor {
     //create the form element and the submit button element as they are mandatory
     //features when creating a form
     const formElement = this.#elementBuilders.form(action, method),
-      submitButtonElement = document.createElement("button");
+      submitButtonElement = this.#elementBuilders.submitButton();
 
     //iterate over the existing form control elements and create them based on existing templates
     for (let formControlElement of formControlElementArr) {
@@ -319,6 +472,8 @@ class FormConstructor {
 }
 
 export class Form {
+  //creates unique class instances of all the sub classes, which
+  //may or may not use the supplied configuration from this main constructor
   constructor(formControlElementArr, action, method) {
     this.#subClasses.elementRefManager = new ElementRefManager();
     this.#subClasses.formConstructor = new FormConstructor(
@@ -333,6 +488,7 @@ export class Form {
     );
   }
 
+  //holds values of specific sub class references
   #subClasses = {
     elementRefManager: null,
     formConstructor: null,
@@ -341,9 +497,11 @@ export class Form {
 
   init(parentElement) {
     if (parentElement instanceof Element) {
-      const formElement = this.#subClasses.formConstructor.init();
+      //checks that the supplied parent element is actually an element so the form can be appended to it
 
-      this.#subClasses.formValidator.init();
+      const formElement = this.#subClasses.formConstructor.init(); //creates the entire form fragment with all necessary children within it
+
+      this.#subClasses.formValidator.init(); //initializes the form validation feature of the form which uses the constraint api
 
       parentElement.append(formElement); //append the form to a target parent element
     } else {
