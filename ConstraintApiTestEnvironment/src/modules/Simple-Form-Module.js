@@ -405,7 +405,13 @@ class ElementRefManager {
 }
 
 class FormConstructor {
-  constructor(formControlElementArr, action, method, elementRefManager) {
+  constructor(
+    formControlElementArr,
+    action,
+    method,
+    submitButtonText,
+    elementRefManager
+  ) {
     if (elementRefManager instanceof ElementRefManager) {
       this.#helperClasses.elementRefManager = elementRefManager; //add the element ref manager class instance to the state of the class
     }
@@ -438,6 +444,10 @@ class FormConstructor {
         `ERROR: FAILED TO APPLY ARGUMENT TO '${this.constructor.name}' CLASS STATE : SUPPLIED ARGUMENT 'method' MUST BE A STRING : RECEIVED ${method}`
       );
     }
+
+    if (typeof submitButtonText === "string") {
+      this.#configData.submitButtonText = submitButtonText;
+    }
   }
 
   //configuration data that the builder methods reference when executing
@@ -445,6 +455,7 @@ class FormConstructor {
     formControlElementArr: null,
     action: null,
     method: null,
+    submitButtonText: "Submit",
   };
 
   //contains references to class instances that will help this class
@@ -466,7 +477,7 @@ class FormConstructor {
     `,
     zipCode: `
     <div class="zipcode-input-container">
-        <label for="email">ZIP Code</label>
+        <label for="zipcode">ZIP Code</label>
         <input type="text" id="zipcode" name="zipcode" pattern="[0-9]{5}" inputmode="numeric" maxlength="5" required>
         <div class="zipcode-validation-failure"></div>
     </div>
@@ -560,6 +571,9 @@ class FormConstructor {
     const formElement = this.#elementBuilders.form(action, method),
       submitButtonElement = this.#elementBuilders.submitButton();
 
+    //adds text to submit button
+    submitButtonElement.textContent = this.#configData.submitButtonText;
+
     //iterate over the existing form control elements and create them based on existing templates
     for (let formControlElement of formControlElementArr) {
       //if the current form control element listed in the config array exists within the templates, create it and append it to the form element
@@ -593,12 +607,13 @@ class FormConstructor {
 export class Form {
   //creates unique class instances of all the sub classes, which
   //may or may not use the supplied configuration from this main constructor
-  constructor(formControlElementArr, action, method) {
+  constructor(formControlElementArr, action, method, submitButtonText) {
     this.#subClasses.elementRefManager = new ElementRefManager();
     this.#subClasses.formConstructor = new FormConstructor(
       formControlElementArr,
       action,
       method,
+      submitButtonText,
       this.#subClasses.elementRefManager
     );
     this.#subClasses.formValidator = new FormValidator(

@@ -1,4 +1,4 @@
-import { Form } from "./modules/form";
+import { Form } from "./modules/Simple-Form-Module.js";
 
 class App {
   start() {
@@ -10,7 +10,8 @@ const modules = {
     form: new Form(
       ["email", "zipCode", "password", "confirmPassword"],
       "#",
-      "GET"
+      "GET",
+      "Sign Up"
     ),
   },
   myApp = new App();
