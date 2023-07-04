@@ -7,7 +7,12 @@ class App {
 }
 
 const modules = {
-    form: new Form(["email", "zipCode", "password", "confirmPassword"], "#", "GET", "Sign Up"),
+    form: new Form(
+      ["email", "password", "confirmPassword"],
+      "#",
+      "GET",
+      "Sign Up"
+    ),
   },
   myApp = new App();
 

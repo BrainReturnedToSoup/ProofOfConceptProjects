@@ -81,13 +81,17 @@ class FormValidator {
 
   #eventFunctionalities = {
     input: {
-      email: () => {
+      email: (event) => {
         //checks for the existence of the retrieved property, if the property was retrieved,
         //the associated functionality can commence
         if ("email" in this.#refData.retrievedElementRefs) {
           const emailInput =
               this.#refData.retrievedElementRefs.email.querySelector("input"),
             validationFailureTextElement = emailInput.nextElementSibling;
+
+          if (event && event !== null && event.target !== emailInput) {
+            return; //instant return if an event was supplied, and it wasn't representing this specific input
+          }
 
           //display the validation failure message or delete all of the text if the input passed
           if (emailInput.validity.valid === false) {
@@ -101,13 +105,17 @@ class FormValidator {
           }
         }
       },
-      zipCode: () => {
+      zipCode: (event) => {
         //checks for the existence of the retrieved property, if the property was retrieved,
         //the associated functionality can commence
         if ("zipCode" in this.#refData.retrievedElementRefs) {
           const zipCodeInput =
               this.#refData.retrievedElementRefs.zipCode.querySelector("input"),
             validationFailureTextElement = zipCodeInput.nextElementSibling;
+
+          if (event && event !== null && event.target !== zipCodeInput) {
+            return; //instant return if an event was supplied, and it wasn't representing this specific input
+          }
 
           //display the validation failure message or delete all of the text if the input passed
           if (zipCodeInput.validity.valid === false) {
@@ -121,7 +129,7 @@ class FormValidator {
           }
         }
       },
-      password: () => {
+      password: (event) => {
         //checks for the existence of the retrieved property, if the property was retrieved,
         //the associated functionality can commence
         if ("password" in this.#refData.retrievedElementRefs) {
@@ -145,6 +153,10 @@ class FormValidator {
             }
           }
 
+          if (event && event !== null && event.target !== passwordInput) {
+            return; //instant return if an event was supplied, and it wasn't representing this specific input
+          }
+
           //retrieve the reference to the validation failure element that will display the relevant messages
           //to the user on what caused the failure, and then check the validity of the target form control element
           const validationFailureTextElement = passwordInput.nextElementSibling;
@@ -161,7 +173,7 @@ class FormValidator {
           }
         }
       },
-      confirmPassword: () => {
+      confirmPassword: (event) => {
         if (
           "password" in this.#refData.retrievedElementRefs &&
           "confirmPassword" in this.#refData.retrievedElementRefs
@@ -186,6 +198,14 @@ class FormValidator {
             return;
           } else {
             confirmPasswordInput.disabled = false;
+          }
+
+          if (
+            event &&
+            event !== null &&
+            event.target !== confirmPasswordInput
+          ) {
+            return; //instant return if an event was supplied, and it wasn't representing this specific input
           }
 
           const validationFailureTextElement =
@@ -226,7 +246,9 @@ class FormValidator {
         for (let functionality of Object.values(
           this.#eventFunctionalities.input
         )) {
-          functionality();
+          //special situation where there is not a specific input event supplied, rather
+          // the validity of the target input is simply read for all instances of functionality
+          functionality(null);
         }
 
         //if a specific form control element fails to be valid, prevent the submission of the form
@@ -247,8 +269,8 @@ class FormValidator {
       //check that the argument supplied is an element to append the event listener to
       if (targetElement instanceof Element) {
         //append the event listener to the target that will read for input events
-        targetElement.addEventListener("input", () => {
-          this.#executeEventFunctionality("input");
+        targetElement.addEventListener("input", (e) => {
+          this.#executeEventFunctionality("input", e);
         });
       } else {
         throw new Error(
@@ -279,21 +301,10 @@ class FormValidator {
     ) {
       //check if the event was supplied and execute the methods with the event supplied as the arg,
       //otherwise just execute the methods
-      console.log("checking for input event");
-      if (event) {
-        //execute all methods found within the corresponding event type functionality
-        for (let formControlMethod of Object.values(
-          functionalities[eventType]
-        )) {
-          formControlMethod(event);
-        }
-      } else {
-        //execute all methods found within the corresponding event type functionality
-        for (let formControlMethod of Object.values(
-          functionalities[eventType]
-        )) {
-          formControlMethod();
-        }
+
+      //execute all methods found within the corresponding event type functionality
+      for (let formControlMethod of Object.values(functionalities[eventType])) {
+        formControlMethod(event);
       }
     } else {
       throw new Error(
