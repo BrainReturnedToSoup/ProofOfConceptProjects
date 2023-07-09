@@ -36,6 +36,8 @@ const generalSubClasses = {
       }
     }
   },
+  ConfigValidator: class {},
+  Form: Form,
 };
 
 const weatherSubClasses = {
@@ -206,7 +208,7 @@ export class WeatherApp {
     explicitDataType: () => {},
     possibleValues: () => {},
     complexDependencies: () => {},
-  }
+  };
 
   //will hold validation methods for various types of checks on property data
   #validationMethods = {
