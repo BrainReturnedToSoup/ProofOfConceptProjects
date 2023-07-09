@@ -1,6 +1,6 @@
 class WeatherApi {
   //will be for initializing the supplied key to the stored end point string
-  constructor(key) {}
+  constructor(apiKey) {}
 
   //stores the api key supplied to the constructor
   #configData = {
@@ -17,6 +17,86 @@ class WeatherApi {
     firstHalf: `https://api.weatherapi.com/v1/weather?q=`,
     secondHalf: `&key=${this.#configData.apiKey}`,
   };
+
+  //holds data that defines what inputs are valid to supply to the various retrieveWeatherData APIs
+  #validConfigInputsPerMethod = {
+    city: {
+      city: {
+        type: "string",
+        required: true,
+      },
+      requestRule: {
+        type: "string",
+        validValues: ["once", "interval"],
+        required: false,
+      },
+      interval: {
+        type: "number",
+        required: false,
+      },
+    },
+  };
+
+  //will validate the incoming configuration before actually trying to retrieve data
+  #validateConfig(method, config) {
+    const errors = [];
+
+    if (method in this.#validConfigInputsPerMethod) {
+      const validDataRef = this.#validConfigInputsPerMethod[method];
+
+      for (let validProperty in validDataRef) {
+        const dataSet = validDataRef[validProperty];
+
+        switch (true) {
+          case "type" in dataSet:
+            if (typeof config[validProperty] !== dataSet["type"]) {
+              errors.push(
+                new TypeError(
+                  `Supplied value for specific config property is an invalid data type, received '${method}' as the method invoked, '${validProperty}' as the property that failed validation, and '${config[validProperty]}' as the value received for said property`
+                )
+              );
+            }
+          case "validValues" in dataSet:
+            if (!dataSet["validValues"].includes(config[validProperty])) {
+              errors.push(
+                new ReferenceError(
+                  `Supplied value for specific config property is not a valid value, received '${method}' as the method invoked, '${validProperty}' as the property that failed validation, and '${config[validProperty]}' as the value received for said property`
+                )
+              );
+            }
+          case "required" in dataSet:
+            if (dataSet["required"] && validProperty in config === false) {
+              errors.push(
+                new ReferenceError(
+                  `Config supplied lacks a required property, the missing property is '${validProperty}' for '${method}' as the corresponding method`
+                )
+              );
+            }
+        }
+      }
+    } else {
+      errors.push(
+        new ReferenceError(
+          `Supplied method does not have a data set to perform validation for, received '${method}'`
+        )
+      );
+    }
+
+    if (errors.length > 0) {
+      throw errors;
+    }
+  }
+
+  //entry point method used by the various retrieveWeatherData methods in order to pick which #retrievalMethods
+  //method to use based on the supplied args
+  #retrieveData(method, config) {
+    try {
+      this.#validateConfig(method, config);
+    } catch (errorArr) {
+      throw errorArr;
+    }
+    //retrieval functionality based on the supplied config
+  }
 
   //will contain methods for either retrieving data only once or on a specific interval when needed
   #retrievalMethods = {
@@ -74,16 +154,22 @@ class WeatherApi {
     },
   };
 
-  //entry point method used by the various retrieveWeatherData methods in order to pick which #retrievalMethods
-  //method to use based on the supplied args
-  #retrieveData(config) {}
-
   //will stop an existing functionality to retrieve data on a specific interval
-  stopExistingRetrievalInterval(instanceKey) {}
+  stopExistingRetrievalInterval(instanceKey) {
+    if (instanceKey in this.#storedRetrievalIntervals) {
+      delete this.#storedRetrievalIntervals[instanceKey];
+    }
+  }
 
   //holds different methods to retrieve data based on the basic parameter
   retrieveWeatherData = {
-    city: (city, rule, interval) => {},
+    city: (city, requestRule = "once", interval = 5000) => {
+      this.#retrieveData({
+        city: city,
+        requestRule: requestRule,
+        interval: interval,
+      });
+    },
   };
 }
 
