@@ -1,43 +1,10 @@
 import { Form } from "./Simple-Form-Module.js";
+import { ElementRefManager } from "./Element-Ref-Manager.js";
 
 const generalSubClasses = {
-  ElementRefManager: class {
-    //acts as a means of managing all element references within this feature
-    //this way weather sub classes can easily access these references
-
-    #cache = new Map();
-
-    //APIs for adding, removing, or retrieving stored element refs
-    addRef(key, value) {
-      if (
-        typeof key === "string" &&
-        !this.#cache.has(key) &&
-        value instanceof Element
-      ) {
-        this.#cache.set(key, value);
-      } else {
-        throw new Error(``);
-      }
-    }
-
-    deleteRef(key) {
-      if (typeof key === "string" && this.#cache.has(key)) {
-        this.#cache.delete(key);
-      } else {
-        throw new Error(``);
-      }
-    }
-
-    retrieveRef(key) {
-      if (typeof key === "string" && this.#cache.has(key)) {
-        return this.#cache.get(key);
-      } else {
-        return null;
-      }
-    }
-  },
-  ConfigValidator: class {},
+  ElementRefManager: ElementRefManager,
   Form: Form,
+  ConfigValidator: class {},
 };
 
 const weatherSubClasses = {
