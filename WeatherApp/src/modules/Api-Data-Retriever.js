@@ -1,21 +1,33 @@
 class WeatherApi {
   //will be for initializing the supplied key to the stored end point string
-  constructor(apiKey) {}
+  constructor(apiKey) {
+    if (typeof apiKey === "string") {
+    } else {
+      throw new TypeError(
+        `Value supplied to constructor for class instance '${this.constructor.name}' is an invalid data type, must be a string, received ${apiKey}`
+      );
+    }
+  }
 
   //stores the api key supplied to the constructor
-  #configData = {
+  #instanceStateData = {
     apiKey: null,
   };
 
+  #latestDataRecieved = {
+    singleRequest: null,
+    fixedInterval: {},
+  };
+
   //holds key value pairs for existing data retrievals that exist on a constant interval
-  #storedRetrievalIntervals = {};
+  #existingRetrievalIntervals = {};
 
   //holds the string templates needed to construct the entire https request link
   //split into two parts because the target city needs to be supplied as a parameter,
   //which it will be sandwiched between these two templates in order to make a complete url
   #endPointStringTemplate = {
     firstHalf: `https://api.weatherapi.com/v1/weather?q=`,
-    secondHalf: `&key=${this.#configData.apiKey}`,
+    secondHalf: `&key=${this.#instanceStateData.apiKey}`,
   };
 
   //holds data that defines what inputs are valid to supply to the various retrieveWeatherData APIs
@@ -27,8 +39,8 @@ class WeatherApi {
       },
       requestRule: {
         type: "string",
-        validValues: ["once", "interval"],
         required: false,
+        validValues: ["once", "interval"],
       },
       interval: {
         type: "number",
@@ -87,28 +99,19 @@ class WeatherApi {
     }
   }
 
-  //entry point method used by the various retrieveWeatherData methods in order to pick which #retrievalMethods
-  //method to use based on the supplied args
-  #retrieveData(method, config) {
-    try {
-      this.#validateConfig(method, config);
-    } catch (errorArr) {
-      throw errorArr;
-    }
-    //retrieval functionality based on the supplied config
-  }
-
   //will contain methods for either retrieving data only once or on a specific interval when needed
   #retrievalMethods = {
     fixedInterval: (city, interval) => {
-      if (city in this.#storedRetrievalIntervals === false) {
+      if (city in this.#existingRetrievalIntervals === false) {
         const { firstHalf, secondHalf } = this.#endPointStringTemplate,
           assembledLink = firstHalf + city + secondHalf;
 
         let existingPromise = false;
 
         //sets an interval to fetch from the api at a fixed rate that was supplied
-        this.#storedRetrievalIntervals[city] = setInterval(() => {
+        //as well as defines a new reference to the latest data retrieved from the set interval
+        this.#latestDataRecieved.fixedInterval[city] = null;
+        this.#existingRetrievalIntervals[city] = setInterval(() => {
           if (!existingPromise) {
             //defines that a new promise for fetching the api data has been made, so the interval doesn't make more
             //calls than necessary
@@ -123,7 +126,7 @@ class WeatherApi {
               })
               .then((data) => {
                 existingPromise = false;
-                return data;
+                this.#latestDataRecieved.fixedInterval[city] = data;
               })
               .catch((error) => {
                 console.error(error, error.stack);
@@ -147,6 +150,7 @@ class WeatherApi {
         const response = await fetch(assembledLink),
           dataObj = await response.json();
 
+        this.#resolvedPromiseData.singleRequest = dataObj;
         return dataObj;
       } catch (error) {
         console.error(error, error.stack);
@@ -155,22 +159,46 @@ class WeatherApi {
   };
 
   //will stop an existing functionality to retrieve data on a specific interval
+  //as well as delete its reference for the data it pulls
   stopExistingRetrievalInterval(instanceKey) {
     if (instanceKey in this.#storedRetrievalIntervals) {
       delete this.#storedRetrievalIntervals[instanceKey];
+      delete this.#latestDataRecieved.fixedInterval[instanceKey];
     }
   }
 
   //holds different methods to retrieve data based on the basic parameter
   retrieveWeatherData = {
     city: (city, requestRule = "once", interval = 5000) => {
-      this.#retrieveData({
-        city: city,
-        requestRule: requestRule,
-        interval: interval,
-      });
+      this.#validateConfig("city", { city, requestRule, interval });
+
+      if (requestRule === "once") {
+        return this.#retrievalMethods.singleRequest(city);
+      } else if (requestRule === "interval") {
+        return this.#retrievalMethods.fixedInterval(city, interval);
+      }
     },
   };
+
+  //for getting the value of the most up to date value of a interval retrieval
+  getCurrentIntervalValue(identifier) {
+    try {
+      if (identifier in this.#latestDataRecieved.fixedInterval) {
+        return this.#latestDataRecieved.fixedInterval[identifier];
+      } else {
+        throw new ReferenceError(
+          `Failed to retrieve the latest data for a specific interval defined, interval assigned to the supplied identifier does not exist, received ${identifier}`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //for getting the value of the last single request made by this instance
+  getLastSingleRequestValue() {
+    return this.#latestDataRecieved.singleRequest;
+  }
 }
 
 export class ApiDataRetriever {
