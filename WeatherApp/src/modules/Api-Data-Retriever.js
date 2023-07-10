@@ -1,11 +1,15 @@
 class WeatherApi {
   //will be for initializing the supplied key to the stored end point string
   constructor(apiKey) {
-    if (typeof apiKey === "string") {
-    } else {
-      throw new TypeError(
-        `Value supplied to constructor for class instance '${this.constructor.name}' is an invalid data type, must be a string, received ${apiKey}`
-      );
+    try {
+      if (typeof apiKey === "string") {
+      } else {
+        throw new TypeError(
+          `Value supplied to constructor for class instance '${this.constructor.name}' is an invalid data type, must be a string, received ${apiKey}`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
     }
   }
 
@@ -14,6 +18,7 @@ class WeatherApi {
     apiKey: null,
   };
 
+  //will hold data that represents essentially the most up to date fetch request response
   #latestDataRecieved = {
     singleRequest: null,
     fixedInterval: {},
@@ -30,7 +35,7 @@ class WeatherApi {
     secondHalf: `&key=${this.#instanceStateData.apiKey}`,
   };
 
-  //holds data that defines what inputs are valid to supply to the various retrieveWeatherData APIs
+  //holds data that defines what inputs are valid to supply to the corresponding retrieveWeatherData APIs
   #validConfigInputsPerMethod = {
     city: {
       city: {
@@ -49,16 +54,21 @@ class WeatherApi {
     },
   };
 
-  //will validate the incoming configuration before actually trying to retrieve data
+  //will validate the incoming configuration before actually trying to define some sort of data retrieval behavior
   #validateConfig(method, config) {
-    const errors = [];
+    const errors = []; //holds all found errors within validation
 
     if (method in this.#validConfigInputsPerMethod) {
-      const validDataRef = this.#validConfigInputsPerMethod[method];
+      // represents the corresponding method in terms of holding the necessary validation data needed
+      const validDataRef = this.#validConfigInputsPerMethod[method]; // the actual data for validation comparison
 
       for (let validProperty in validDataRef) {
+        // iterates over all of the possible properties corresponding to the method
         const dataSet = validDataRef[validProperty];
 
+        //for checking the various types of properties that can represent a single property
+        //which these properties will be base line in terms of defining the characteristics of the corresponding
+        //data that they are checking
         switch (true) {
           case "type" in dataSet:
             if (typeof config[validProperty] !== dataSet["type"]) {
@@ -202,20 +212,51 @@ class WeatherApi {
 }
 
 export class ApiDataRetriever {
-  //acts as an entrypoint in order to retrieve data from a specific api end point
-  //This class will act as a controller class, at which it will simply create a new
-  //instance of the helper class that corresponds to the api that you want to retrieve data from
-  constructor(selectedApi, key) {}
-
   //will hold key value pairs to valid apis to target, where the key will be the name of the api, and
   //the value will be a reference to the helper class instance that represents the api essentially
   #validApis = {
     WeatherAPI: WeatherApi,
   };
 
+  //will hold key values pairs to the keys that will be used for their corresponding api
+  #keys = {
+    WeatherAPI: null,
+  };
+
+  //api in order to add keys pertaining to specific targeted data retrieval apis
+  defineApiKey(selectedApi, key) {
+    try {
+      if (selectedApi in this.#keys && typeof key === "string") {
+        this.#keys[selectedApi] = key;
+      } else {
+        throw new ReferenceError(
+          `Either the selected API does not exist as a valid API to add a key to within the keys cache, or the supplied key is not a valid data type, received '${selectedApi}' as the supplied selected API and '${key}' as the received key`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
   //will return a helper class instance that represents the api that you want to retrieve data from,
   //of course if said api is a valid api instance to reference.
   //The helper instance will already be configured with the key that you used, and will have a unique
   //set of apis that pertain to its own use case
-  returnApiInstance() {}
+  getApiInstance(selectedApi) {
+    try {
+      if (
+        selectedApi in this.#validApis &&
+        selectedApi in this.#keys &&
+        this.#keys[selectedApi] !== null
+      ) {
+        return new this.#validApis.WeatherAPI(this.#keys[selectedApi]);
+      } else {
+        throw new ReferenceError(
+          `Selected API is invalid as it either does not exist as a valid API to get or does not have a valid key in order to create the specific api instance, received '${selectedApi}' as the received selected API`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
