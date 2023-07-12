@@ -377,4 +377,9 @@ export class EventDrivenFunctionalityManager {
   getExistingFunctionalities() {
     return this.#eventListenerData.functionalities;
   }
+
+  //a simple api to get the data representing whether each specific event listener is on or off
+  getActiveEventListeners() {
+    return this.#eventListenerData.active;
+  }
 }
