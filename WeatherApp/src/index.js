@@ -1,10 +1,13 @@
-const displayData = async () => {
-  const weatherDataRes = await fetch(
-      "http://api.weatherapi.com/v1/current.json?key=1b02a8d7c80a47a992443529230607&q=London&aqi=no"
-    ),
-    weatherDataObj = await weatherDataRes.json();
+import { EventDrivenFunctionalityManager } from "./modules/Event-Driven-Functionality-Manager";
 
-  console.log(weatherDataObj);
-};
+const testInstance = new EventDrivenFunctionalityManager(document.body);
 
-displayData();
+testInstance.eventListenerOn("mousedown");
+
+testInstance.addFunctionalityToEvent(
+  "click",
+  "i hate it here",
+  (event) => {
+    console.log(event);
+  }
+);

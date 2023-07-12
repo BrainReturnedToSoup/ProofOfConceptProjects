@@ -70,7 +70,7 @@ export class ElementRefManager {
 
   retrieveRef(key) {
     try {
-      this.#cacheManipulator("get", key);
+      return this.#cacheManipulator("get", key);
     } catch (error) {
       console.error(error, error.stack);
     }
