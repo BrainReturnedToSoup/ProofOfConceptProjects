@@ -1,18 +1,32 @@
 class FormValidator {
-  constructor(formControlElementArr, elementRefManager) {
-    if (
-      elementRefManager instanceof ElementRefManager &&
-      Array.isArray(formControlElementArr) &&
-      formControlElementArr.length > 0
-    ) {
-      //adds supplied arguments as values to specific configuration properties and helper classes within the class instance if they meet the following:
-      //formControlElementArr must be an array that contains elements of some sort, and elementRefManager must be an instance from the class ElementRefManager
-      this.#helperClasses.elementRefManager = elementRefManager;
-      this.#configData.formControlElementArr = formControlElementArr;
-    } else {
-      throw new Error(
-        `ERROR: FAILED TO INITIALIZE FORM VALIDATION ON TARGET FOR : EITHER OF THE RECEIVED ARGUMENTS ARE INVALID : 'formControlElementArr' MUST BE AN ARRAY WITH ELEMENTS AND 'elementRefManager' MUST BE AN INSTANCE OF THE CLASS 'ElementRefManager' : RECEIVED ${formControlElementArr} AND ${elementRefManager}`
-      );
+  constructor(
+    formControlElementArr,
+    elementRefManager,
+    eventDrivenFunctionalityManager
+  ) {
+    try {
+      if (
+        //make a simple validation of the constructor args
+        elementRefManager instanceof ElementRefManager &&
+        eventDrivenFunctionalityManager instanceof
+          EventDrivenFunctionalityManager &&
+        Array.isArray(formControlElementArr) &&
+        formControlElementArr.length > 0
+      ) {
+        this.#configData.formControlElementArr = formControlElementArr; // will be used to determine which elements to apply validation to
+
+        this.#helperClasses.elementRefManager = elementRefManager; // will be used to pull the references of said elements
+        this.#helperClasses.eventDrivenFunctionalityManager =
+          eventDrivenFunctionalityManager; // will be used to catch the various events needed in order to facilitate the needed functionality
+
+        this.#fetchRequiredElementRefs(); // fetch all of the required element references in order to facilitate the validation based on the constructed form
+      } else {
+        throw new ReferenceError(
+          `Failed to apply various configuration data to the class instance state data, one of the supplied arguments fails to meet a requirement defined by the constructor, received '${formControlElementArr}' as the supplied array to contain form control elements, '${elementRefManager}' as the supplied element reference manager class, and "${eventDrivenFunctionalityManager}" as the supplied event driven functionality manager class`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
     }
   }
 
@@ -20,18 +34,21 @@ class FormValidator {
   //which is supplied by the constructor arguments mostly
   #configData = {
     formControlElementArr: null,
+    validationOn: false,
   };
 
   //holds data that is important to facilitate the functionality of this class
   //but is not necessarily derived directly from the constructor arguments
   #refData = {
     retrievedElementRefs: {},
+    elementsRetrieved: false,
   };
 
   //holds values to important class instances that help facilitate specific functionality within the class
   //through their interfaces
   #helperClasses = {
     elementRefManager: null,
+    eventDrivenFunctionalityManager: null,
   };
 
   //holds the text data relating to a specific validation failure based on the corresponding form control element, which will
@@ -57,6 +74,39 @@ class FormValidator {
       customError: "These passwords do not match.",
     },
   };
+
+  #getValidationFailureMessage(formControlElement, validityStateObj) {
+    //checks for the existence of the corresponding form control element within validationFailureText,
+    //as well as whether validityStateObj is in fact an object
+    //Then it checks all properties within the validityStateObj and checks for any true boolean value on
+    //the various validation failure properties, if this happens, return the corresponding text to represent
+    //the validation failure message to the user
+    if (formControlElement in this.#validationFailureText) {
+      switch (true) {
+        case validityStateObj.valueMissing:
+          return this.#validationFailureText[formControlElement].valueMissing;
+        case validityStateObj.typeMismatch:
+          return this.#validationFailureText[formControlElement].typeMismatch;
+        case validityStateObj.tooLong:
+          return this.#validationFailureText[formControlElement].tooLong;
+        case validityStateObj.tooShort:
+          return this.#validationFailureText[formControlElement].tooShort;
+        case validityStateObj.rangeOverflow:
+          return this.#validationFailureText[formControlElement].rangeOverflow;
+        case validityStateObj.stepMismatch:
+          return this.#validationFailureText[formControlElement].stepMismatch;
+        case validityStateObj.patternMismatch:
+          return this.#validationFailureText[formControlElement]
+            .patternMismatch;
+        case validityStateObj.customError:
+          return this.#validationFailureText[formControlElement].customError;
+      }
+    } else {
+      throw new Error(
+        `Failed to retrieve text to display corresponding to the validation that a specific input failed, the supplied form control element does not exist within the validation failure text data, received '${formControlElement}' as the supplied form control element `
+      );
+    }
+  }
 
   #fetchRequiredElementRefs() {
     //iterates over every element in the supplied form control element array, and retrieves their corresponding
@@ -264,151 +314,579 @@ class FormValidator {
     },
   };
 
-  #eventListenersInitializers = {
-    input: (targetElement) => {
-      //check that the argument supplied is an element to append the event listener to
-      if (targetElement instanceof Element) {
-        //append the event listener to the target that will read for input events
-        targetElement.addEventListener("input", (e) => {
-          this.#executeEventFunctionality("input", e);
-        });
-      } else {
-        throw new Error(
-          `ERROR: FAILED TO APPEND INPUT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement}`
-        );
-      }
+  //will hold functions that will be supplied to the event driven functionality manager
+  //class when adding a sort of functionality, this way the manager only needs to accept
+  //one functionality to execute corresponding to the event listener, and the supplied
+  //function will execute all of the necessary functionality from the validator scope
+  #createFunctionalitiesEntryPoint(eventType) {
+    const methodName = `formValidation${eventType}`, //creates the unique method name
+      assembledMethodArr = [
+        methodName,
+        (event) => {
+          for (let method in this.#eventFunctionalities[eventType]) {
+            this.#eventFunctionalities[eventType][method](event);
+          }
+        },
+      ];
+
+    //creates a 2 element array that contains the method name as the first element,
+    //and a function as the actual method being implemented
+    return assembledMethodArr;
+  }
+
+  #eventDrivenFunctionalityManagerMethods = {
+    addFunctionalities: () => {
+      //will add entrypoint functions to the event driven functionality manager class instance to all of the
+      //necessary event listeners, so that upon every time that event is caught, this entry point function will execute,
+      //which it will execute all of the functions from the form validator scope, which each individual functionality will be supplied the event caught
+      const { eventDrivenFunctionalityManager } = this.#helperClasses,
+        inputMethodArr = this.#createFunctionalitiesEntryPoint("input"),
+        submitMethodArr = this.#createFunctionalitiesEntryPoint("submit");
+
+      eventDrivenFunctionalityManager.addFunctionalityToEvent(
+        "input",
+        inputMethodArr[0],
+        inputMethodArr[1]
+      );
+
+      eventDrivenFunctionalityManager.addFunctionalityToEvent(
+        "submit",
+        submitMethodArr[0],
+        submitMethodArr[1]
+      );
     },
-    submit: (targetElement) => {
-      if (targetElement instanceof Element) {
-        targetElement.addEventListener("submit", (e) => {
-          this.#executeEventFunctionality("submit", e);
-        });
-      } else {
-        throw new Error(
-          `ERROR: FAILED TO APPEND SUBMIT EVENT LISTENER TO TARGET ELEMENT : VALUE SUPPLIED FOR TARGET ELEMENT IS NOT AN ELEMENT : RECEIVED ${targetElement}`
-        );
-      }
+    removeFunctionalities: () => {
+      //removes all of the added entrypoints from the event driven functionality manager
+      const { eventDrivenFunctionalityManager } = this.#helperClasses;
+
+      eventDrivenFunctionalityManager.removeFunctionalityFromEvent(
+        "formValidationInput"
+      );
+
+      eventDrivenFunctionalityManager.removeFunctionalityFromEvent(
+        "formValidationSubmit"
+      );
+    },
+    turnOnEventListeners: () => {
+      //turns on event listeners through the manager
+      const { eventDrivenFunctionalityManager } = this.#helperClasses;
+
+      eventDrivenFunctionalityManager.eventListenerOn("input");
+      eventDrivenFunctionalityManager.eventListenerOn("submit");
+    },
+    turnOffEventListeners: () => {
+      //turns off event listeners through the manager
+      const { eventDrivenFunctionalityManager } = this.#helperClasses;
+
+      eventDrivenFunctionalityManager.eventListenerOff("input");
+      eventDrivenFunctionalityManager.eventListenerOff("submit");
     },
   };
 
-  #executeEventFunctionality(eventType, event) {
-    const functionalities = this.#eventFunctionalities;
+  //turn on the validation of the corresponding form for this class instance
+  validationOn() {
+    try {
+      if (!this.#configData.validationOn) {
+        const { addFunctionalities, turnOnEventListeners } =
+          this.#eventDrivenFunctionalityManagerMethods;
 
-    if (
-      eventType in functionalities &&
-      Object.values(functionalities).length > 0
-      //check for existing properties and methods before attempting to execute anything
-    ) {
-      //check if the event was supplied and execute the methods with the event supplied as the arg,
-      //otherwise just execute the methods
+        addFunctionalities();
+        turnOnEventListeners();
 
-      //execute all methods found within the corresponding event type functionality
-      for (let formControlMethod of Object.values(functionalities[eventType])) {
-        formControlMethod(event);
+        this.#configData.validationOn = true;
+      } else {
+        throw new Error(
+          `Failed to turn validation on because it's already on for this specific class instance`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //turn off the validation of the corresponding form for this class instance
+  validationOff() {
+    try {
+      if (this.#configData.validationOn) {
+        const { removeFunctionalities, turnOffEventListeners } =
+          this.#eventDrivenFunctionalityManagerMethods;
+
+        removeFunctionalities();
+        turnOffEventListeners();
+
+        this.#configData.validationOn = false;
+      } else {
+        throw new Error(
+          `Failed to turn validation off because it's already off for this specific class instance`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+}
+
+class EventDrivenFunctionalityManager {
+  //basically initializes the class instance, takes an argument that represents the element to append all event listeners to
+  //which are created within this class instance. Also initializes data structures important for facilitating the functionalities
+  //of the various private and public methods within said class
+  constructor(targetElement) {
+    try {
+      if (targetElement instanceof Element) {
+        this.#targetElement = targetElement;
+        this.#initEventListenerDataStructures();
+      } else {
+        throw new ReferenceError(
+          `Supplied target element for this class instance is not an element, received '${targetElement}'`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //holds an array full of the valid event listeners that you can add/remove and
+  //control functionalities with
+  #validEventListeners = [
+    "input",
+    "submit",
+    "focus",
+    "blur",
+    "click",
+    "mousedown",
+    "mouseup",
+    "mouseover",
+  ];
+
+  //holds references to valid event listeners, and holds
+  //data to represent what to initialize every
+  //added property to equal by default
+  #eventListenerDataStructures = {
+    active: () => {
+      return false;
+    },
+    entryPointRefs: () => {
+      return null;
+    },
+    functionalities: () => {
+      return new Object();
+    },
+  };
+
+  //basically sets up the data structures to incorporate some default properties an values necessary
+  //to facilitate the other functionality within the class. This way, for instance in the future that I
+  //add another valid event listener, I can simply just add it to the valid event listeners array and
+  //everything will work with it, all without having to edit the already present functionality too much
+  //if necessary
+  #initEventListenerDataStructures() {
+    if (this.#validEventListeners.length > 0) {
+      for (let dataStructure in this.#eventListenerDataStructures) {
+        //for retrieving the actual reference to a specific data structure that will be initialized internally based
+        //on valid event listener types
+        const dataStructureRef = this.#eventListenerData[dataStructure];
+
+        for (let eventListenerType of this.#validEventListeners) {
+          if (typeof eventListenerType === "string") {
+            //for setting the internal properties of the corresponding data structures to their
+            //default property values. This way it will account for any new event listener types
+            //automatically in the future
+            dataStructureRef[eventListenerType] =
+              this.#eventListenerDataStructures[dataStructure]();
+          } else {
+            throw new TypeError(
+              `Current event listener type being referenced within validEventListeners is not a correct data type, should be a string, received '${eventListenerType}'`
+            );
+          }
+        }
       }
     } else {
-      throw new Error(
-        `ERROR: FAILED TO EXECUTE ALL FUNCTIONALITY ASSOCIATED WITH THE SUPPLIED EVENT TYPE : VALUE SUPPLIED FOR THE EVENT TYPE DOES NOT EXIST WITHIN THE FUNCTIONALITY OBJECT : RECEIVED ${eventType}`
+      throw new ReferenceError(
+        `Could not initialize necessary data structures within the class instance, as there are not any valid event listeners to add to any corresponding data structure, validEventListeners is empty`
       );
     }
   }
 
-  #getValidationFailureMessage(formControlElementString, validityStateObj) {
-    //checks for the existence of the corresponding form control element within validationFailureText,
-    //as well as whether validityStateObj is in fact an object
-    //Then it checks all properties within the validityStateObj and checks for any true boolean value on
-    //the various validation failure properties, if this happens, return the corresponding text to represent
-    //the validation failure message to the user
-    if (
-      formControlElementString in this.#validationFailureText &&
-      typeof validityStateObj === "object"
-    ) {
-      switch (true) {
-        case validityStateObj.valueMissing:
-          return this.#validationFailureText[formControlElementString]
-            .valueMissing;
-        case validityStateObj.typeMismatch:
-          return this.#validationFailureText[formControlElementString]
-            .typeMismatch;
-        case validityStateObj.tooLong:
-          return this.#validationFailureText[formControlElementString].tooLong;
-        case validityStateObj.tooShort:
-          return this.#validationFailureText[formControlElementString].tooShort;
-        case validityStateObj.rangeOverflow:
-          return this.#validationFailureText[formControlElementString]
-            .rangeOverflow;
-        case validityStateObj.stepMismatch:
-          return this.#validationFailureText[formControlElementString]
-            .stepMismatch;
-        case validityStateObj.patternMismatch:
-          return this.#validationFailureText[formControlElementString]
-            .patternMismatch;
-        case validityStateObj.customError:
-          return this.#validationFailureText[formControlElementString]
-            .customError;
+  //the target element to append all of these event listeners to
+  #targetElement = null;
+
+  #eventListenerData = {
+    //an easy storage for keeping track of already initialized event listeners
+    //each property is a unique event listener type set to a boolean
+    active: {},
+
+    //holds key value pairs to the callbacks used to catch any events
+    //from corresponding event listeners based on their type. If
+    //the corresponding event listener isn't active, their corresponding
+    //value is equal to null
+    entryPointRefs: {},
+
+    //will hold key value pairs for corresponding event types, and
+    //and object holding all of the callbacks to execute upon each
+    //event caught pertaining to said event type
+    functionalities: {},
+  };
+
+  //holds reference data to validate arguments supplied to the various apis
+  #validatorReferenceData = {
+    addFunctionalityToEvent: {
+      eventListenerType: {
+        type: "string",
+        validInputs: this.#validEventListeners,
+      },
+      uniqueIdentifier: {
+        type: "string",
+      },
+      callback: { type: "function" },
+    },
+    removeFunctionalityFromEvent: {
+      eventListenerType: {
+        type: "string",
+        validInputs: this.#validEventListeners,
+      },
+      uniqueIdentifier: {
+        type: "string",
+      },
+    },
+    eventListenerOn: {
+      eventListenerType: {
+        type: "string",
+        validInputs: this.#validEventListeners,
+      },
+    },
+    eventListenerOff: {
+      eventListenerType: {
+        type: "string",
+        validInputs: this.#validEventListeners,
+      },
+    },
+  };
+
+  //conducts validation on supplied args and compares them to the validation reference data
+  #argValidatorForApis(method, argsObj) {
+    if (method in this.#validatorReferenceData) {
+      const validationRefs = this.#validatorReferenceData[method];
+      for (let methodArg in validationRefs) {
+        //iterate through all of the corresponding arguments based on the selected method
+
+        const methodArgValidProps = validationRefs[methodArg];
+
+        //checks if type is a property to validate against the corresponding argument
+        if (methodArgValidProps.hasOwnProperty("type")) {
+          //check the typing
+          if (typeof argsObj[methodArg] !== methodArgValidProps["type"]) {
+            throw new TypeError(
+              `Value of received argument for a corresponding api is not the correct data type, received '${
+                argsObj[methodArg]
+              }' as the value with a data type of '${typeof argsObj[
+                methodArg
+              ]}' for the argument '${methodArg}' for the method '${method}', needs to be a(n) '${
+                methodArgValidProps["type"]
+              }'`
+            );
+          }
+
+          if (methodArgValidProps["type"] === "string") {
+            //if the corresponding argument didn't fail its typing test, and it's supposed to be a string, validate the string
+            const stringPassed = this.#stringValidator(argsObj[methodArg]);
+
+            if (!stringPassed) {
+              throw new ReferenceError(
+                `Value of a received argument for a corresponding api is a string that is invalid, most likely empty or contains spaces, received '${argsObj[methodArg]}' for the argument '${methodArg}' for the method '${method}'`
+              );
+            }
+          }
+        }
+
+        //checks if validInputs is a property to validate against the corresponding argument
+        if (
+          methodArgValidProps.hasOwnProperty("validInputs") &&
+          !methodArgValidProps["validInputs"].includes(argsObj[methodArg])
+        ) {
+          throw new ReferenceError(
+            `Value of received argument for a corresponding api is not valid because it does not match one of the valid
+             parameters to accept for the specific argument, received '${
+               argsObj[methodArg]
+             }' as the value with a data type of '${typeof argsObj[
+              methodArg
+            ]}' for the argument '${methodArg}' for the method '${method}', needs to be a(n) '${
+              methodArgValidProps["type"]
+            }' as well as match one of these valid inputs '${
+              methodArgValidProps["validInputs"]
+            }'`
+          );
+        }
       }
     } else {
-      throw new Error(
-        `ERROR: FAILED TO RETRIEVE VALIDATION FAILURE MESSAGE DATA FOR THE CORRESPONDING : TARGET FORM CONTROL ELEMENT DOES NOT EXIST WITHIN THE '#validationFailureText' OBJECT : RECEIVED ${formControlElementString}`
+      throw new ReferenceError(
+        `Failed to perform validation on a specific apis input arguments, the reference data for the corresponding api 
+        does not exist within 'validatorReferenceData', received '${method}' as the method attempting to be validated`
       );
     }
   }
 
-  init() {
-    //get the refs of the form element and the corresponding form control elements being used in the supplied instance
-    this.#fetchRequiredElementRefs();
-    //initialize the event listener that is already configured to the necessary functionality for input events in the context of the form, and append it to the form tag itself,
-    //this way the event functionality uses event bubbling to facilitate the functionality attached to the specific event type.
-    this.#eventListenersInitializers.input(
-      this.#refData.retrievedElementRefs["formElement"]
-    );
-    console.log(this.#refData.retrievedElementRefs["formElement"]);
-    this.#eventListenersInitializers.submit(
-      this.#refData.retrievedElementRefs["formElement"]
-    );
+  //makes sure that a supplied string for what ever reason isn't empty
+  //or contains any spaces
+  #stringValidator(string) {
+    //checking for if the string is just an empty string
+    if (string === "") {
+      return false;
+    }
+
+    const sanitizedString = string.replace(/\s/g, "");
+
+    //checking for any spaces within the string
+    return string === sanitizedString;
+  }
+
+  //will be supplied to each event listener creation in order
+  //to serve as the entry point to execute the appended functionality
+  //for the specific event listener type, so that all associated functionality
+  //is executed every event caught
+  #eventFunctionalityEntryPoint(event, eventListenerType) {
+    if (eventListenerType in this.#eventListenerData.functionalities) {
+      //checks for the existence of the event listener type, as well as whether the associated functionality reference has methods to execute
+      const functionalityObj =
+          this.#eventListenerData.functionalities[eventListenerType],
+        hasMethodsToExecute = Object.keys(functionalityObj).length > 0;
+
+      if (hasMethodsToExecute) {
+        for (let method in functionalityObj) {
+          functionalityObj[method](event); //executes every existing method within the corresponding event type functionality object, and does so with the supply of the event
+        }
+      } else {
+        //simple warning for user when they have an event listener running but its not actually executing any functionality
+        console.warn(
+          `Functionality for a corresponding event type is attempting to execute, but there isn't any methods to execute for said event type within 'eventListenerFunctionality', received '${eventListenerType}' as the type of event that is on, but doesn't have actual functionality associated with it`
+        );
+      }
+    } else {
+      throw new ReferenceError(
+        `Could not execute associated event functionality, as the property that represents the event type within 'eventListenerFunctionality' does not exist, received ${eventListenerType} for the event listener type`
+      );
+    }
+  }
+
+  //will add the target event listener from the target element if it is not active as well as check if the
+  //event listener type exists within the functionality data structure
+  #eventListenerInitializer(eventListenerType) {
+    if (
+      this.#validEventListeners.includes(eventListenerType) &&
+      this.#eventListenerData.active[eventListenerType] === false
+    ) {
+      //have to make a separate callback to supply to the event listener, so that I can have the reference to it
+      //in the future in order to be able to remove said event listener when needed
+      const { active, entryPointRefs } = this.#eventListenerData;
+
+      const listenerEntryPoint = (e) => {
+        this.#eventFunctionalityEntryPoint(e, eventListenerType);
+      };
+
+      this.#targetElement.addEventListener(
+        eventListenerType,
+        listenerEntryPoint
+      ); //create event listener and append it to target element
+
+      entryPointRefs[eventListenerType] = listenerEntryPoint; //store the callback to be used later if needed
+
+      active[eventListenerType] = true; //toggle the specific event listener as active
+    } else {
+      throw new Error(
+        `Cannot add specific event listener, as the target event listener is already active, or is not a valid event listener to initialized, received '${eventListenerType}' as the event listener trying to be initialized, here are some valid event listeners to create '${Object.values(
+          this.#validEventListeners
+        )}'`
+      );
+    }
+  }
+
+  //will remove the target event listener from the target element if it is active as well as check if
+  //the evet listener type exists within the existing
+  #eventListenerRemover(eventListenerType) {
+    if (
+      this.#validEventListeners.includes(eventListenerType) &&
+      this.#eventListenerData.active[eventListenerType] === true
+    ) {
+      const { active, entryPointRefs } = this.#eventListenerData;
+
+      const listenerEntryPointRef = entryPointRefs[eventListenerType]; //have to retrieve the exact callback that was used when creating the event listener from before
+
+      this.#targetElement.removeEventListener(
+        eventListenerType,
+        listenerEntryPointRef
+      ); //remove the event listener from the target element
+
+      entryPointRefs[eventListenerType] = null; //reset the callback reference back to null since the event listener was removed
+
+      active[eventListenerType] = false; //toggle the specific event listener as inactive
+    } else {
+      throw new Error(
+        `Cannot remove specific event listener, as the target event listener is not currently active, received ${eventListenerType}`
+      );
+    }
+  }
+
+  //will add a callback to perhaps a list of callbacks to execute to
+  //pertaining to the specific event listener type. This callback is managed by
+  //assigning it an identifier as its key, and the callback is the value of said key
+  addFunctionalityToEvent(eventListenerType, uniqueIdentifier, callback) {
+    try {
+      this.#argValidatorForApis("addFunctionalityToEvent", {
+        eventListenerType,
+        callback,
+        uniqueIdentifier,
+      });
+
+      //make sure that the unique identifier for the supplied callback to be
+      //executed isn't already present in the corresponding event functionalities
+      const functionalitiesForSpecificEvent =
+        this.#eventListenerData.functionalities[eventListenerType];
+
+      if (!functionalitiesForSpecificEvent.hasOwnProperty(uniqueIdentifier)) {
+        //adds a new method to the object that holds all of the methods to execute everytime the corresponding event is caught
+        functionalitiesForSpecificEvent[uniqueIdentifier] = callback;
+      } else {
+        throw new Error(
+          `Failed to add functionality to a specific event listener, as the supplied unique identifier already matches an existing callback within said specific event listener functionality, received '${uniqueIdentifier}' for the callback '${callback}'`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //will remove a callback from perhaps a list of callbacks to execute to
+  //pertaining to the specific event listener type. Finds the corresponding functionality
+  //using the supplied key
+  removeFunctionalityFromEvent(eventListenerType, uniqueIdentifier) {
+    try {
+      this.#argValidatorForApis("removeFunctionalityFromEvent", {
+        eventListenerType,
+        uniqueIdentifier,
+      }); //validate input
+
+      //make sure that a callback with the unique identifier as its key exists within the
+      //corresponding functionality
+
+      const functionalitiesForSpecificEvent =
+        this.#eventListenerData.functionalities[eventListenerType];
+
+      if (functionalitiesForSpecificEvent.hasOwnProperty(uniqueIdentifier)) {
+        delete functionalitiesForSpecificEvent[uniqueIdentifier]; //deletes the target method entirely if it exists within the target event listener functionality
+      } else {
+        throw new Error(
+          `Failed to remove a specific functionality associated with the supplied unique identifier from the corresponding event listener functionality, the method was not found, received '${uniqueIdentifier}' as the unique identifier for the corresponding event listener '${eventListenerType}'`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //turns an an event listener by adding it from the target element
+  eventListenerOn(eventListenerType) {
+    try {
+      this.#argValidatorForApis("eventListenerOn", { eventListenerType }); //validate input
+      this.#eventListenerInitializer(eventListenerType); //initialize the event listener corresponding to the supplied type
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //turns off an event listener by removing it from the target element
+  eventListenerOff(eventListenerType) {
+    try {
+      this.#argValidatorForApis("eventListenerOff", { eventListenerType }); //validate input
+      this.#eventListenerRemover(eventListenerType); //remove the event listener corresponding to the supplied type
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //a simple api to get the data on currently existing methods per event type
+  getExistingFunctionalities() {
+    return this.#eventListenerData.functionalities;
+  }
+
+  //a simple api to get the data representing whether each specific event listener is on or off
+  getActiveEventListeners() {
+    return this.#eventListenerData.active;
   }
 }
 
 class ElementRefManager {
-  //holds unique key value pairs representing specific form element references
-  #refCache = new Map();
+  //acts as a means of managing all element references supplied to the class instance
+  //highly reuseable as it can be applied to pretty much any front end feature
 
-  addRef(key, element) {
-    if (
-      typeof key === "string" &&
-      !this.#refCache.has(key) &&
-      element instanceof Element
-    ) {
-      //adds a key value pair representing an element ref within the class cache if the arguments follow these requirements:
-      //the supplied key is a string, the ref cache doesn't already have a key value pair with said key, and the value is an element
-      this.#refCache.set(key, element);
+  #cache = new Map();
+
+  //will be what actually manipulates the cache based on the instructions given, also returns any errors that it comes across when doing so
+  #cacheManipulator(methodType, key, value) {
+    const errors = [];
+
+    if (typeof key === "string") {
+      switch (methodType) {
+        case "set":
+          if (value instanceof Element) {
+            this.#cache.set(key, value);
+          } else {
+            errors.push(
+              new TypeError(
+                `Supplied value to be stored within the element cache manager is not an element, received '${value}' as the value corresponding to the supplied key '${key}'`
+              )
+            );
+          }
+        case "get":
+          return this.#cache.get(key);
+        case "delete":
+          this.#cache.delete(key);
+          break;
+        default:
+          errors.push(
+            new SyntaxError(
+              `Supplied 'methodType' argument value does not match any of the valid methods available to enact on the cache within '${this.constructor.name}', received '${methodType}' as the supplied method type`
+            )
+          );
+      }
     } else {
-      throw new Error(
-        `ERROR: FAILED TO ADD KEY VALUE PAIR FOR AN ELEMENT REFERENCE TO REFERENCE CACHE : ARGUMENTS FAILED TO MEET REQUIREMENTS TO BE VALID : RECEIVED ${key} AS THE KEY AND ${element} AS THE ELEMENT`
+      errors.push(
+        new TypeError(
+          `Supplied 'key' argument value is an incorrect data type, must be a string, received '${key}'`
+        )
       );
+    }
+
+    this.#throwFoundErrors(errors);
+  }
+
+  //for throwing multiple errors found within an operation, so
+  //that a try/catch can potentially handle multiple errors as opposed to say only one error at a time if needed
+  #throwFoundErrors(errorArr) {
+    if (errorArr.length > 0) {
+      throw errorArr;
     }
   }
 
-  removeRef(key) {
-    if (this.#refCache.has(key)) {
-      //removes the key value pair if the target key exists within the ref cache
-      this.#refCache.delete(key);
-    } else {
-      throw new Error(
-        `ERROR: FAILED TO DELETE KEY VALUE PAIR FOR AN ELEMENT REFERENCE IN REFERENCE CACHE : TARGET KEY DOES NOT EXIST : RECEIVED ${key}`
-      );
+  //APIs for adding, removing, or retrieving stored element refs
+  addRef(key, value) {
+    try {
+      this.#cacheManipulator("set", key, value);
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  deleteRef(key) {
+    try {
+      this.#cacheManipulator("delete", key);
+    } catch (error) {
+      console.error(error, error.stack);
     }
   }
 
   retrieveRef(key) {
-    if (this.#refCache.has(key)) {
-      //retrieves the reference value if the target key has been declared within the ref cache
-      const retrievedRef = this.#refCache.get(key);
-      return retrievedRef;
-    } else {
-      //will return null if the specific reference couldn't be retrieved, as opposed to throwing an error as I do not want the thread of execution stopping here
-      //which making this method this way opens more possibilities in terms of what can be done whenever another class uses this class instance
-      return null;
+    try {
+      return this.#cacheManipulator("get", key);
+    } catch (error) {
+      console.error(error, error.stack);
     }
   }
 }
@@ -601,7 +1079,7 @@ class FormConstructor {
   }
 
   //single api to return the corresponding form element based on the supplied arguments to the class constructor
-  init() {
+  createForm() {
     const { formControlElementArr, action, method } = this.#configData,
       assembledFormElement = this.#buildCompleteFormElement(
         formControlElementArr,
@@ -617,7 +1095,10 @@ export class Form {
   //creates unique class instances of all the sub classes, which
   //may or may not use the supplied configuration from this main constructor
   constructor(formControlElementArr, action, method, submitButtonText) {
+    //unique ERM
     this.#subClasses.elementRefManager = new ElementRefManager();
+
+    //unique form constructor
     this.#subClasses.formConstructor = new FormConstructor(
       formControlElementArr,
       action,
@@ -625,9 +1106,21 @@ export class Form {
       submitButtonText,
       this.#subClasses.elementRefManager
     );
+
+    //create the form
+    this.#formElement = this.#subClasses.formConstructor.createForm();
+
+    //unique EDFM
+    this.#subClasses.eventDrivenFunctionalityManager =
+      new EventDrivenFunctionalityManager(
+        this.#subClasses.elementRefManager.retrieveRef("formElement")
+      );
+
+    //unique validator
     this.#subClasses.formValidator = new FormValidator(
       formControlElementArr,
-      this.#subClasses.elementRefManager
+      this.#subClasses.elementRefManager,
+      this.#subClasses.eventDrivenFunctionalityManager
     );
   }
 
@@ -636,21 +1129,46 @@ export class Form {
     elementRefManager: null,
     formConstructor: null,
     formValidator: null,
+    eventDrivenFunctionalityManager: null,
   };
 
-  appendForm(parentElement) {
-    if (parentElement instanceof Element) {
-      //checks that the supplied parent element is actually an element so the form can be appended to it
+  #formElement = null; //holds a reference to the actual form that was created using the supplied args
 
-      const formElement = this.#subClasses.formConstructor.init(); //creates the entire form fragment with all necessary children within it
+  #formAppended = false; //data to use as a reference so that the form cannot be appended more than once
 
-      this.#subClasses.formValidator.init(); //initializes the form validation feature of the form which uses the constraint api
+  #validationOn = false; //data to represent whether the validation is taking place on the form
 
-      parentElement.append(formElement); //append the form to a target parent element
+  toggleValidation() {
+    if (!this.#validationOn) {
+      this.#subClasses.formValidator.validationOn();
+      this.#validationOn = true;
     } else {
-      throw new Error(
-        `ERROR: COULD NOT APPEND FORM TO TARGET ELEMENT : VALUE SUPPLIED AS THE PARENT ELEMENT IS NOT AN ELEMENT : RECEIVED ${parentElement}`
-      );
+      this.#subClasses.formValidator.validationOff();
+      this.#validationOn = false;
+    }
+  }
+
+  appendForm(parentElement) {
+    try {
+      if (
+        parentElement instanceof Element &&
+        this.#formElement instanceof Element &&
+        !this.#formAppended
+      ) {
+        //checks that the supplied parent element is actually an element so the form can be appended to it
+
+        this.#subClasses.formValidator.validationOn(); //initializes the form validation feature of the form which uses the constraint api
+
+        parentElement.append(this.#formElement); //append the form to a target parent element
+
+        this.#formAppended = true; //saves to state that the form created was appended so that this method won't successfully work more than once
+      } else {
+        throw new Error(
+          `Failed to append form to a target element, either the supplied target element is not an element, the constructed form is not an element, or the form was already appended once before, received '${parentElement}' as the target element to append the form to`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
     }
   }
 }
