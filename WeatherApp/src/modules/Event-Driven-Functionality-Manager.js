@@ -34,9 +34,15 @@ export class EventDrivenFunctionalityManager {
   //data to represent what to initialize every
   //added property to equal by default
   #eventListenerDataStructures = {
-    active: false,
-    entryPointRefs: null,
-    functionalities: {},
+    active: () => {
+      return false;
+    },
+    entryPointRefs: () => {
+      return null;
+    },
+    functionalities: () => {
+      return new Object();
+    },
   };
 
   //basically sets up the data structures to incorporate some default properties an values necessary
@@ -57,7 +63,7 @@ export class EventDrivenFunctionalityManager {
             //default property values. This way it will account for any new event listener types
             //automatically in the future
             dataStructureRef[eventListenerType] =
-              this.#eventListenerDataStructures[dataStructure];
+              this.#eventListenerDataStructures[dataStructure]();
           } else {
             throw new TypeError(
               `Current event listener type being referenced within validEventListeners is not a correct data type, should be a string, received '${eventListenerType}'`
@@ -176,6 +182,8 @@ export class EventDrivenFunctionalityManager {
               methodArg
             ]}' for the argument '${methodArg}' for the method '${method}', needs to be a(n) '${
               methodArgValidProps["type"]
+            }' as well as match one of these valid inputs '${
+              methodArgValidProps["validInputs"]
             }'`
           );
         }
@@ -301,15 +309,12 @@ export class EventDrivenFunctionalityManager {
 
       //make sure that the unique identifier for the supplied callback to be
       //executed isn't already present in the corresponding event functionalities
-      if (
-        !this.#eventListenerData.functionalities[
-          eventListenerType
-        ].hasOwnProperty(uniqueIdentifier)
-      ) {
+      const functionalitiesForSpecificEvent =
+        this.#eventListenerData.functionalities[eventListenerType];
+
+      if (!functionalitiesForSpecificEvent.hasOwnProperty(uniqueIdentifier)) {
         //adds a new method to the object that holds all of the methods to execute everytime the corresponding event is caught
-        this.#eventListenerData.functionalities[eventListenerType][
-          uniqueIdentifier
-        ] = callback;
+        functionalitiesForSpecificEvent[uniqueIdentifier] = callback;
       } else {
         throw new Error(
           `Failed to add functionality to a specific event listener, as the supplied unique identifier already matches an existing callback within said specific event listener functionality, received '${uniqueIdentifier}' for the callback '${callback}'`
@@ -332,17 +337,15 @@ export class EventDrivenFunctionalityManager {
 
       //make sure that a callback with the unique identifier as its key exists within the
       //corresponding functionality
-      if (
-        this.#eventListenerData.functionalities[
-          eventListenerType
-        ].hasOwnProperty(uniqueIdentifier)
-      ) {
-        delete this.#eventListenerData.functionalities[eventListenerType][
-          uniqueIdentifier
-        ]; //deletes the target method entirely if it exists within the target event listener functionality
+
+      const functionalitiesForSpecificEvent =
+        this.#eventListenerData.functionalities[eventListenerType];
+
+      if (functionalitiesForSpecificEvent.hasOwnProperty(uniqueIdentifier)) {
+        delete functionalitiesForSpecificEvent[uniqueIdentifier]; //deletes the target method entirely if it exists within the target event listener functionality
       } else {
         throw new Error(
-          `Failed to remove a specific functionality associated with the supplied unique identifier from the corresponding event listener functionality, the method was not found, received '${uniqueIdentifier}' for the unique identifier for the corresponding event listener '${eventListenerType}'`
+          `Failed to remove a specific functionality associated with the supplied unique identifier from the corresponding event listener functionality, the method was not found, received '${uniqueIdentifier}' as the unique identifier for the corresponding event listener '${eventListenerType}'`
         );
       }
     } catch (error) {
@@ -368,5 +371,10 @@ export class EventDrivenFunctionalityManager {
     } catch (error) {
       console.error(error, error.stack);
     }
+  }
+
+  //a simple api to get the data on currently existing methods per event type
+  getExistingFunctionalities() {
+    return this.#eventListenerData.functionalities;
   }
 }
