@@ -1,10 +1,39 @@
-import { Form } from "./Simple-Form-Module.js";
-import { ElementRefManager } from "./Element-Ref-Manager.js";
-
 const generalSubClasses = {
-  ElementRefManager: ElementRefManager,
-  Form: Form,
-  ConfigValidator: class {},
+  ElementRefManager: class {
+    //acts as a means of managing all element references within this feature
+    //this way weather sub classes can easily access these references
+
+    #cache = new Map();
+
+    //APIs for adding, removing, or retrieving stored element refs
+    addRef(key, value) {
+      if (
+        typeof key === "string" &&
+        !this.#cache.has(key) &&
+        value instanceof Element
+      ) {
+        this.#cache.set(key, value);
+      } else {
+        throw new Error(``);
+      }
+    }
+
+    deleteRef(key) {
+      if (typeof key === "string" && this.#cache.has(key)) {
+        this.#cache.delete(key);
+      } else {
+        throw new Error(``);
+      }
+    }
+
+    retrieveRef(key) {
+      if (typeof key === "string" && this.#cache.has(key)) {
+        return this.#cache.get(key);
+      } else {
+        return null;
+      }
+    }
+  },
 };
 
 const weatherSubClasses = {
@@ -124,46 +153,25 @@ export class WeatherApp {
     validate: (property, propertyValue, suppliedConfig) => {
       if (typeof this.#validConfigValues[property] === "string") {
         //this means that it's an explicitly defined data type
-        const validDataType = this.#validConfigValues[property];
-        this.#validationMethods.type(propertyValue, validDataType);
+        this.#configPropertyValueValidators.explicitDataType(
+          property,
+          propertyValue
+        );
       } else if (Array.isArray(this.#validConfigValues[property])) {
         //this means that there is an array of valid values for the corresponding property
         //grab the data type expected from the array that contains valid values, as all of the elements should be the same data type
-        const validDataType = typeof this.#validConfigValues[property][0];
-        this.#validationMethods.type(propertyValue, validDataType);
-
-        //then if the property value passes the type check, do a value check
-        const validDataValues = this.#validConfigValues[property];
-        this.#validationMethods.value(propertyValue, validDataValues);
+        this.#configPropertyValueValidators.possibleValues(
+          property,
+          propertyValue
+        );
       } else if (typeof this.#validConfigValues[property] === "object") {
         //this means that this property has a dependency on another property being
         // different as well, so multiple properties have to be validated at once essentially
-        const { checkDependentProperty } = this.#validConfigValues[property];
-
-        if (
-          "validInputs" in this.#validConfigValues[property] === true &&
-          "validDataType" in this.#validConfigValues[property] === false
-        ) {
-          //validate the data type of the supplied property value
-          const validDataType =
-            typeof this.#validConfigValues[property]["validInputs"][0];
-          this.#validationMethods.type(propertyValue, validDataType);
-          //then validate whether the supplied value is a possible value
-          const validDataValues =
-            this.#validConfigValues[property]["validInputs"];
-          this.#validationMethods.value(propertyValue, validDataValues);
-        } else if (
-          "validDataType" in this.#validConfigValues[property] === true &&
-          "validInputs" in this.#validConfigValues[property] === false
-        ) {
-          const validDataType =
-            this.#validConfigValues[property]["validDataType"];
-          this.#validationMethods.type(propertyValue, validDataType);
-        } else {
-          throw new SyntaxError(
-            `A specific property within the validConfigValues object was not configured correctly, either both properties 'validInputs' and 'validDataType' were declared, or neither of them were declared, only or the other can be declared, within '${property}' this was found.`
-          );
-        }
+        this.#configPropertyValueValidators.complexDependencies(
+          property,
+          propertyValue,
+          suppliedConfig
+        );
       }
     },
     applyToFinal: (property, propertyValue) => {
@@ -171,10 +179,49 @@ export class WeatherApp {
     },
   };
 
+  //will hold methods to conduct specific higher level functionality to validate specific properties,
+  //but not in the sense of doing the checking of the individual data types or valid values
   #configPropertyValueValidators = {
-    explicitDataType: () => {},
-    possibleValues: () => {},
-    complexDependencies: () => {},
+    explicitDataType: (property, propertyValue) => {
+      const validDataType = this.#validConfigValues[property];
+      this.#validationMethods.type(propertyValue, validDataType);
+    },
+    possibleValues: (property, propertyValue) => {
+      const validDataType = typeof this.#validConfigValues[property][0];
+      this.#validationMethods.type(propertyValue, validDataType);
+
+      //then if the property value passes the type check, do a value check
+      const validDataValues = this.#validConfigValues[property];
+      this.#validationMethods.value(propertyValue, validDataValues);
+    },
+    complexDependencies: (property, propertyValue, suppliedConfig) => {
+      const { checkDependentProperty } = this.#validConfigValues[property];
+
+      if (
+        "validInputs" in this.#validConfigValues[property] === true &&
+        "validDataType" in this.#validConfigValues[property] === false
+      ) {
+        //validate the data type of the supplied property value
+        const validDataType =
+          typeof this.#validConfigValues[property]["validInputs"][0];
+        this.#validationMethods.type(propertyValue, validDataType);
+        //then validate whether the supplied value is a possible value
+        const validDataValues =
+          this.#validConfigValues[property]["validInputs"];
+        this.#validationMethods.value(propertyValue, validDataValues);
+      } else if (
+        "validDataType" in this.#validConfigValues[property] === true &&
+        "validInputs" in this.#validConfigValues[property] === false
+      ) {
+        const validDataType =
+          this.#validConfigValues[property]["validDataType"];
+        this.#validationMethods.type(propertyValue, validDataType);
+      } else {
+        throw new SyntaxError(
+          `A specific property within the validConfigValues object was not configured correctly, either both properties 'validInputs' and 'validDataType' were declared, or neither of them were declared, only or the other can be declared, within '${property}' this was found.`
+        );
+      }
+    },
   };
 
   //will hold validation methods for various types of checks on property data
