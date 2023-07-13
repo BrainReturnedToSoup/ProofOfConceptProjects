@@ -384,7 +384,7 @@ class FormValidator {
   };
 
   //turn on the validation of the corresponding form for this class instance
-  validationOn() {
+  activate() {
     try {
       if (!this.#configData.validationOn) {
         const { addFunctionalities, turnOnEventListeners } =
@@ -405,7 +405,7 @@ class FormValidator {
   }
 
   //turn off the validation of the corresponding form for this class instance
-  validationOff() {
+  deactivate() {
     try {
       if (this.#configData.validationOn) {
         const { removeFunctionalities, turnOffEventListeners } =
@@ -1091,7 +1091,7 @@ class FormConstructor {
   }
 }
 
-export class Form {
+export class UserDataForm {
   //creates unique class instances of all the sub classes, which
   //may or may not use the supplied configuration from this main constructor
   constructor(formControlElementArr, action, method, submitButtonText) {
@@ -1140,10 +1140,10 @@ export class Form {
 
   toggleValidation() {
     if (!this.#validationOn) {
-      this.#subClasses.formValidator.validationOn();
+      this.#subClasses.formValidator.activate();
       this.#validationOn = true;
     } else {
-      this.#subClasses.formValidator.validationOff();
+      this.#subClasses.formValidator.deactivate();
       this.#validationOn = false;
     }
   }
@@ -1157,7 +1157,7 @@ export class Form {
       ) {
         //checks that the supplied parent element is actually an element so the form can be appended to it
 
-        this.#subClasses.formValidator.validationOn(); //initializes the form validation feature of the form which uses the constraint api
+        this.#subClasses.formValidator.activate(); //initializes the form validation feature of the form which uses the constraint api
 
         parentElement.append(this.#formElement); //append the form to a target parent element
 
