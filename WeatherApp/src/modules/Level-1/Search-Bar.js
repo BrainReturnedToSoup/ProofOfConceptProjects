@@ -240,6 +240,11 @@ class SearchBarFunctionality {
     useDynamicOptions: false,
   };
 
+  //holds data that represents the current state of the class
+  #stateData = {
+    functionalityOn: false,
+  };
+
   //holds references to necessary elements to facilitate
   //functionalities
   #retrievedRefs = {
@@ -247,12 +252,23 @@ class SearchBarFunctionality {
     dataList: null,
   };
 
+  //holds the key value pairs representing subscribers of the emitted api data received
   #subscribers = {};
 
   //used to help facilitate functionality of making an api request with a supplied api instance,
   //this way the search bar class can accomodate any type of api, but the user has to come up with
   //the mediator that supplies the right functionality
   #mediatorMethod = null;
+
+  #functionalities = {
+    init: () => {}, //adds functionalities to the functionality manager
+    remove: () => {}, //removes functionalties from functionality manager
+  };
+
+  #eventListeners = {
+    init: () => {}, //turns on event listeners, only a submit listener for the most part
+    remove: () => {}, //turns off event listeners
+  };
 
   //will make an api request utilizing the current input within the search bar, though it will do this
   //using the supplied mediator method, because the api request functionality is api neutral, but you
@@ -274,11 +290,52 @@ class SearchBarFunctionality {
 
   //activates functionality of the search bar, includes any other injected functionalities,
   //for instance the dynamic options functionality if applicable
-  activate() {}
+  activate() {
+    try {
+      if (!this.#stateData.functionalityOn) {
+        this.#functionalities.init(); //add the associated functionalities first
+        this.#eventListeners.init(); //then turn on the event listeners
+
+        //turn on the dynamic options functionality if applicable
+        if (this.#configData.useDynamicOptions) {
+          this.#helperClasses.dynamicOptionsManager.activate();
+        }
+
+        this.#stateData.functionalityOn = true; //define the state after the method is done
+      } else {
+        throw new Error(
+          `Failed to activate search bar functionality, as it appears to already be on`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 
   //does the same thing as activate, but of course it just deactivates all functionalities,
   //including the injected functionalities
-  deactivate() {}
+  deactivate() {
+    try {
+      //check if the functionality is on
+      if (this.#stateData.functionalityOn) {
+        this.#eventListeners.remove(); //remove event listeners first and then
+        this.#functionalities.remove(); //the functionalities
+
+        //turn off the dynamic options manager functionality if applicable
+        if (this.#configData.useDynamicOptions) {
+          this.#helperClasses.dynamicOptionsManager.deactivate();
+        }
+
+        this.#stateData.functionalityOn = false; //define the state after the method is done
+      } else {
+        throw new Error(
+          `Failed to deactivate search bar functionality, as it appears to already be off`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 class SearchBarConstructor {
