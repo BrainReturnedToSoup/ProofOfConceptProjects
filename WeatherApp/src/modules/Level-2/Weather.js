@@ -1,55 +1,16 @@
+import { ElementRefManager } from "../Level-0/Element-Ref-Manager.js";
+import { LocalStorageCacheManager } from "../Level-0/Local-Storage-Cache-Manager.js";
+import { SearchBar } from "../Level-1/Search-Bar.js";
+
 const generalSubClasses = {
-  ElementRefManager: class {
-    //acts as a means of managing all element references within this feature
-    //this way weather sub classes can easily access these references
-
-    #cache = new Map();
-
-    //APIs for adding, removing, or retrieving stored element refs
-    addRef(key, value) {
-      if (
-        typeof key === "string" &&
-        !this.#cache.has(key) &&
-        value instanceof Element
-      ) {
-        this.#cache.set(key, value);
-      } else {
-        throw new Error(``);
-      }
-    }
-
-    deleteRef(key) {
-      if (typeof key === "string" && this.#cache.has(key)) {
-        this.#cache.delete(key);
-      } else {
-        throw new Error(``);
-      }
-    }
-
-    retrieveRef(key) {
-      if (typeof key === "string" && this.#cache.has(key)) {
-        return this.#cache.get(key);
-      } else {
-        return null;
-      }
-    }
-  },
+  ElementRefManager: ElementRefManager, //this will manage the element references on the top level, that being the main app structuring
+  LocalStorageCacheManager: LocalStorageCacheManager, //needs to be injected from the top level so other sub classes can use the same instance
+  SearchBar: SearchBar, //reusable feature, creates the whole feature on its own, will inject the necessary dependencies to make it work for this application
 };
 
-const weatherSubClasses = {
-  WeatherDataRetriever: class {
-    //will be used to retrieve data from
-    //the corresponding weather data api
-    constructor(config, weatherDataApiLink) {}
-
-    //will contain data that will dictate the behavior of the various private methods within this class, which in turn will determine the behavior surrounding retrieving weather data
-    //all of the weather app subclasses will need to be supplied the same configurations in order for these classes to work
-    #configData = {};
-
-    //retrieves data based on config, using the supplied link to server
-    retrieveData(location) {}
-  },
-  AppBuilder: class {
+const weatherAppSubClasses = {
+  WeatherApi: null, //will be the entry point to communicate with the api
+  MainAppConstructor: class {
     //builds the entire weather app element fragmet with all of the necessary elements
     //will store references to each element created into the elementRefManager
     constructor(config) {}
@@ -93,8 +54,8 @@ const weatherSubClasses = {
     };
 
     buildApp() {}
-  },
-  ApplyDataToDOM: class {
+  }, //constructs the main structure of the app, not things like the search bar though
+  Renderer: class {
     //will be used to keep the weather data within this app feature always up to date,
     //will utilize the element cache manager to do so
     constructor(config) {}
@@ -105,9 +66,12 @@ const weatherSubClasses = {
     //will fetch and apply api data to the
     //display based on the config supplied
     applyCurrentDataToDisplay() {}
-  },
+  }, //will render information on the page based on the supplied data
 };
 
+//orchestrates all of these sub classes together in order to form the entire weather app
+//will inject dependencies where they are needed etc. Will provide a way to customize
+//some features with the weather app
 export class WeatherApp {
   constructor(config) {}
 
