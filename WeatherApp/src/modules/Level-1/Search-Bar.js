@@ -1,5 +1,6 @@
 import { EventDrivenFunctionalityManager } from "../Level-0/Event-Driven-Functionality-Manager";
 import { ElementRefManager } from "../Level-0/Element-Ref-Manager";
+import { LocalStorageCacheManager } from "../Level-0/Local-Storage-Cache-Manager"
 
 //will pull from a cache in order to render options
 //under the search bar
@@ -203,7 +204,8 @@ class DynamicOptionsFunctionality {
 }
 
 //will be the controller class that choreographs the corresponding construction and functionality
-class DynamicOptionsManager {
+//needed to render in options dynamically to a specific text box
+class DynamicOptions {
   constructor() {}
 }
 
@@ -214,17 +216,38 @@ class DynamicOptionsManager {
 //into the local storage so that the dynamic options manager can use that
 //data
 class SearchBarFunctionality {
-  //will pretty much take a bunch of helper classes in order to facilitate
-  //at the very least a very basic search bar functionality, though there are
-  //configurable parameters for adding dynamic options to said search bar.
-  //Otherwise the functionality of the search bar is pretty consistent for the most part
   constructor(
-    elementRefManager,
-    eventDrivenFunctionalityManager,
-    apiInstance,
-    useDynamicOptions = false,
-    dynamicOptionsManager
-  ) {}
+    elementRefManager, //for retrieving necessary element references
+    eventDrivenFunctionalityManager, //for actually applying functionality that uses DOM events
+    apiInstance, //the api to communicate with per search query
+    mediatorMethod //the method that sort of bridges the gap between this functionality class, and the api instance being used
+    //NEEDS TO BE A FUNCTION THAT WILL ACCEPT THE CURRENT INPUT VALUE OF THE SEARCH BAR UPON ITS SUBMISSION
+    //THE MEDIATOR WILL TAKE THIS INPUT AND USE IT TO MAKE A CORRESPONDING API REQUEST UTILIZING ITS INFORMATION
+    //THE MEDIATOR WILL RETURN THE PROMISE THAT IT RECEIVED FROM THE API IT INTERACTS WITH
+  ) {
+    try {
+        //validate the constructor arguments
+        this.#argValidator("constructor", {
+          elementRefManager,
+          eventDrivenFunctionalityManager,
+          apiInstance,
+          mediatorMethod
+        });
+
+        //define the internal state with these arguments
+        this.#helperClasses.elementRefManager = elementRefManager;
+        this.#helperClasses.eventDrivenFunctionalityManager = eventDrivenFunctionalityManager;
+        this.#helperClasses.apiInstance = apiInstance;
+
+        this.#configData.mediatorMethod = mediatorMethod;
+
+        this.#retrieveElementRefs(); //after all of the configuration is done, retrieve the needed references to facilitate the functionality
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  //--------------------------CLASS-INSTANCE-DATA-AND-REFS-------------------------------//
 
   //holds various helper class instances in order to facilitate functionalities using the tools in these
   //helper classes to do so
@@ -232,61 +255,236 @@ class SearchBarFunctionality {
     elementRefManager: null,
     eventDrivenFunctionalityManager: null,
     apiInstance: null,
-    dynamicOptionsManager: null,
   };
 
   //holds configuration data to determine the behavior of this class
   #configData = {
-    useDynamicOptions: false,
+    mediatorMethod: null,
   };
 
   //holds data that represents the current state of the class
   #stateData = {
     functionalityOn: false,
-  };
-
-  //holds references to necessary elements to facilitate
-  //functionalities
-  #retrievedRefs = {
-    searchBarInput: null,
-    dataList: null,
+    searchSubmitted: false,
   };
 
   //holds the key value pairs representing subscribers of the emitted api data received
   #subscribers = {};
 
-  //used to help facilitate functionality of making an api request with a supplied api instance,
-  //this way the search bar class can accomodate any type of api, but the user has to come up with
-  //the mediator that supplies the right functionality
-  #mediatorMethod = null;
+  //---------------------------ELEMENT-REFERENCE-RETRIEVAL------------------------------//
+
+  //holds references to necessary elements to facilitate
+  //functionalities
+  #retrievedElementRefs = {
+    searchBarInput: null,
+  };
+
+    //method that actually retrieves the necessary refs to facilitate the corresponding functionality
+    //uses the supplied element reference mananger as the source
+   #retrieveElementRefs() {
+      this.#retrievedElementRefs.searchBarInput =
+        this.#helperClasses.elementRefManager.retrieveRef("search-bar-input");
+    }
+  
+  //--------------------------------ARGUMENT-VALIDATION------------------------------------//
+
+  //will hold data as reference to facilitate various argument validation
+  #argValidationData = {
+    constructor: {
+      elementRefManager: {instanceof: ElementRefManager},
+      eventDrivenFunctionalityManager: {instanceof: EventDrivenFunctionalityManager},
+      apiInstance: {
+        type: "object",
+        constructorType: "function", // this way we can check if it's an instance of any type of class
+      }, 
+      mediatorMethod: {type: "function"},
+    },
+    removeEmitSubscriber: {
+      subscriberName: {
+        type: "string",
+      },
+    },
+    addEmitSubscriber: {
+      subscriberName: {
+        type: "string",
+      },
+      methodToExecute: {
+        type: "function",
+      },
+    },
+  };
+
+  //will validate arguments received based on the method they came from
+  #argValidator(method, argObj) {
+    if (
+      this.#argValidationData.hasOwnProperty(method) &&
+      typeof argObj === "object"
+    ) {
+      //loop through all of the supplied arguments
+      for (let argument in argObj) {
+        //if the argument is a valid argument in the first place
+        if (argument in this.#argValidationData[method]) {
+          const argProperties = this.#argValidationData[method][argument],
+            receivedArgValue = argObj[argument];
+
+          //check the type of the argument value if applicable
+          if (
+            argProperties.hasOwnProperty("type") &&
+            typeof receivedArgValue !== argProperties["type"]
+          ) {
+            throw new TypeError(
+              `Method failed validation, as one of the supplied arguments failed to meet the necessary data type, the argument was '${argument}' which had a value of '${receivedArgValue}' with the type of '${typeof receivedArgValue}', should have a type of '${
+                argProperties["type"]
+              }'`
+            );
+          }
+
+          //check the instance the supplied argument is supposed to be, such as from a specific class
+          if(argProperties.hasOwnProperty("instanceof") && receivedArgValue instanceof argProperties["type"] === false) {
+            throw new TypeError(`Method failed validation, as one of the supplied arguments failed to be an instance of a specific class, received '${receivedArgValue}' for the argument '${argument}' in which the instance it should be of is '${argProperties["type"]}' but it isn't`)
+          }
+
+          //check if the supplied argument is in fact some sort of class instance
+          if(argProperties.hasOwnProperty("constructorType") && typeof receivedArgValue.constructor !== argProperties["constructorType"]) {
+            throw new TypeError(`Method failed validation, as noe of the supplied arguments failed to be an instance of some type of class, received '${receivedArgValue}' for the argument '${argument}'`)
+          }
+
+        } else {
+          throw new ReferenceError(
+            `Method failed validation, as one of the supplied arguments was not recognized for the method '${method}', the supplied argument was '${argument}'`
+          );
+        }
+      }
+    } else {
+      throw new ReferenceError(
+        `Failed to validate arguments of a specific method supplied, either the method doesn't have validation data to use, or the supplied argument object is not an object, received '${method}' as the supplied method and '${argObj}' as the supplied argument object`
+      );
+    }
+  }
+
+
+  //------------------------------TOOLS-TO-CONFIGURE-EDFM-INSTANCE---------------------------------//
 
   #functionalities = {
-    init: () => {}, //adds functionalities to the functionality manager
-    remove: () => {}, //removes functionalties from functionality manager
+    init: () => {
+      this.#helperClasses.eventDrivenFunctionalityManager.addFunctionalityToEvent(
+        "submit",
+        "searchBarSubmit",
+        this.#submitFunctionality
+      );
+    }, //adds functionalities to the functionality manager
+    remove: () => {
+      this.#helperClasses.eventDrivenFunctionalityManager.removeFunctionalityFromEvent(
+        "submit",
+        "searchBarSubmit"
+      );
+    }, //removes functionalties from functionality manager
   };
 
   #eventListeners = {
-    init: () => {}, //turns on event listeners, only a submit listener for the most part
-    remove: () => {}, //turns off event listeners
+    init: () => {
+      this.#helperClasses.eventDrivenFunctionalityManager.eventListenerOn(
+        "submit"
+      );
+    }, //turns on event listeners, only a submit listener for the most part
+    remove: () => {
+      this.#helperClasses.eventDrivenFunctionalityManager.eventListenerOff(
+        "submit"
+      );
+    }, //turns off event listeners
   };
 
-  //will make an api request utilizing the current input within the search bar, though it will do this
-  //using the supplied mediator method, because the api request functionality is api neutral, but you
-  //have to supply a mediator method that will essentially execute the api request corresponding to
-  //the supplied api
-  #makeApiRequest(currentInput) {}
+  //-------------------------CLASS-SPECIFIC-FUNCTIONALITIES-TO-ADD----------------------------------//
 
-  //emits the data received through the api request to all of the registered subscribers
-  #emitSuccessfulRequestData() {}
+  //entrypoint for the functionality that will execute upon
+  //the search bar submitting
+  #submitFunctionality() {
+    //condition to make sure that you can't spam search requests until the last search promise is resolved first
+    if(this.#stateData.searchSubmitted === false) {
+      this.#stateData.searchSubmitted = true;
+
+      const { searchBarInput } = this.#retrieveElementRefs,
+        {makeApiRequest, emitSuccessfulRequestData, saveSearchBarInput } = this.#functionalities,
+        input = searchBarInput.value, //save a specific input state that was submitted
+        promiseOfApiResponse = makeApiRequest(input);
+
+      promiseOfApiResponse
+      .then((data) => {
+        emitSuccessfulRequestData(data); //emit the data that was retrieved from the specific promise
+        this.#stateData.searchSubmitted = false; //revert the state back so that another promise can be made, meaning another search can be made
+      })
+      .catch((error) => {
+        console.error(error, error.stack)
+      })
+    }
+  }
+
+  #functionalities = {
+
+    makeApiRequest: (currentInput) => {
+      const promiseOfApiResponse =
+        this.#configData.mediatorMethod(currentInput, this.#helperClasses.apiInstance); 
+        //the mediator method will take the current input, and the api instance, and then execute the functionality
+        //needed in order to return a promise from the api instance
+        //based on the use case, and the api being interacted with.
+        return promiseOfApiResponse
+    },
+    emitSuccessfulRequestData: (data) => {
+      const subscribers = Object.keys(this.#subscribers).length;
+      //check if there are any subscribers to emit the data to
+      if (subscribers > 0) {
+        //if so, iterate through the subscribers, and invoke their associated methods
+        //and do so supplying the data as their arguments, so the data received is sent to their method scope
+        for (let subscriber in this.#subscribers) {
+          this.#subscribers[subscriber](data);
+        }
+      }
+    },
+  }
+
+  //--------------------------------------------APIs----------------------------------------------//
 
   //adds a subscriber that will receive the data that was received on a successful api request
   //the subscriber name will be the key, and the value will be a method that was supplied to execute
   //so that the subscriber can receive the data and do what ever with it
-  addEmitSubscriber(subscriberName, methodToExecute) {}
+  addEmitSubscriber(subscriberName, methodToExecute) {
+    try {
+      //validate the incoming arguments for their types and values
+      this.#argValidationData("addEmitSubscriber", {
+        subscriberName,
+        methodToExecute,
+      });
+
+      if (!this.#subscribers.hasOwnProperty(subscriberName)) {
+        this.#subscribers[subscriberName] = methodToExecute; // add the subscriber to the internal subscriber list, the corresponding method will be executed when an api request is successful
+      } else {
+        throw new ReferenceError(
+          `Failed to add a new subscriber to the search bar publisher, the subscriber attempting to be added already exists, received '${subscriberName}' as the supplied subscriber name`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 
   //similar to the addEmitSubscriber, but it simply removes a subscriber to emit the data to through
   //their supplied method
-  removeEmitSubscriber(subscriberName) {}
+  removeEmitSubscriber(subscriberName) {
+    try {
+      //validate incoming args for their types and values
+      this.#argValidationData("removeEmitSubscriber", { subscriberName });
+
+      if (this.#subscribers.hasOwnProperty(subscriberName)) {
+        delete this.#subscribers[subscriberName];
+      } else {
+        throw new ReferenceError(
+          `Failed to remove an existing subscriber from the search bar subscribers list, the subscriber attempting to be removed does not exist, received '${subscriberName}'`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 
   //activates functionality of the search bar, includes any other injected functionalities,
   //for instance the dynamic options functionality if applicable
@@ -295,11 +493,6 @@ class SearchBarFunctionality {
       if (!this.#stateData.functionalityOn) {
         this.#functionalities.init(); //add the associated functionalities first
         this.#eventListeners.init(); //then turn on the event listeners
-
-        //turn on the dynamic options functionality if applicable
-        if (this.#configData.useDynamicOptions) {
-          this.#helperClasses.dynamicOptionsManager.activate();
-        }
 
         this.#stateData.functionalityOn = true; //define the state after the method is done
       } else {
@@ -321,11 +514,6 @@ class SearchBarFunctionality {
         this.#eventListeners.remove(); //remove event listeners first and then
         this.#functionalities.remove(); //the functionalities
 
-        //turn off the dynamic options manager functionality if applicable
-        if (this.#configData.useDynamicOptions) {
-          this.#helperClasses.dynamicOptionsManager.deactivate();
-        }
-
         this.#stateData.functionalityOn = false; //define the state after the method is done
       } else {
         throw new Error(
@@ -342,9 +530,7 @@ class SearchBarConstructor {
   constructor(
     elementRefManager,
     uniqueIdentifier,
-    action = "#",
-    method = "post",
-    addDataList = false
+    addDataList = false,
   ) {
     try {
       //validate reference manager
@@ -434,9 +620,6 @@ class SearchBarConstructor {
 
       formElement.classList.add(generalClass);
       formElement.classList.add(this.#configData.uniqueIdentifier); //add both of the necessary classes, one a general tag, the other the unique identifier
-
-      formElement.setAttribute("action", this.#configData.action); //define both the action and method of the form, which will determine the behavior of
-      formElement.setAttribute("method", this.#configData.method); //the constructed search bar
 
       return formElement;
     },
@@ -534,13 +717,30 @@ class SearchBarConstructor {
 }
 
 export class SearchBar {
-  constructor() {}
+  constructor(apiInstance, mediatorMethod, useDynamicOptions = false) {
+    
+  } //acts as an entry point to configure the search bar in specific ways, such as the api to fetch from, the mediator method to use
 
-  #subClasses = {};
+  #subClasses = {}; // sub classes at which they work together to form the entire feature
 
-  #searchBarElement = null;
+  #configData = {
+    dynamicOptions: null, //data defining whether dynamic options will be used on this instance
+  }
 
-  #searchBarAppended = false;
+  #stateData = {
+    searchBarAppended: false, //data point so that the search bar instance cannot be appended more than once
+    subscribers: {}, //holds key value pairs representing subscribers to the data that is received on a successful api request made by the search bar
+  }
 
-  appendSearchBar(parentElement) {}
+  #searchBarElement = null; // reference to entire search bar fragment
+
+  unsubscribe(subscriberName) {} // a way for modules to unsubscribe from receiving the data
+
+  subscribe(subscriberName, method) {} // and entrypoint for modules to subscribe to the data made by any successful api request by the search bar
+
+  appendSearchBar(parentElement) {} // a way to append the entire search bar to a specific element
+
+  activate(functionality = "main") {} // a way to activate functionalities in a search bar feature, by default it will target the main functionality, not the dynamic options if applicable
+
+  deactivate(functionality = "main") {} // works in the same way the activate api does but for disabling a search bar feature, defaults to the main functionality unless otherwise specified
 }
