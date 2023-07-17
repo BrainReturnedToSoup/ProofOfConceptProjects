@@ -1,9 +1,44 @@
 import { ElementRefManager } from "../Level-0/Element-Ref-Manager";
 
 class SearchBarFunctionality {
-  constructor(argsObj) {}
+  constructor(argsObj) {
+    try {
+      this.#argValidator("constructor", argsObj);
+
+      const { searchBarElement, apiInstance, mediatorMethod } = argsObj;
+
+      this.#searchBarElement = searchBarElement;
+
+      this.#helperClasses.apiInstance = apiInstance;
+
+      this.#configData.mediatorMethod = mediatorMethod;
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 
   //------------------ARGUMENT-VALIDATION-----------------------//
+
+  #argValidationData = {
+    constructor: {
+      searchBarElement: { instanceof: Element },
+      apiInstance: { instanceof: Object },
+      mediatorMethod: { typeof: "function" },
+    },
+    subscribe: {
+      subName: {
+        type: "string",
+      },
+      entryPointMethod: {
+        type: "function",
+      },
+    },
+    unsubscribe: {
+      subName: {
+        type: "string",
+      },
+    },
+  };
 
   #validate = {
     type: (suppliedArg, argName, methodOrigin, correctType) => {
@@ -54,15 +89,128 @@ class SearchBarFunctionality {
     }
   }
 
+  //------------------STATE-AND-CONFIG-DATA----------------------//
+
+  #configData = {
+    mediatorMethod: null,
+  };
+
+  #stateData = {
+    functionalityActive: false,
+  };
+
+  #elementReferences = {
+    searchBarInput: null,
+  };
+
+  #helperClasses = {
+    apiInstance: null,
+  };
+
+  #eventListenerMethodRefs = {
+    submit: null,
+  };
+
+  #searchBarElement = null;
+
   //-------------------FUNCTIONALITIES---------------------------//
+
+  #submitFunctionality() {
+    //entry point to execute all functionality related to the submission of the search bar instance
+  }
 
   //-------------------EVENT-LISTENERS---------------------------//
 
+  #addEventListeners() {
+    const submitFunc = this.#submitFunctionality; //make a unique instance
+
+    this.#eventListenerMethodRefs.submit = submitFunc; //save the unique instance to state
+
+    this.#searchBarElement.addEventListener("submit", submitFunc); //use the unique as the event listener callback
+  }
+
+  #removeEventListeners() {
+    const submitFuncRef = this.#eventListenerMethodRefs.submit; //grab the unique instance saved in state
+
+    this.#searchBarElement.removeEventListener("submit", submitFuncRef); //use it to remove the submit event listener
+  }
+
+  //--------------------FETCH-DATA-PUB-SUB-----------------------//
+
+  #emitFetchedData(fetchedData) {
+    const numOfSubscribers = Object.keys(this.#subscribers).length;
+
+    //check for subscribers
+    if (numOfSubscribers > 0) {
+      for (let subscriber in this.#subscribers) {
+        this.#subscribers[subscriber](fetchedData);
+      }
+    }
+  } //emits the received data to all of the present subscribers
+
+  #subscribers = {};
+
+  subscribe(subName, entryPointMethod) {
+    try {
+      this.#argValidator("subscribe", { subName, entryPointMethod });
+
+      if (!this.#subscribers.hasOwnProperty(subName)) {
+        this.#subscribers[subName] = entryPointMethod;
+      } else {
+        throw new ReferenceError(`Failed to add a subscriber to the search bar functionality publisher, as the
+        subscriber seems to already exist, received '${subName}' as the subscriber being added`);
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  unsubscribe(subName) {
+    try {
+      this.#argValidator("unsubscribe", { subName });
+
+      if (this.#subscribers.hasOwnProperty(subName)) {
+        delete this.#subscribers[subName];
+      } else {
+        throw new ReferenceError(`Failed to remove a subscriber from the search bar functionality publisher, as the
+        subscriber attempting to be removed does not exist, received '${subName}' as the subscriber being removed`);
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
   //-------------------------APIs--------------------------------//
 
-  activate() {}
+  //activate or deactivate the functionality of the search bar instance
 
-  deactivate() {}
+  activate() {
+    try {
+      if (!this.#stateData.functionalityActive) {
+        this.#addEventListeners();
+      } else {
+        throw new Error(
+          `Failed to activate the functionality on a specific search bar instance, it appears to already be on`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  deactivate() {
+    try {
+      if (this.#stateData.functionalityActive) {
+        this.#removeEventListeners();
+      } else {
+        throw new Error(
+          `Failed to deactivate the functionality on a specific search bar instance, it appears to already be off`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 class SearchBarConstructor {
