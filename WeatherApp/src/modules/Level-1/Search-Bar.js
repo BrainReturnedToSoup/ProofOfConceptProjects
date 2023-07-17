@@ -1,6 +1,5 @@
 import { EventDrivenFunctionalityManager } from "../Level-0/Event-Driven-Functionality-Manager";
 import { ElementRefManager } from "../Level-0/Element-Ref-Manager";
-import { LocalStorageCacheManager } from "../Level-0/Local-Storage-Cache-Manager"
 
 //will pull from a cache in order to render options
 //under the search bar
@@ -206,7 +205,14 @@ class DynamicOptionsFunctionality {
 //will be the controller class that choreographs the corresponding construction and functionality
 //needed to render in options dynamically to a specific text box
 class DynamicOptions {
-  constructor() {}
+  constructor(
+    uniqueIdentifier, // unique identifier to use in order to define a unique dynamic options instance
+    apiInstance, //api instance to use in order to pull data and use the data to render in the options
+    mediatorMethod, //in order to facilitate functionality on the supplied api that the abstractions within the functionalities can use
+    eventDrivenFunctionalityManager, //used to 
+    elementRefManager,
+    inputIdentifier
+  ) {}
 }
 
 //will be used to implement functionality on the search bar itself
@@ -717,30 +723,189 @@ class SearchBarConstructor {
 }
 
 export class SearchBar {
-  constructor(apiInstance, mediatorMethod, useDynamicOptions = false) {
-    
-  } //acts as an entry point to configure the search bar in specific ways, such as the api to fetch from, the mediator method to use
+  constructor(
+    uniqueIdentifier,
+    apiInstanceMain,
+    mediatorMethodMain,
+    useDynamicOptions = false,
+    apiInstanceDynamicOptions,
+    mediatorMethodDynamicOptions,
+    elementRefManager = new ElementRefManager(),
+    eventDrivenFunctionalityManager = new EventDrivenFunctionalityManager()
+    ) {
 
-  #subClasses = {}; // sub classes at which they work together to form the entire feature
+      //validate the incoming arguments for their types and values
+      this.#argValidator("constructor", {
+        apiInstanceMain,
+        mediatorMethodMain,
+        useDynamicOptions,
+        apiInstanceDynamicOptions,
+        mediatorMethodDynamicOptions,
+        elementRefManager,
+        eventDrivenFunctionalityManager
+      });
+
+      //logic for applying the arguments to the state
+  } 
+
+  //-------------------------------------CLASS-INSTANCE-DATA-AND-REFS--------------------------------------------//
+
+  #subClasses = {
+    apiInstanceMain: null, // api instance that will be supplied to the search bar functionality class instance
+    apiInstanceDynamicOptions: null, // api instance that will be supplied to the dynamic options functionality class instance
+    elementRefManager: null, // top level element reference manager, used by both the search bar functionality and the dynamic options controller
+    eventDrivenFunctionalityManager: null, // main event driven functionality manager instance that will be used by both the search bar and dynamic options functionalities
+    searchBarConstructor: null, // class instance that will construct the entire search bar form, accepts configuration
+    searchBarFunctionality: null, // class instance that will facilitate the main functionality of the search bar, so the api requests upon searching, and emitting the successful search data
+    dynamicOptions: null, // a controller class that implements the feature of having dynamic options on the specific search bar
+  };
+
+  #mediators = {
+    main: null,
+    dynamicOptions: null,
+  }
 
   #configData = {
-    dynamicOptions: null, //data defining whether dynamic options will be used on this instance
+    useDynamicOptions: false, //data defining whether dynamic options will be used on this instance
   }
 
   #stateData = {
     searchBarAppended: false, //data point so that the search bar instance cannot be appended more than once
     subscribers: {}, //holds key value pairs representing subscribers to the data that is received on a successful api request made by the search bar
-  }
+    mainFuncOn: false, //represents whether the main functionality for the search bar is on or not
+    dynamicOptionFuncOn: false, //represents whether the dynamic options functionality for the search bar is on or not
+  } 
 
   #searchBarElement = null; // reference to entire search bar fragment
 
-  unsubscribe(subscriberName) {} // a way for modules to unsubscribe from receiving the data
+  //-----------------------------------------API-ARGUMENT-VALIDATION----------------------------------------------//
 
-  subscribe(subscriberName, method) {} // and entrypoint for modules to subscribe to the data made by any successful api request by the search bar
+  #argValidationData = {
+    constructor: {},
+    unsubscribe: {},
+    subscribe: {},
+    activate: {},
+    deactivate: {},
+    appendSearchBar: {},
+  } // reference data used to validate the corresponding method args
 
-  appendSearchBar(parentElement) {} // a way to append the entire search bar to a specific element
+  #argValidator(method, argObj) {} //used to validate the supplied arguments based on the method they came from
 
-  activate(functionality = "main") {} // a way to activate functionalities in a search bar feature, by default it will target the main functionality, not the dynamic options if applicable
+  //------------------------------------------FUNCTIONALITY-TOGGLERS----------------------------------------------//
 
-  deactivate(functionality = "main") {} // works in the same way the activate api does but for disabling a search bar feature, defaults to the main functionality unless otherwise specified
+  #activators = {
+    main: () => {}, //activates the main functionality of the search bar
+    dynamicOptions: () => {}, //activates the dynamic options functionality of the search bar if applicable
+  }
+
+  #deactivators = {
+    main: () => {}, //deactivates the main functionality of the search bar 
+    dynamicOptions: () => {}, //deactivates the dynamic options functionality of the search bar if applicable
+  }
+
+  //-------------------------------------------------APIs---------------------------------------------------------//
+
+  unsubscribe(subscriberName) {
+    this.#argValidator("unsubscribe", { subscriberName })
+
+    //logic to remove a subscriber
+
+  } // a way for modules to unsubscribe from receiving the data
+
+  subscribe(subscriberName, method) {
+
+    try {
+      
+    } catch (error) {
+      
+    }
+    this.#argValidator("subscribe", { subscriberName, method })
+
+    //logic to add a subscriber
+
+  } // and entrypoint for modules to subscribe to the data made by any successful api request by the search bar
+
+  activate(functionality = "main") {
+    try {
+      this.#argValidator("activate", { functionality })
+
+      const { main, dynamicOptions } = this.#activators;
+
+      if(functionality === "main") {
+
+        if(!this.#stateData.mainFuncOn) {
+          main();
+
+          this.#stateData.mainFuncOn = true;
+        } else {
+          throw new Error(`Failed to activate main functionality, as it appears to already be on`)
+        }
+
+      } else if(functionality === "dynamicOptions") {
+
+        if(this.#stateData.dynamicOptionFuncOn) {
+          dynamicOptions();
+
+          this.#stateData.dynamicOptionFuncOn = true;
+        } else {
+          throw new Error(`Failed to activate dynamic options functionality, as it appears to already be on`)
+        }
+
+      }
+
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  } // a way to activate functionalities in a search bar feature, by default it will target the main functionality, not the dynamic options if applicable
+
+  deactivate(functionality = "main") {
+    try {
+      this.#argValidator("deactivate", { functionality })
+
+      const { main, dynamicOptions } = this.#deactivators
+
+      if(functionality === "main") {
+
+        //check if the main functionality is on
+        if(this.#stateData.mainFuncOn) {
+          main();
+
+          this.#stateData.mainFuncOn = false;
+        } else {
+          throw new Error(`Failed to deactivate main functionality, as it appears to already be off`)
+        }
+
+      } else if(functionality === "dynamicOptions") {
+
+        //check if dynamic functionality is on
+        if(this.#stateData.dynamicOptionFuncOn) {
+          dynamicOptions();
+
+          this.#stateData.dynamicOptionFuncOn = false;
+        } else {
+          throw new Error(`Failed to deactivate dynamic options functionality, as it appears to already be off`)
+        }
+
+      }
+
+    } catch (error) {
+      console.error(error, error.stack)
+    }
+  } // works in the same way the activate api does but for disabling a search bar feature, defaults to the main functionality unless otherwise specified
+
+  appendSearchBar(parentElement) {
+    try {
+      this.#argValidator("appendSearchBar", { parentElement }) //validate the args
+
+      if(!this.#stateData.searchBarAppended) {
+        parentElement.append(this.#searchBarElement); //append the search bar instance to the target element
+
+        this.#stateData.searchBarAppended = true; //change the class state to true
+      } else {
+        throw new Error(`Failed to append search bar instance to target element because this specific instance has already appended to another element`)
+      }
+    } catch (error) {
+      console.error(error, error.stack)
+    }
+  }
 }
