@@ -162,13 +162,11 @@ class WeatherApi extends ApiInterface {
       apiKey: { type: "string" },
     },
     getCurrentWeather: {
-      locationMethod: { type: "string" },
-      locationValue: { type: "string" },
+      loc: { type: "string" },
     },
     getForecast: {
-      locationMethod: { type: "string" },
-      locationValue: { type: "string" },
-      numOfDays: { type: "number", positive: true },
+      loc: { type: "string" },
+      days: { type: "number", posOrNeg: "positive" },
     },
   };
 
@@ -191,10 +189,17 @@ class WeatherApi extends ApiInterface {
         );
       }
     },
-    positive: (suppliedArg, argName, methodOrigin, correctInstance) => {
-      if (correctInstance && suppliedArg !== Math.abs(suppliedArg)) {
-        throw new Error(`Argument '${argName}' for method '${methodOrigin}' failed value validation,
-        received '${suppliedArg}' which is negative, needs to be positive`);
+    posOrNeg: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (correctInstance === "positive") {
+        if (suppliedArg !== Math.abs(suppliedArg)) {
+          throw new Error(`Argument '${argName}' for method '${methodOrigin}' failed integer validation,
+          received '${suppliedArg}' which is negative, but it needs to be positive`);
+        }
+      } else if (correctInstance === "negative") {
+        if (suppliedArg === Math.abs(suppliedArg)) {
+          throw new Error(`Argument '${argName}' for method '${methodOrigin}' failed integer validation,
+          received '${suppliedArg}' which is positive, but it needs to be negative`);
+        }
       }
     },
   };
@@ -230,16 +235,14 @@ class WeatherApi extends ApiInterface {
 
   //------------------------HELPER-METHODS-----------------------//
 
-  #addUrlParams = {
-    location: (url, location) => {
-      const alteredUrl = url + `q=${location}`;
-      return alteredUrl;
+  #urlParams = {
+    location: (location) => {
+      return `q=${location}`;
     },
-    numOfDays: (url, numOfDays) => {
-      const alteredUrl = url + `days=${numOfDays}`;
-      return alteredUrl;
+    numOfDays: (numOfDays) => {
+      return `days=${numOfDays}`;
     },
-    airQuality: (url, boolean) => {
+    airQuality: (boolean) => {
       let yesOrNo;
 
       if (boolean) {
@@ -247,11 +250,9 @@ class WeatherApi extends ApiInterface {
       } else {
         yesOrNo = "no";
       }
-      const alteredUrl = url + `aqi=${yesOrNo}`;
-
-      return alteredUrl;
+      return `aqi=${yesOrNo}`;
     },
-    weatherAlerts: (url, boolean) => {
+    weatherAlerts: (boolean) => {
       let yesOrNo;
 
       if (boolean) {
@@ -259,10 +260,7 @@ class WeatherApi extends ApiInterface {
       } else {
         yesOrNo = "no";
       }
-
-      const alteredUrl = url + `alerts=${yesOrNo}`;
-
-      return alteredUrl;
+      return `alerts=${yesOrNo}`;
     },
   };
 
@@ -270,7 +268,64 @@ class WeatherApi extends ApiInterface {
 
   //location method is the method to use to retrieve current weather data. Example: IP, city, etc.
   //location value is the corresponding value, so say the corresponding IP, or city, etc.
-  getCurrentWeather(locationMethod, locationValue) {}
+  getCurrentWeather(loc) {
+    try {
+      //validate input
+      this.#argValidator("getCurrentWeather", { loc });
 
-  getForecast(locationMethod, locationValue, numOfDays) {}
+      //get the base url and the parameter string constructors
+      const baseUrl = this.#urlTemplate,
+        { location, airQuality, weatherAlerts } = this.#urlParams,
+        { get } = this.requestMethods;
+
+      //build the necessary parameters
+      const locString = location(loc),
+        airQualityString = airQuality(false),
+        weatherAlertsString = weatherAlerts(false);
+
+      //concat into the final url string
+      const finalUrl =
+        baseUrl + locString + airQualityString + weatherAlertsString;
+
+      //make a get request that returns a promise instance
+      const requestPromise = get(finalUrl);
+
+      return requestPromise;
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  getForecast(loc, days) {
+    try {
+      //validate input
+      this.#argValidator("getForecast", { loc, days });
+
+      //get the base url and the parameter string constructors
+      const baseUrl = this.#urlTemplate,
+        { location, numOfDays, airQuality, weatherAlerts } = this.#urlParams,
+        { get } = this.requestMethods;
+
+      //build the necessary parameters
+      const locString = location(loc),
+        numOfDaysString = numOfDays(days),
+        airQualityString = airQuality(false),
+        weatherAlertsString = weatherAlerts(false);
+
+      //concat into the final url string
+      const finalUrl =
+        baseUrl +
+        locString +
+        numOfDaysString +
+        airQualityString +
+        weatherAlertsString;
+
+      //make a get request that returns a promise instance
+      const requestPromise = get(finalUrl);
+
+      return requestPromise;
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
