@@ -1,262 +1,276 @@
-class WeatherApi {
-  //will be for initializing the supplied key to the stored end point string
-  constructor(apiKey) {
-    try {
-      if (typeof apiKey === "string") {
-      } else {
-        throw new TypeError(
-          `Value supplied to constructor for class instance '${this.constructor.name}' is an invalid data type, must be a string, received ${apiKey}`
-        );
-      }
-    } catch (error) {
-      console.error(error, error.stack);
-    }
-  }
+//API INTERFACES THAT EXTEND FROM THE TEMPLATE SHOULD ALWAYS RETURN THE FETCH PROMISE FOR THEIR APIS
+//THIS WAY THE API INTERACTION CAN BE MODULARIZED AND WHOEVER USES THE API INSTANCE CAN CONFIGURE THEIR OWN
+//FUNCTIONALITY RELATING TO THE API REQUEST PROMISE. ALL THESE CLASSES DO IS PROVIDE A STRAIGHT FORWARD
+//WAY TO MAKE FETCH REQUESTS TO SPECIFIC APIS, THATS IT.
 
-  //stores the api key supplied to the constructor
-  #instanceStateData = {
+class ApiInterface {
+  //the purpose of this class is to act as a generic template that specific api
+  //interfacing classes can extend to and create their specific functionalities with
+  //using the general fetch methods within this template
+
+  //--------------------STATE-AND-CONFIG-DATA----------------------//
+
+  configData = {
     apiKey: null,
+    apiName: null,
   };
 
-  //will hold data that represents essentially the most up to date fetch request response
-  #latestDataRecieved = {
-    singleRequest: null,
-    fixedInterval: {},
-  };
-
-  //holds key value pairs for existing data retrievals that exist on a constant interval
-  #existingRetrievalIntervals = {};
-
-  //holds the string templates needed to construct the entire https request link
-  //split into two parts because the target city needs to be supplied as a parameter,
-  //which it will be sandwiched between these two templates in order to make a complete url
-  #endPointStringTemplate = {
-    firstHalf: `https://api.weatherapi.com/v1/weather?q=`,
-    secondHalf: `&key=${this.#instanceStateData.apiKey}`,
-  };
-
-  //holds data that defines what inputs are valid to supply to the corresponding retrieveWeatherData APIs
-  #validConfigInputsPerMethod = {
-    city: {
-      city: {
-        type: "string",
-        required: true,
+  defaultOptions = {
+    get: {
+      method: "get",
+    },
+    post: {
+      method: "post",
+      //part of sending data to the server
+      headers: {
+        "Content-Type": "application/json",
       },
-      requestRule: {
-        type: "string",
-        required: false,
-        validValues: ["once", "interval"],
+      body: null, //should be JSON data
+    },
+    put: {
+      method: "put",
+      //part of sending data to the server
+      headers: {
+        "Content-Type": "application/json",
       },
-      interval: {
-        type: "number",
-        required: false,
-      },
+      body: null, //should be JSON data
+    },
+    delete: {
+      method: "delete",
     },
   };
 
-  //will validate the incoming configuration before actually trying to define some sort of data retrieval behavior
-  #validateConfig(method, config) {
-    const errors = []; //holds all found errors within validation
+  //-----------------------HELPER-METHODS---------------------------//
 
-    if (method in this.#validConfigInputsPerMethod) {
-      // represents the corresponding method in terms of holding the necessary validation data needed
-      const validDataRef = this.#validConfigInputsPerMethod[method]; // the actual data for validation comparison
+  addPayload(options, payload) {
+    const convertedPayload = this.convertPayloadToJSON(payload);
+    options.body = convertedPayload;
 
-      for (let validProperty in validDataRef) {
-        // iterates over all of the possible properties corresponding to the method
-        const dataSet = validDataRef[validProperty];
-
-        //for checking the various types of properties that can represent a single property
-        //which these properties will be base line in terms of defining the characteristics of the corresponding
-        //data that they are checking
-        switch (true) {
-          case "type" in dataSet:
-            if (typeof config[validProperty] !== dataSet["type"]) {
-              errors.push(
-                new TypeError(
-                  `Supplied value for specific config property is an invalid data type, received '${method}' as the method invoked, '${validProperty}' as the property that failed validation, and '${config[validProperty]}' as the value received for said property`
-                )
-              );
-            }
-          case "validValues" in dataSet:
-            if (!dataSet["validValues"].includes(config[validProperty])) {
-              errors.push(
-                new ReferenceError(
-                  `Supplied value for specific config property is not a valid value, received '${method}' as the method invoked, '${validProperty}' as the property that failed validation, and '${config[validProperty]}' as the value received for said property`
-                )
-              );
-            }
-          case "required" in dataSet:
-            if (dataSet["required"] && validProperty in config === false) {
-              errors.push(
-                new ReferenceError(
-                  `Config supplied lacks a required property, the missing property is '${validProperty}' for '${method}' as the corresponding method`
-                )
-              );
-            }
-        }
-      }
-    } else {
-      errors.push(
-        new ReferenceError(
-          `Supplied method does not have a data set to perform validation for, received '${method}'`
-        )
-      );
-    }
-
-    if (errors.length > 0) {
-      throw errors;
-    }
+    return options;
   }
 
-  //will contain methods for either retrieving data only once or on a specific interval when needed
-  #retrievalMethods = {
-    fixedInterval: (city, interval) => {
-      if (city in this.#existingRetrievalIntervals === false) {
-        const { firstHalf, secondHalf } = this.#endPointStringTemplate,
-          assembledLink = firstHalf + city + secondHalf;
+  convertPayloadToJSON(payload) {
+    const convertedPayload = JSON.stringify(payload);
+    return convertedPayload;
+  }
 
-        let existingPromise = false;
+  processResponseAsJSON = async (response) => {
+    const processedResponse = await response.json();
+    return processedResponse;
+  };
 
-        //sets an interval to fetch from the api at a fixed rate that was supplied
-        //as well as defines a new reference to the latest data retrieved from the set interval
-        this.#latestDataRecieved.fixedInterval[city] = null;
-        this.#existingRetrievalIntervals[city] = setInterval(() => {
-          if (!existingPromise) {
-            //defines that a new promise for fetching the api data has been made, so the interval doesn't make more
-            //calls than necessary
-            existingPromise = true;
+  //------------------------API-INTERACTION--------------------------/
 
-            //creates a new fetch promise that when resolved will toggle the existing promise to false,
-            //this way only one fetch promise can be actually made at one time, as opposed to stacking
-            //promises indefinitely, which can really stack the api calls
-            fetch(assembledLink)
-              .then((resp) => {
-                return resp.json();
-              })
-              .then((data) => {
-                existingPromise = false;
-                this.#latestDataRecieved.fixedInterval[city] = data;
-              })
-              .catch((error) => {
-                console.error(error, error.stack);
-              });
-          }
-        }, interval);
-      } else {
-        throw new Error(
-          `Supplied city to retrieve weather data from at an interval is already present as a declared interval, received ${city}`
-        ); // for when a specific interval already exists, you can declare the interval twice
+  requestMethods = {
+    get: async (url, options = this.defaultOptions.get) => {
+      try {
+        const resp = await fetch(url, options); //await a response first
+
+        //if the request was successful
+        if (resp.ok === true) {
+          const parsedData = await this.processResponseAsJSON(resp);
+          return parsedData;
+        } else {
+          //if the request failed for some reason
+          throw new Error(
+            `GET Request to the desired api failed, target api is '${this.configData.apiName}', '${resp.status}: ${resp.statusText}'`
+          );
+        }
+      } catch (error) {
+        console.error(error, error.stack);
       }
     },
-    singleRequest: async (city) => {
-      //creates a fetch link corresponding to the city targeted
-      const { firstHalf, secondHalf } = this.#endPointStringTemplate,
-        assembledLink = firstHalf + city + secondHalf;
-
-      //gets the response from the api using the link made
-      //then treats it as a json response
+    post: async (url, options = this.defaultOptions.post, payload) => {
       try {
-        const response = await fetch(assembledLink),
-          dataObj = await response.json();
+        const finalOptions = this.addPayload(options, payload);
 
-        this.#resolvedPromiseData.singleRequest = dataObj;
-        return dataObj;
+        const resp = await fetch(url, finalOptions);
+        //if the request was successful
+        if (resp.ok === true) {
+          const parsedData = await this.processResponseAsJSON(resp);
+          return parsedData;
+        } else {
+          //if the request failed for some reason
+          throw new Error(
+            `POST Request to the desired api failed, target api is '${this.configData.apiName}', '${resp.status}: ${resp.statusText}'`
+          );
+        }
+      } catch (error) {
+        console.error(error, error.stack);
+      }
+    },
+    put: async (url, options = this.defaultOptions.put, payload) => {
+      try {
+        const finalOptions = this.addPayload(options, payload);
+
+        const resp = await fetch(url, finalOptions);
+        //if the request was successful
+        if (resp.ok === true) {
+          const parsedData = await this.processResponseAsJSON(resp);
+          return parsedData;
+        } else {
+          //if the request failed for some reason
+          throw new Error(
+            `PUT Request to the desired api failed, target api is '${this.configData.apiName}', '${resp.status}: ${resp.statusText}'`
+          );
+        }
+      } catch (error) {
+        console.error(error, error.stack);
+      }
+    },
+    delete: async (url, options = this.defaultOptions.delete) => {
+      try {
+        const resp = await fetch(url, options); //await a response first
+
+        //if the request was successful
+        if (resp.ok === true) {
+          const parsedData = await this.processResponseAsJSON(resp);
+          return parsedData;
+        } else {
+          //if the request failed for some reason
+          throw new Error(
+            `DELETE Request to the desired api failed, target api is '${this.configData.apiName}', '${resp.status}: ${resp.statusText}'`
+          );
+        }
       } catch (error) {
         console.error(error, error.stack);
       }
     },
   };
+}
 
-  //will stop an existing functionality to retrieve data on a specific interval
-  //as well as delete its reference for the data it pulls
-  stopExistingRetrievalInterval(instanceKey) {
-    if (instanceKey in this.#storedRetrievalIntervals) {
-      delete this.#storedRetrievalIntervals[instanceKey];
-      delete this.#latestDataRecieved.fixedInterval[instanceKey];
-    }
+class WeatherApi extends ApiInterface {
+  constructor(apiKey) {
+    super(); //call parent constructor
+
+    this.#argValidator("constructor", { apiKey });
+
+    //define the configuration for the weather api instance
+    this.configData.apiName = "WeatherApi";
+    this.configData.apiKey = apiKey;
   }
 
-  //holds different methods to retrieve data based on the basic parameter
-  retrieveWeatherData = {
-    city: (city, requestRule = "once", interval = 5000) => {
-      this.#validateConfig("city", { city, requestRule, interval });
+  //---------------------STATE-AND-CONFIG-DATA------------------//
 
-      if (requestRule === "once") {
-        return this.#retrievalMethods.singleRequest(city);
-      } else if (requestRule === "interval") {
-        return this.#retrievalMethods.fixedInterval(city, interval);
+  //the base template string, at which to add parameters, they are concatenated at the end of the string
+  #urlTemplate = `http://api.weatherapi.com/v1/current.json?key=${this.configData.apiKey}`;
+
+  //---------------------ARGUMENT-VALIDATION--------------------//
+
+  #argValidationData = {
+    constructor: {
+      apiKey: { type: "string" },
+    },
+    getCurrentWeather: {
+      locationMethod: { type: "string" },
+      locationValue: { type: "string" },
+    },
+    getForecast: {
+      locationMethod: { type: "string" },
+      locationValue: { type: "string" },
+      numOfDays: { type: "number", positive: true },
+    },
+  };
+
+  //holds methods that actually do the validation of a specific supplied argument on one of its properties
+  #validate = {
+    type: (suppliedArg, argName, methodOrigin, correctType) => {
+      if (typeof suppliedArg !== correctType) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed type validation,
+           received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
+            needs to have the type '${correctType}'`
+        );
+      }
+    },
+    instanceof: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (!(suppliedArg instanceof correctInstance)) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed instance validation,
+           received '${suppliedArg}' which is not an instance of '${correctInstance}'`
+        );
+      }
+    },
+    positive: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (correctInstance && suppliedArg !== Math.abs(suppliedArg)) {
+        throw new Error(`Argument '${argName}' for method '${methodOrigin}' failed value validation,
+        received '${suppliedArg}' which is negative, needs to be positive`);
       }
     },
   };
 
-  //for getting the value of the most up to date value of a interval retrieval
-  getCurrentIntervalValue(identifier) {
-    try {
-      if (identifier in this.#latestDataRecieved.fixedInterval) {
-        return this.#latestDataRecieved.fixedInterval[identifier];
-      } else {
-        throw new ReferenceError(
-          `Failed to retrieve the latest data for a specific interval defined, interval assigned to the supplied identifier does not exist, received ${identifier}`
-        );
+  #argValidator(methodName, argsObj) {
+    if (this.#argValidationData.hasOwnProperty(methodName)) {
+      const methodValidationData = this.#argValidationData[methodName];
+
+      for (let arg in argsObj) {
+        const argValue = argsObj[arg];
+
+        //check if a supplied arg is a valid arg to supply
+        if (!methodValidationData.hasOwnProperty(arg)) {
+          throw new ReferenceError(
+            `Unrecognized argument for a specific method, received '${arg}' with a value of '${argsObj[arg]}'`
+          );
+        }
+
+        //go down the list of properties to check for on the specific arg
+        for (let property in methodValidationData[arg]) {
+          const correctValue = methodValidationData[arg][property]; //retrieve the data that will be used as a reference for validating the arg
+
+          this.#validate[property](argValue, arg, methodName, correctValue); //validate the arg based on the property being checked currently
+        }
       }
-    } catch (error) {
-      console.error(error, error.stack);
+    } else {
+      throw new ReferenceError(
+        `Failed to validate the supplied arguments for a specific method, validation data
+         corresponding to this method does not exist, received '${methodName}' as the method being validated`
+      );
     }
   }
 
-  //for getting the value of the last single request made by this instance
-  getLastSingleRequestValue() {
-    return this.#latestDataRecieved.singleRequest;
-  }
-}
+  //------------------------HELPER-METHODS-----------------------//
 
-export class ApiDataRetriever {
-  //will hold key value pairs to valid apis to target, where the key will be the name of the api, and
-  //the value will be a reference to the helper class instance that represents the api essentially
-  #validApis = {
-    WeatherAPI: WeatherApi,
+  #addUrlParams = {
+    location: (url, location) => {
+      const alteredUrl = url + `q=${location}`;
+      return alteredUrl;
+    },
+    numOfDays: (url, numOfDays) => {
+      const alteredUrl = url + `days=${numOfDays}`;
+      return alteredUrl;
+    },
+    airQuality: (url, boolean) => {
+      let yesOrNo;
+
+      if (boolean) {
+        yesOrNo = "yes";
+      } else {
+        yesOrNo = "no";
+      }
+      const alteredUrl = url + `aqi=${yesOrNo}`;
+
+      return alteredUrl;
+    },
+    weatherAlerts: (url, boolean) => {
+      let yesOrNo;
+
+      if (boolean) {
+        yesOrNo = "yes";
+      } else {
+        yesOrNo = "no";
+      }
+
+      const alteredUrl = url + `alerts=${yesOrNo}`;
+
+      return alteredUrl;
+    },
   };
 
-  //will hold key values pairs to the keys that will be used for their corresponding api
-  #keys = {
-    WeatherAPI: null,
-  };
+  //------------------------API-INTERFACE------------------------//
 
-  //api in order to add keys pertaining to specific targeted data retrieval apis
-  defineApiKey(selectedApi, key) {
-    try {
-      if (selectedApi in this.#keys && typeof key === "string") {
-        this.#keys[selectedApi] = key;
-      } else {
-        throw new ReferenceError(
-          `Either the selected API does not exist as a valid API to add a key to within the keys cache, or the supplied key is not a valid data type, received '${selectedApi}' as the supplied selected API and '${key}' as the received key`
-        );
-      }
-    } catch (error) {
-      console.error(error, error.stack);
-    }
-  }
+  //location method is the method to use to retrieve current weather data. Example: IP, city, etc.
+  //location value is the corresponding value, so say the corresponding IP, or city, etc.
+  getCurrentWeather(locationMethod, locationValue) {}
 
-  //will return a helper class instance that represents the api that you want to retrieve data from,
-  //of course if said api is a valid api instance to reference.
-  //The helper instance will already be configured with the key that you used, and will have a unique
-  //set of apis that pertain to its own use case
-  getApiInstance(selectedApi) {
-    try {
-      if (
-        selectedApi in this.#validApis &&
-        selectedApi in this.#keys &&
-        this.#keys[selectedApi] !== null
-      ) {
-        return new this.#validApis.WeatherAPI(this.#keys[selectedApi]);
-      } else {
-        throw new ReferenceError(
-          `Selected API is invalid as it either does not exist as a valid API to get or does not have a valid key in order to create the specific api instance, received '${selectedApi}' as the received selected API`
-        );
-      }
-    } catch (error) {
-      console.error(error, error.stack);
-    }
-  }
+  getForecast(locationMethod, locationValue, numOfDays) {}
 }
