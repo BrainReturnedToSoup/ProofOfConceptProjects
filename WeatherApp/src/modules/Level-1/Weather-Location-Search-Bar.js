@@ -5,13 +5,24 @@ class SearchBarFunctionality {
     try {
       this.#argValidator("constructor", argsObj);
 
-      const { searchBarElement, apiInstance, mediatorMethod } = argsObj;
+      //apply args to state and config
+      const { apiInstance, mediatorMethod, elementReferenceManager } = argsObj;
 
-      this.#searchBarElement = searchBarElement;
+      this.#helperClasses.apiInstance = apiInstance; //api for the search bar to use for search querying
+      this.#helperClasses.elementReferenceManager = elementReferenceManager;
 
-      this.#helperClasses.apiInstance = apiInstance;
+      this.#configData.mediatorMethod = mediatorMethod; //used to connect this class with the supplied api
 
-      this.#configData.mediatorMethod = mediatorMethod;
+      //fetch some important element references
+      this.#elementReferences.searchBarForm =
+        this.#helperClasses.elementReferenceManager.retrieveRef(
+          "Search-Bar-Form"
+        );
+
+      this.#elementReferences.searchBarInput =
+        this.#helperClasses.elementReferenceManager.retrieveRef(
+          "Search-Bar-Input"
+        );
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -20,10 +31,19 @@ class SearchBarFunctionality {
   //------------------ARGUMENT-VALIDATION-----------------------//
 
   #argValidationData = {
+    //methods
     constructor: {
-      searchBarElement: { instanceof: Element },
-      apiInstance: { instanceof: Object },
-      mediatorMethod: { typeof: "function" },
+      //args
+      apiInstance: {
+        //properties
+        instanceof: Object,
+      },
+      mediatorMethod: {
+        typeof: "function",
+      },
+      elementReferenceManager: {
+        instanceof: ElementRefManager,
+      },
     },
     subscribe: {
       subName: {
@@ -97,32 +117,64 @@ class SearchBarFunctionality {
 
   #stateData = {
     functionalityActive: false,
-  };
-
-  #elementReferences = {
-    searchBarInput: null,
+    requestInProgress: false,
   };
 
   #helperClasses = {
     apiInstance: null,
+    elementReferenceManager: null,
+  };
+
+  #elementReferences = {
+    searchBarForm: null,
+    searchBarInput: null,
   };
 
   #eventListenerMethodRefs = {
     submit: null,
   };
 
-  #searchBarElement = null;
-
   //-------------------FUNCTIONALITIES---------------------------//
 
-  #submitFunctionality() {
-    //entry point to execute all functionality related to the submission of the search bar instance
+  #makeApiRequest(searchInputValue) {
+    const { mediatorMethod } = this.#configData,
+      { apiInstance } = this.#helperClasses,
+      searchQueryPromise = mediatorMethod(searchInputValue, apiInstance);
+    //the mediator method is meant to take the search input and make a corresponding
+    //request desired on the supplied api, the api should return a promise, and thus the mediator will
+    //return this promise
+
+    return searchQueryPromise;
+  }
+
+  #handleSearchQuery() {
+    if (!this.#stateData.requestInProgress) {
+      this.#stateData.requestInProgress = true;
+
+      const { searchBarInput } = this.#elementReferences,
+        searchQueryPromise = this.#makeApiRequest(searchBarInput.value); //get a promise for an api response using the input value of the search
+
+      searchQueryPromise
+        .then((data) => {
+          this.#emitSearchQueryData(data); //if the query is successful and you get a data response, emit the data
+        })
+        .catch((error) => {
+          console.error(error, error.stack);
+        })
+        .finally(() => {
+          this.#stateData.requestInProgress = false; //reset the request in progress to false if the existing request either succeeds or fails
+        });
+    } else {
+      console.warn(
+        `Attempting to make another search query while another is still in progress, please wait until it resolves or rejects.`
+      );
+    }
   }
 
   //-------------------EVENT-LISTENERS---------------------------//
 
   #addEventListeners() {
-    const submitFunc = this.#submitFunctionality; //make a unique instance
+    const submitFunc = this.#handleSearchQuery; //make a unique instance
 
     this.#eventListenerMethodRefs.submit = submitFunc; //save the unique instance to state
 
@@ -137,7 +189,7 @@ class SearchBarFunctionality {
 
   //--------------------FETCH-DATA-PUB-SUB-----------------------//
 
-  #emitFetchedData(fetchedData) {
+  #emitSearchQueryData(fetchedData) {
     const numOfSubscribers = Object.keys(this.#subscribers).length;
 
     //check for subscribers
