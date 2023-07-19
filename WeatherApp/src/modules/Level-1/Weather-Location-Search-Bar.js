@@ -1,4 +1,5 @@
-import { ElementRefManager } from "../Level-0/Element-Ref-Manager";
+import { ElementRefManager } from "../Level-0/Element-Ref-Manager.js";
+import { WeatherApi } from "../Level-0/Api-Interfaces.js";
 
 class SearchBarFunctionality {
   constructor(argsObj) {
@@ -39,7 +40,7 @@ class SearchBarFunctionality {
         instanceof: Object,
       },
       mediatorMethod: {
-        typeof: "function",
+        type: "function",
       },
       elementReferenceManager: {
         instanceof: ElementRefManager,
@@ -118,6 +119,7 @@ class SearchBarFunctionality {
   #stateData = {
     functionalityActive: false,
     requestInProgress: false,
+    responseData: null,
   };
 
   #helperClasses = {
@@ -130,9 +132,7 @@ class SearchBarFunctionality {
     searchBarInput: null,
   };
 
-  #eventListenerMethodRefs = {
-    submit: null,
-  };
+  #subscribers = {};
 
   //-------------------FUNCTIONALITIES---------------------------//
 
@@ -152,17 +152,20 @@ class SearchBarFunctionality {
       this.#stateData.requestInProgress = true;
 
       const { searchBarInput } = this.#elementReferences,
-        searchQueryPromise = this.#makeApiRequest(searchBarInput.value); //get a promise for an api response using the input value of the search
+        searchQueryPromise = this.#makeApiRequest(searchBarInput.value), //get a promise for an api response using the input value of the search
+        classScope = this;
 
       searchQueryPromise
         .then((data) => {
-          this.#emitSearchQueryData(data); //if the query is successful and you get a data response, emit the data
+          this.#emitSearchQueryData.bind(classScope)(data);
+          //emit the query data, have to bind it to this class instance, because otherwise the method scope will point to the promise
+          //and the method wont be able to access this class's private variables
         })
         .catch((error) => {
           console.error(error, error.stack);
         })
         .finally(() => {
-          this.#stateData.requestInProgress = false; //reset the request in progress to false if the existing request either succeeds or fails
+          this.#stateData.requestInProgress = false;
         });
     } else {
       console.warn(
@@ -171,25 +174,32 @@ class SearchBarFunctionality {
     }
   }
 
+  #test = null;
+
   //-------------------EVENT-LISTENERS---------------------------//
 
+  #submitFunc = (event) => {
+    event.preventDefault(); //prevent regular form submit behavior
+    this.#handleSearchQuery(); //start the search functionality
+  };
+
   #addEventListeners() {
-    const submitFunc = this.#handleSearchQuery; //make a unique instance
-
-    this.#eventListenerMethodRefs.submit = submitFunc; //save the unique instance to state
-
-    this.#searchBarElement.addEventListener("submit", submitFunc); //use the unique as the event listener callback
+    this.#elementReferences.searchBarForm.addEventListener(
+      "submit",
+      this.#submitFunc
+    ); //use the unique as the event listener callback
   }
 
   #removeEventListeners() {
-    const submitFuncRef = this.#eventListenerMethodRefs.submit; //grab the unique instance saved in state
-
-    this.#searchBarElement.removeEventListener("submit", submitFuncRef); //use it to remove the submit event listener
+    this.#elementReferences.searchBarForm.removeEventListener(
+      "submit",
+      this.#submitFunc
+    ); //use it to remove the submit event listener
   }
 
   //--------------------FETCH-DATA-PUB-SUB-----------------------//
 
-  #emitSearchQueryData(fetchedData) {
+  #emitSearchQueryData = async (fetchedData) => {
     const numOfSubscribers = Object.keys(this.#subscribers).length;
 
     //check for subscribers
@@ -198,9 +208,7 @@ class SearchBarFunctionality {
         this.#subscribers[subscriber](fetchedData);
       }
     }
-  } //emits the received data to all of the present subscribers
-
-  #subscribers = {};
+  }; //emits the received data to all of the present subscribers
 
   subscribe(subName, entryPointMethod) {
     try {
@@ -278,6 +286,8 @@ class SearchBarConstructor {
       this.#configData.dynamicOptionsOn = dynamicOptionsOn;
 
       this.#helperClasses.elementReferenceManager = elementReferenceManager; //class instance
+
+      this.#completeSearchBar = this.#createSearchBarFrag();
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -354,6 +364,8 @@ class SearchBarConstructor {
   #helperClasses = {
     elementReferenceManager: null, //used to store references instead of spam querying
   };
+
+  #completeSearchBar = null;
 
   //--------------------ELEMENT-REFERENCE-CACHING-------------------//
 
@@ -448,25 +460,38 @@ class SearchBarConstructor {
   //------------------------------APIs------------------------------//
 
   returnSearchBarFragment() {
-    const completeSearchBar = this.#createSearchBarFrag();
-    return completeSearchBar;
+    return this.#completeSearchBar;
   }
 }
 
-class WeatherLocationSearchBar {
+export class WeatherLocationSearchBar {
   //facilitate the building of the entire search bar,
-  constructor() {
-    //logic for executing the build and appending functionality in one complete package
+  constructor(uniqueIdentifier) {
+    //validate constructor args
+    this.#argValidator("constructor", { uniqueIdentifier });
+
+    this.#initHelperClassInstances(uniqueIdentifier); //init all of the helper class instances
+
+    this.#buildSearchBar(); //builds the search bar and saves it to the state
+
+    this.#subscribeToApiData(); //so that the controller receives api data from the functionality helper, then it can emit said data to its own subscribers
+
+    this.#turnOnFunctionality(); //turn on the functionality of the search bar after everything else
   }
 
   //------------------ARGUMENT-VALIDATION-------------------------//
 
   #argValidationData = {
     //method
-    subscribe: {
+    constructor: {
       //args
-      subName: {
+      uniqueIdentifier: {
         //properties of arg
+        type: "string",
+      },
+    },
+    subscribe: {
+      subName: {
         type: "string",
       },
       entryPointMethod: {
@@ -481,6 +506,14 @@ class WeatherLocationSearchBar {
     append: {
       parentElement: {
         instanceof: Element,
+      },
+    },
+    mediatorMethod: {
+      input: {
+        type: "string",
+      },
+      apiInstance: {
+        instanceof: WeatherApi,
       },
     },
   };
@@ -537,11 +570,6 @@ class WeatherLocationSearchBar {
 
   //------------------STATE-AND-CONFIG-DATA-----------------------//
 
-  #helperClassArgs = {
-    searchBarConstructor: {},
-    searchBarFunctionality: {},
-  };
-
   #helperClassInstances = {
     weatherApi: null,
     searchBarConstructor: null,
@@ -549,9 +577,99 @@ class WeatherLocationSearchBar {
     elementReferenceManager: null,
   };
 
+  #mediatorMethod = (input, apiInstance) => {
+    this.#argValidator("mediatorMethod", { input, apiInstance }); //validate the args coming into the mediator method
+
+    const responsePromise = apiInstance.getCurrentWeather(input); //get a promise instance from the api
+
+    return responsePromise; //return said promise
+  };
+
+  #apiKey = "58d62657e3c444ae9a725813231907";
+
   #searchBarAppended = false;
 
   #completeSearchBarElement = null;
+
+  //------------------CONSTRUCTOR-HELPER-METHODS-------------------//
+
+  #buildSearchBar() {
+    //build the complete search bar
+    const { searchBarConstructor } = this.#helperClassInstances,
+      completeSearchBarElement = searchBarConstructor.returnSearchBarFragment();
+
+    //save the complete search bar to state
+    this.#completeSearchBarElement = completeSearchBarElement;
+  }
+
+  #subscribeToApiData() {
+    const { searchBarFunctionality } = this.#helperClassInstances,
+      classScope = this;
+
+    //subscribes to the search bar functionality helper pub sub, so that this
+    //controller will receive api data. It will then take this api data and emit
+    //it to its own subscribers
+    searchBarFunctionality.subscribe(
+      "WeatherAppSearchBar",
+      this.#publisherEntryPoint.bind(classScope)
+      //invoke the publisher entry point method, have to bind the
+      //method scope to this class instance, otherwise it will point to the
+      //functionality helper class
+    );
+  }
+
+  #turnOnFunctionality() {
+    const { searchBarFunctionality } = this.#helperClassInstances;
+
+    searchBarFunctionality.activate();
+  }
+
+  #initHelperClassInstances(uniqueIdentifier) {
+    const {
+      weatherApi,
+      elementReferenceManager,
+      searchBarConstructor,
+      searchBarFunctionality,
+    } = this.#initMethods;
+
+    //inits all of the helper class instances in the correct order,
+    //some of these helpers use other helpers as dependencies
+    weatherApi();
+    elementReferenceManager();
+    searchBarConstructor(uniqueIdentifier);
+    searchBarFunctionality();
+  }
+
+  #initMethods = {
+    weatherApi: () => {
+      this.#helperClassInstances.weatherApi = new WeatherApi(this.#apiKey);
+    },
+    elementReferenceManager: () => {
+      this.#helperClassInstances.elementReferenceManager =
+        new ElementRefManager();
+    },
+    searchBarConstructor: (uniqueIdentifier) => {
+      //init the search bar constructor, which requires the element ref manager instance as a dependency
+      this.#helperClassInstances.searchBarConstructor =
+        new SearchBarConstructor({
+          elementReferenceManager:
+            this.#helperClassInstances.elementReferenceManager,
+          uniqueIdentifier: uniqueIdentifier,
+          dynamicOptionsOn: false,
+        });
+    },
+    searchBarFunctionality: () => {
+      //init the search bar functionality class, which requires the element ref manager and the weather api instances as dependencies
+      //also uses a mediator method to link the api instance to the search bar functionality
+      this.#helperClassInstances.searchBarFunctionality =
+        new SearchBarFunctionality({
+          apiInstance: this.#helperClassInstances.weatherApi,
+          mediatorMethod: this.#mediatorMethod,
+          elementReferenceManager:
+            this.#helperClassInstances.elementReferenceManager,
+        });
+    },
+  };
 
   //--------------------FETCH-DATA-PUB-SUB-------------------------//
 

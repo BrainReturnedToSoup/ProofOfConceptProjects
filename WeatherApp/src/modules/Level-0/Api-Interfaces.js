@@ -10,11 +10,6 @@ class ApiInterface {
 
   //--------------------STATE-AND-CONFIG-DATA----------------------//
 
-  configData = {
-    apiKey: null,
-    apiName: null,
-  };
-
   defaultOptions = {
     get: {
       method: "get",
@@ -139,7 +134,7 @@ class ApiInterface {
   };
 }
 
-class WeatherApi extends ApiInterface {
+export class WeatherApi extends ApiInterface {
   constructor(apiKey) {
     super(); //call parent constructor
 
@@ -153,7 +148,12 @@ class WeatherApi extends ApiInterface {
   //---------------------STATE-AND-CONFIG-DATA------------------//
 
   //the base template string, at which to add parameters, they are concatenated at the end of the string
-  #urlTemplate = `http://api.weatherapi.com/v1/current.json?key=${this.configData.apiKey}`;
+  configData = {
+    apiName: null,
+    apiKey: null,
+  };
+
+  #urlTemplate = `http://api.weatherapi.com/v1/current.json?key=`;
 
   //---------------------ARGUMENT-VALIDATION--------------------//
 
@@ -236,11 +236,14 @@ class WeatherApi extends ApiInterface {
   //------------------------HELPER-METHODS-----------------------//
 
   #urlParams = {
+    key: () => {
+      return this.configData.apiKey;
+    },
     location: (location) => {
-      return `q=${location}`;
+      return `&q=${location}`;
     },
     numOfDays: (numOfDays) => {
-      return `days=${numOfDays}`;
+      return `&days=${numOfDays}`;
     },
     airQuality: (boolean) => {
       let yesOrNo;
@@ -250,7 +253,7 @@ class WeatherApi extends ApiInterface {
       } else {
         yesOrNo = "no";
       }
-      return `aqi=${yesOrNo}`;
+      return `&aqi=${yesOrNo}`;
     },
     weatherAlerts: (boolean) => {
       let yesOrNo;
@@ -260,7 +263,7 @@ class WeatherApi extends ApiInterface {
       } else {
         yesOrNo = "no";
       }
-      return `alerts=${yesOrNo}`;
+      return `&alerts=${yesOrNo}`;
     },
   };
 
@@ -275,17 +278,22 @@ class WeatherApi extends ApiInterface {
 
       //get the base url and the parameter string constructors
       const baseUrl = this.#urlTemplate,
-        { location, airQuality, weatherAlerts } = this.#urlParams,
+        { key, location, airQuality, weatherAlerts } = this.#urlParams,
         { get } = this.requestMethods;
 
       //build the necessary parameters
-      const locString = location(loc),
+      const keyString = key(),
+        locString = location(loc),
         airQualityString = airQuality(false),
         weatherAlertsString = weatherAlerts(false);
 
       //concat into the final url string
       const finalUrl =
-        baseUrl + locString + airQualityString + weatherAlertsString;
+        baseUrl +
+        keyString +
+        locString +
+        airQualityString +
+        weatherAlertsString;
 
       //make a get request that returns a promise instance
       const requestPromise = get(finalUrl);
@@ -303,11 +311,13 @@ class WeatherApi extends ApiInterface {
 
       //get the base url and the parameter string constructors
       const baseUrl = this.#urlTemplate,
-        { location, numOfDays, airQuality, weatherAlerts } = this.#urlParams,
+        { key, location, numOfDays, airQuality, weatherAlerts } =
+          this.#urlParams,
         { get } = this.requestMethods;
 
       //build the necessary parameters
-      const locString = location(loc),
+      const keyString = key(),
+        locString = location(loc),
         numOfDaysString = numOfDays(days),
         airQualityString = airQuality(false),
         weatherAlertsString = weatherAlerts(false);
@@ -315,6 +325,7 @@ class WeatherApi extends ApiInterface {
       //concat into the final url string
       const finalUrl =
         baseUrl +
+        keyString +
         locString +
         numOfDaysString +
         airQualityString +

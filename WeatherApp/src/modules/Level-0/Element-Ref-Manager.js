@@ -20,8 +20,10 @@ export class ElementRefManager {
               )
             );
           }
+          break;
         case "get":
-          return this.#cache.get(key);
+          const reference = this.#cache.get(key);
+          return reference;
         case "delete":
           this.#cache.delete(key);
           break;
@@ -74,5 +76,9 @@ export class ElementRefManager {
     } catch (error) {
       console.error(error, error.stack);
     }
+  }
+
+  size() {
+    return this.#cache.size;
   }
 }
