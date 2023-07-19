@@ -2,6 +2,8 @@ import { WeatherLocationSearchBar } from "./modules/Level-1/Weather-Location-Sea
 
 const searchBar = new WeatherLocationSearchBar("balls");
 
-searchBar.subscribe("balls", (data) => {console.log(data, "it works")})
+searchBar.subscribe("balls", (data) => {
+  console.log(data, "it works");
+});
 
 searchBar.append(document.body);

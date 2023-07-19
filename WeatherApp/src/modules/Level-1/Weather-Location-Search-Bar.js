@@ -7,23 +7,16 @@ class SearchBarFunctionality {
       this.#argValidator("constructor", argsObj);
 
       //apply args to state and config
-      const { apiInstance, mediatorMethod, elementReferenceManager } = argsObj;
+      const { apiInstance, mediatorMethod, searchBarForm, searchBarInput } =
+        argsObj;
 
       this.#helperClasses.apiInstance = apiInstance; //api for the search bar to use for search querying
-      this.#helperClasses.elementReferenceManager = elementReferenceManager;
 
       this.#configData.mediatorMethod = mediatorMethod; //used to connect this class with the supplied api
 
-      //fetch some important element references
-      this.#elementReferences.searchBarForm =
-        this.#helperClasses.elementReferenceManager.retrieveRef(
-          "Search-Bar-Form"
-        );
-
-      this.#elementReferences.searchBarInput =
-        this.#helperClasses.elementReferenceManager.retrieveRef(
-          "Search-Bar-Input"
-        );
+      //save some important references to state
+      this.#elementReferences.searchBarForm = searchBarForm;
+      this.#elementReferences.searchBarInput = searchBarInput;
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -42,8 +35,11 @@ class SearchBarFunctionality {
       mediatorMethod: {
         type: "function",
       },
-      elementReferenceManager: {
-        instanceof: ElementRefManager,
+      searchBarForm: {
+        instanceof: Element,
+      },
+      searchBarInput: {
+        instanceof: Element,
       },
     },
     subscribe: {
@@ -119,20 +115,16 @@ class SearchBarFunctionality {
   #stateData = {
     functionalityActive: false,
     requestInProgress: false,
-    responseData: null,
   };
 
   #helperClasses = {
     apiInstance: null,
-    elementReferenceManager: null,
   };
 
   #elementReferences = {
     searchBarForm: null,
     searchBarInput: null,
   };
-
-  #subscribers = {};
 
   //-------------------FUNCTIONALITIES---------------------------//
 
@@ -159,13 +151,13 @@ class SearchBarFunctionality {
         .then((data) => {
           this.#emitSearchQueryData.bind(classScope)(data);
           //emit the query data, have to bind it to this class instance, because otherwise the method scope will point to the promise
-          //and the method wont be able to access this class's private variables
+          //and the method wont be able to access this class's private variables within the private method invocation
         })
         .catch((error) => {
           console.error(error, error.stack);
         })
         .finally(() => {
-          this.#stateData.requestInProgress = false;
+          this.#stateData.requestInProgress = false; //reset the class state so another request can be made
         });
     } else {
       console.warn(
@@ -173,8 +165,6 @@ class SearchBarFunctionality {
       );
     }
   }
-
-  #test = null;
 
   //-------------------EVENT-LISTENERS---------------------------//
 
@@ -209,6 +199,8 @@ class SearchBarFunctionality {
       }
     }
   }; //emits the received data to all of the present subscribers
+
+  #subscribers = {};
 
   subscribe(subName, entryPointMethod) {
     try {
@@ -247,7 +239,9 @@ class SearchBarFunctionality {
   activate() {
     try {
       if (!this.#stateData.functionalityActive) {
-        this.#addEventListeners();
+        this.#addEventListeners(); //append the event listeners to the target form element
+
+        this.#stateData.functionalityActive = true;
       } else {
         throw new Error(
           `Failed to activate the functionality on a specific search bar instance, it appears to already be on`
@@ -261,7 +255,9 @@ class SearchBarFunctionality {
   deactivate() {
     try {
       if (this.#stateData.functionalityActive) {
-        this.#removeEventListeners();
+        this.#removeEventListeners(); //remove the event listeners from the target form element
+
+        this.#stateData.functionalityActive = false;
       } else {
         throw new Error(
           `Failed to deactivate the functionality on a specific search bar instance, it appears to already be off`
@@ -470,7 +466,7 @@ export class WeatherLocationSearchBar {
     //validate constructor args
     this.#argValidator("constructor", { uniqueIdentifier });
 
-    this.#initHelperClassInstances(uniqueIdentifier); //init all of the helper class instances
+    this.#initHelperClassInstances(uniqueIdentifier); //init all of the helper class instances which they will already be supplied with the correct dependencies
 
     this.#buildSearchBar(); //builds the search bar and saves it to the state
 
@@ -572,11 +568,12 @@ export class WeatherLocationSearchBar {
 
   #helperClassInstances = {
     weatherApi: null,
+    elementReferenceManager: null,
     searchBarConstructor: null,
     searchBarFunctionality: null,
-    elementReferenceManager: null,
   };
 
+  //PAIRED WITH THE API INSTANCE
   #mediatorMethod = (input, apiInstance) => {
     this.#argValidator("mediatorMethod", { input, apiInstance }); //validate the args coming into the mediator method
 
@@ -585,7 +582,7 @@ export class WeatherLocationSearchBar {
     return responsePromise; //return said promise
   };
 
-  #apiKey = "58d62657e3c444ae9a725813231907";
+  #apiKey = "58d62657e3c444ae9a725813231907"; //my api key to use the weatherapi endpoint
 
   #searchBarAppended = false;
 
@@ -614,7 +611,7 @@ export class WeatherLocationSearchBar {
       this.#publisherEntryPoint.bind(classScope)
       //invoke the publisher entry point method, have to bind the
       //method scope to this class instance, otherwise it will point to the
-      //functionality helper class
+      //functionality helper class instead, and the private variables within the scope won't be accessible
     );
   }
 
@@ -659,14 +656,24 @@ export class WeatherLocationSearchBar {
         });
     },
     searchBarFunctionality: () => {
-      //init the search bar functionality class, which requires the element ref manager and the weather api instances as dependencies
-      //also uses a mediator method to link the api instance to the search bar functionality
+      //fetch the element references for the specific search bar instance
+      const searchBarFormRef =
+          this.#helperClassInstances.elementReferenceManager.retrieveRef(
+            "Search-Bar-Form"
+          ),
+        searchBarInputRef =
+          this.#helperClassInstances.elementReferenceManager.retrieveRef(
+            "Search-Bar-Input"
+          );
+
+      //init the search bar functionality class, which requires references to the search bar input and the form element that it exists within,
+      //as well as the api instance being used and the mediator method to connect the search bar functionality to the api instance
       this.#helperClassInstances.searchBarFunctionality =
         new SearchBarFunctionality({
           apiInstance: this.#helperClassInstances.weatherApi,
           mediatorMethod: this.#mediatorMethod,
-          elementReferenceManager:
-            this.#helperClassInstances.elementReferenceManager,
+          searchBarForm: searchBarFormRef,
+          searchBarInput: searchBarInputRef,
         });
     },
   };
@@ -707,7 +714,7 @@ export class WeatherLocationSearchBar {
 
   unsubscribe(subName) {
     try {
-      this.#argValidationData("unsubscribe", { subName });
+      this.#argValidator("unsubscribe", { subName });
 
       if (this.#subscribers.hasOwnProperty(subName)) {
         delete this.#subscribers[subName];
