@@ -1,6 +1,6 @@
 import { WeatherLocationSearchBar } from "./modules/Level-1/Weather-Location-Search-Bar.js";
 
-const searchBar = new WeatherLocationSearchBar("balls");
+const searchBar = new WeatherLocationSearchBar();
 
 searchBar.subscribe("balls", (data) => {
   console.log(data, "it works");

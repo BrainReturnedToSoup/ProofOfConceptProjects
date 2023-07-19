@@ -110,6 +110,9 @@ class SearchBarFunctionality {
 
   #configData = {
     mediatorMethod: null,
+    //used to connect the search query functionality of this class to the api instance supplied,
+    // the args for this method should be this (input, apiInstance). This method should
+    //return a promise instance that will eventually return the data behind the api get request
   };
 
   #stateData = {
@@ -278,12 +281,12 @@ class SearchBarConstructor {
       const { uniqueIdentifier, elementReferenceManager, dynamicOptionsOn } =
         argsObj;
 
-      this.#configData.uniqueIdentifier = uniqueIdentifier; //reg data
+      this.#configData.uniqueIdentifier = uniqueIdentifier; //config data to determine some characteristics of the constructed search bar
       this.#configData.dynamicOptionsOn = dynamicOptionsOn;
 
-      this.#helperClasses.elementReferenceManager = elementReferenceManager; //class instance
+      this.#helperClasses.elementReferenceManager = elementReferenceManager; //class instance to store each individual element reference
 
-      this.#completeSearchBar = this.#createSearchBarFrag();
+      this.#completeSearchBar = this.#createSearchBarFrag(); //create the entire search bar fragment and save it to the state
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -295,7 +298,10 @@ class SearchBarConstructor {
     //method
     constructor: {
       //args
-      uniqueIdentifier: { type: "string" },
+      uniqueIdentifier: {
+        //properties
+        type: "string",
+      },
       elementReferenceManager: { instanceof: ElementRefManager },
       dynamicOptionsOn: { type: "boolean" },
     },
@@ -398,6 +404,8 @@ class SearchBarConstructor {
 
       //define attributes
       if (dynamicOptionsOn) {
+        //if this search bar will feature dynamic options in some capacity
+        //add the necessary attribute to link the data list to the input
         inputElement.setAttribute(
           "list",
           `Search-Bar-Data-List-${uniqueIdentifier}`
@@ -421,7 +429,7 @@ class SearchBarConstructor {
       dataListElement.setAttribute(
         "id",
         `Search-Bar-Data-List-${uniqueIdentifier}`
-      );
+      ); //should match the list attribute value on the corresponding input field
 
       //store reference
       this.#storeElementRef("Search-Bar-Data-List", dataListElement);
@@ -457,6 +465,7 @@ class SearchBarConstructor {
 
   returnSearchBarFragment() {
     return this.#completeSearchBar;
+    //return the complete search bar that was constructed and save to state upon the class instance being made
   }
 }
 
@@ -573,7 +582,7 @@ export class WeatherLocationSearchBar {
     searchBarFunctionality: null,
   };
 
-  //PAIRED WITH THE API INSTANCE
+  //--DEPENDENCY
   #mediatorMethod = (input, apiInstance) => {
     this.#argValidator("mediatorMethod", { input, apiInstance }); //validate the args coming into the mediator method
 
@@ -582,6 +591,7 @@ export class WeatherLocationSearchBar {
     return responsePromise; //return said promise
   };
 
+  //--DEPENDENCY
   #apiKey = "58d62657e3c444ae9a725813231907"; //my api key to use the weatherapi endpoint
 
   #searchBarAppended = false;
