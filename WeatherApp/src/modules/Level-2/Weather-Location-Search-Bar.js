@@ -3,6 +3,15 @@ import { WeatherApi } from "../Level-0/Api-Interfaces.js";
 import { SearchBarFunctionality } from "../Level-1/Search-Bar-Functionality.js";
 import { SearchBarConstructor } from "../Level-1/Search-Bar-Constructor.js";
 
+//CREATES THE ENTIRE SEARCH BAR FEATURE INCLUDING THE FUNCTIONALITY UPON CLASS INSTANCE
+//TAKES A UNIQUE IDENTIFIER AND AN API KEY SPECIFICALLY FOR 'weatherApi' FOR ITS CONSTRUCTOR ARGS
+
+//USES THE IMPORTED HELPER CLASSES IN ORDER TO MAKE A UNIQUE FEATURE IMPLEMENTATION, SPECIFICALLY FOR SEARCHING
+//FOR WEATHER DATA BASED ON THE SUPPLIED LOCATION
+
+//OFFERS A PUB SUB SUBSCRIPTION SO THAT ONE CAN ACCESS THE DATA RETRIEVED FROM THE SEARCH QUERY API
+//REQUEST. SUBSCRIBE TO THIS CLASS TO DO SO FOR WEATHER DATA BASED ON THE LOCATION SUPPLIED
+
 export class WeatherLocationSearchBar {
   //facilitate the building of the entire search bar,
   constructor(uniqueIdentifier, apiKey) {
