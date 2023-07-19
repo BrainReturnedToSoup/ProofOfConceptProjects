@@ -1,13 +1,15 @@
 import { ElementRefManager } from "../Level-0/Element-Ref-Manager.js";
 import { WeatherApi } from "../Level-0/Api-Interfaces.js";
-import { SearchBarFunctionality } from "../Level-1/Search-Bar-Helpers/Search-Bar-Functionality.js";
-import { SearchBarConstructor } from "../Level-1/Search-Bar-Helpers/Search-Bar-Constructor.js";
+import { SearchBarFunctionality } from "../Level-1/Search-Bar-Functionality.js";
+import { SearchBarConstructor } from "../Level-1/Search-Bar-Constructor.js";
 
 export class WeatherLocationSearchBar {
   //facilitate the building of the entire search bar,
-  constructor(uniqueIdentifier) {
+  constructor(uniqueIdentifier, apiKey) {
     //validate constructor args
-    this.#argValidator("constructor", { uniqueIdentifier });
+    this.#argValidator("constructor", { uniqueIdentifier, apiKey });
+
+    this.#apiKey = apiKey; //save the supplied api key to state to be used later
 
     this.#initHelperClassInstances(uniqueIdentifier); //init all of the helper class instances which they will already be supplied with the correct dependencies
 
@@ -26,6 +28,9 @@ export class WeatherLocationSearchBar {
       //args
       uniqueIdentifier: {
         //properties of arg
+        type: "string",
+      },
+      apiKey: {
         type: "string",
       },
     },
@@ -126,7 +131,7 @@ export class WeatherLocationSearchBar {
   };
 
   //--DEPENDENCY
-  #apiKey = "58d62657e3c444ae9a725813231907"; //my api key to use the weatherapi endpoint
+  #apiKey = null; //my api key to use the weatherapi endpoint
 
   #searchBarAppended = false;
 

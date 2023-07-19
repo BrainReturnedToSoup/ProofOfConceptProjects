@@ -1,3 +1,5 @@
+import { ElementRefManager } from "../Level-0/Element-Ref-Manager"; //requires this class reference for its argument validation
+
 export class SearchBarConstructor {
   constructor(argsObj) {
     try {
