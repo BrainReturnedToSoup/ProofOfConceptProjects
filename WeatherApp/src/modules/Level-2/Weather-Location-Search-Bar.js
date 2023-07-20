@@ -144,6 +144,8 @@ export class WeatherLocationSearchBar {
 
   #searchBarAppended = false;
 
+  #functionalityOn = false;
+
   #completeSearchBarElement = null;
 
   //------------------CONSTRUCTOR-HELPER-METHODS-------------------//
@@ -171,12 +173,6 @@ export class WeatherLocationSearchBar {
       //method scope to this class instance, otherwise it will point to the
       //functionality helper class instead, and the private variables within the scope won't be accessible
     );
-  }
-
-  #turnOnFunctionality() {
-    const { searchBarFunctionality } = this.#helperClassInstances;
-
-    searchBarFunctionality.activate();
   }
 
   #initHelperClassInstances(uniqueIdentifier) {
@@ -289,6 +285,43 @@ export class WeatherLocationSearchBar {
 
   //--------------------------MAIN-APIs------------------------------//
 
+  //tools activate or deactivate the functionality behind the search bar instance
+  activateFunctionality() {
+    try {
+      if (!this.#functionalityOn) {
+        const { searchBarFunctionality } = this.#helperClassInstances;
+
+        searchBarFunctionality.activate();
+
+        this.#functionalityOn = true;
+      } else {
+        throw new Error(
+          `Failed to toggle the weather app search bar on, as it appears to already be on`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
+  deactivateFunctionality() {
+    try {
+      if (this.#functionalityOn) {
+        const { searchBarFunctionality } = this.#helperClassInstances;
+
+        searchBarFunctionality.deactivate();
+
+        this.#functionalityOn = false;
+      } else {
+        throw new Error(
+          `Failed to toggle the weather app search bar off, as it appears to already be off`
+        );
+      }
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
+
   //append the complete search bar element after it has been made completely
   append(parentElement) {
     try {
@@ -301,7 +334,7 @@ export class WeatherLocationSearchBar {
       } else {
         throw new Error(
           `Failed to append a weather app search bar instance, as the target instance was
-           already appended somewhere else`
+             already appended somewhere else`
         );
       }
     } catch (error) {

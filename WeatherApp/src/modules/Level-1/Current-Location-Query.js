@@ -1,6 +1,7 @@
-import { WeatherApi } from "./modules/Level-0/Api-Interfaces";
-
-class CurrentLocationQuery {
+//a way to ask for the current location, and then make an api request using said
+//current location, then emit the data from the api request. This can be configured
+//for any use case that may require using the users current location to get data
+export class CurrentLocationQuery {
   constructor(apiInstance, mediatorMethod) {
     try {
       this.#argValidator("constructor", { apiInstance, mediatorMethod }); //validate the args
@@ -45,8 +46,8 @@ class CurrentLocationQuery {
       if (typeof suppliedArg !== correctType) {
         throw new Error(
           `Argument '${argName}' for method '${methodOrigin}' failed type validation,
-              received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
-               needs to have the type '${correctType}'`
+                received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
+                 needs to have the type '${correctType}'`
         );
       }
     },
@@ -54,7 +55,7 @@ class CurrentLocationQuery {
       if (!(suppliedArg instanceof correctInstance)) {
         throw new Error(
           `Argument '${argName}' for method '${methodOrigin}' failed instance validation,
-              received '${suppliedArg}' which is not an instance of '${correctInstance}'`
+                received '${suppliedArg}' which is not an instance of '${correctInstance}'`
         );
       }
     },
@@ -84,7 +85,7 @@ class CurrentLocationQuery {
     } else {
       throw new ReferenceError(
         `Failed to validate the supplied arguments for a specific method, validation data
-            corresponding to this method does not exist, received '${methodName}' as the method being validated`
+              corresponding to this method does not exist, received '${methodName}' as the method being validated`
       );
     }
   }
@@ -166,7 +167,7 @@ class CurrentLocationQuery {
       } else {
         throw new ReferenceError(
           `Failed to add a subscriber to the weather app search bar publisher, as the
-           subscriber seems to already exist, received '${subName}' as the subscriber being added`
+             subscriber seems to already exist, received '${subName}' as the subscriber being added`
         );
       }
     } catch (error) {
@@ -183,7 +184,7 @@ class CurrentLocationQuery {
       } else {
         throw new ReferenceError(
           `Failed to remove a subscriber from the weather app search bar publisher, as the
-           subscriber attempting to be removed does not exist, received '${subName}' as the subscriber being removed`
+             subscriber attempting to be removed does not exist, received '${subName}' as the subscriber being removed`
         );
       }
     } catch (error) {
@@ -249,23 +250,3 @@ class CurrentLocationQuery {
     }
   }
 }
-
-const mediatorMethod = (lon, lat, apiInstance) => {
-  const locationString = `${lat},${lon}`, //create the coords string in a way that works with the api interface for a location
-    responsePromise = apiInstance.getCurrentWeather(locationString); //get the weather using said coords string as the location string
-
-  return responsePromise;
-};
-
-const getWeatherData = new CurrentLocationQuery(
-  new WeatherApi("58d62657e3c444ae9a725813231907"),
-  mediatorMethod
-);
-
-getWeatherData.subscribe("balls", (data) => {
-  console.log(data);
-});
-
-document.body.addEventListener("click", () => {
-  getWeatherData.requestCurrentLocation();
-});
