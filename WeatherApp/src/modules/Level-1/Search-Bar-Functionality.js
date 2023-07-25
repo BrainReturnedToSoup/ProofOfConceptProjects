@@ -4,12 +4,7 @@ export class SearchBarFunctionality {
       this.#argValidator("constructor", argsObj);
 
       //apply args to state and config
-      const { apiInstance, mediatorMethod, searchBarForm, searchBarInput } =
-        argsObj;
-
-      this.#helperClasses.apiInstance = apiInstance; //api for the search bar to use for search querying
-
-      this.#configData.mediatorMethod = mediatorMethod; //used to connect this class with the supplied api
+      const { searchBarForm, searchBarInput } = argsObj;
 
       //save some important references to state
       this.#elementReferences.searchBarForm = searchBarForm;
@@ -25,13 +20,6 @@ export class SearchBarFunctionality {
     //methods
     constructor: {
       //args
-      apiInstance: {
-        //properties
-        instanceof: Object,
-      },
-      mediatorMethod: {
-        type: "function",
-      },
       searchBarForm: {
         instanceof: Element,
       },
@@ -105,20 +93,8 @@ export class SearchBarFunctionality {
 
   //------------------STATE-AND-CONFIG-DATA----------------------//
 
-  #configData = {
-    mediatorMethod: null,
-    //used to connect the search query functionality of this class to the api instance supplied,
-    // the args for this method should be this (input, apiInstance). This method should
-    //return a promise instance that will eventually return the data behind the api get request
-  };
-
   #stateData = {
     functionalityActive: false,
-    requestInProgress: false,
-  };
-
-  #helperClasses = {
-    apiInstance: null,
   };
 
   #elementReferences = {
@@ -126,51 +102,14 @@ export class SearchBarFunctionality {
     searchBarInput: null,
   };
 
-  //-------------------FUNCTIONALITIES---------------------------//
-
-  #makeApiRequest(searchInputValue) {
-    const { mediatorMethod } = this.#configData,
-      { apiInstance } = this.#helperClasses,
-      searchQueryPromise = mediatorMethod(searchInputValue, apiInstance);
-    //the mediator method is meant to take the search input and make a corresponding
-    //request desired on the supplied api, the api should return a promise, and thus the mediator will
-    //return this promise
-
-    return searchQueryPromise;
-  }
-
-  #handleSearchQuery() {
-    if (!this.#stateData.requestInProgress) {
-      this.#stateData.requestInProgress = true;
-
-      const { searchBarInput } = this.#elementReferences,
-        searchQueryPromise = this.#makeApiRequest(searchBarInput.value), //get a promise for an api response using the input value of the search
-        classScope = this;
-
-      searchQueryPromise
-        .then((data) => {
-          this.#emitSearchQueryData.bind(classScope)(data);
-          //emit the query data, have to bind it to this class instance, because otherwise the method scope will point to the promise
-          //and the method wont be able to access this class's private variables within the private method invocation
-        })
-        .catch((error) => {
-          console.error(error, error.stack);
-        })
-        .finally(() => {
-          this.#stateData.requestInProgress = false; //reset the class state so another request can be made
-        });
-    } else {
-      console.warn(
-        `Attempting to make another search query while another is still in progress, please wait until it resolves or rejects.`
-      );
-    }
-  }
-
   //-------------------EVENT-LISTENERS---------------------------//
 
   #submitFunc = (event) => {
     event.preventDefault(); //prevent regular form submit behavior
-    this.#handleSearchQuery(); //start the search functionality
+
+    const searchBarInputElement = this.#elementReferences.searchBarInput;
+
+    this.#emitSearchBarText(searchBarInputElement.value);
   };
 
   #addEventListeners() {
@@ -187,18 +126,18 @@ export class SearchBarFunctionality {
     ); //use it to remove the submit event listener
   }
 
-  //--------------------FETCH-DATA-PUB-SUB-----------------------//
+  //--------------------INPUT-VALUE-PUB-SUB-----------------------//
 
-  #emitSearchQueryData = async (fetchedData) => {
+  #emitSearchBarText = async (input) => {
     const numOfSubscribers = Object.keys(this.#subscribers).length;
 
     //check for subscribers
     if (numOfSubscribers > 0) {
       for (let subscriber in this.#subscribers) {
-        this.#subscribers[subscriber](fetchedData);
+        this.#subscribers[subscriber](input);
       }
     }
-  }; //emits the received data to all of the present subscribers
+  }; //emits the search bar input to all of the present subscribers
 
   #subscribers = {};
 

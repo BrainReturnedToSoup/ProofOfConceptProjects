@@ -5,20 +5,7 @@ import { CurrentLocationQuery } from "../Level-1/Current-Location-Query.js";
 
 //specific implementation for this app specifically
 import { WeatherLocationSearchBar } from "../Level-2/Weather-Location-Search-Bar.js";
-
-const importedHelperClasses = {
-  ElementRefManager: ElementRefManager,
-  //this will manage the element references on the top level, that being the main app structuring
-  SearchBar: WeatherLocationSearchBar,
-  //reusable feature, creates the whole feature on its own, will inject the necessary dependencies to make it work for this application
-  //Will be used to look up weather data based on the supplied location
-  WeatherApi: WeatherApi,
-  //class that acts as an interface to use the weather api to retrieve weather data based on a location
-  currentLocationQuery: CurrentLocationQuery,
-  //class that will get the current location of the user in the form of coordinates using the browser api geolocation
-  //It will then make an api request using the supplied api instance and mediator method with the coordinates.
-  //I will use this to make a weather api request using the users current location as the target essentially
-};
+import { WeatherAppConstructor } from "../Level-2/Weather-App-Constructor.js";
 
 class WeatherAppFunctionality {
   constructor() {

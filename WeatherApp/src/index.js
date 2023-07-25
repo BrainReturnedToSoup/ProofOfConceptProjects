@@ -1,10 +1,13 @@
-import { WeatherAppConstructor } from "./modules/Level-2/Weather-App-Constructor";
 import { ElementRefManager } from "./modules/Level-0/Element-Ref-Manager";
+import { WeatherLocationSearchBar } from "./modules/Level-2/Weather-Location-Search-Bar";
 
-const refManagerInstance = new ElementRefManager(),
-  weatherAppPageInstance = new WeatherAppConstructor(refManagerInstance),
-  pageFrag = weatherAppPageInstance.returnWeatherAppFragment();
+const searchBar = new WeatherLocationSearchBar("test", "null");
 
-document.body.append(pageFrag);
+searchBar.append(document.body);
 
-console.log(refManagerInstance.size());
+searchBar.subscribeToSearchBarInput("test", (input) => {
+  console.log("inputValue", input);
+});
+searchBar.subscribeToApiData("test", (data) => {
+  console.log("apiData", data);
+});
