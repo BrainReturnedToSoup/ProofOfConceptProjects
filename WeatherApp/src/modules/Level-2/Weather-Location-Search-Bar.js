@@ -211,7 +211,9 @@ export class WeatherLocationSearchBar {
 
     this.#apiKey = apiKey; //save the supplied api key to state to be used later
 
-    this.#initHelperClassInstances(uniqueIdentifier); //init all of the helper class instances which they will already be supplied with the correct dependencies
+    this.#uniqueIdentifier = uniqueIdentifier; //save to supplied unique identifier to state to be used later
+
+    this.#initHelperClassInstances(); //init all of the helper class instances which they will already be supplied with the correct dependencies
 
     this.#buildSearchBar(); //builds the search bar and saves it to the state
 
@@ -324,6 +326,8 @@ export class WeatherLocationSearchBar {
   //--DEPENDENCY
   #apiKey = null; //my api key to use the weatherapi endpoint
 
+  #uniqueIdentifier = null;
+
   #searchBarAppended = false;
 
   #functionalityOn = false;
@@ -341,7 +345,7 @@ export class WeatherLocationSearchBar {
     this.#completeSearchBarElement = completeSearchBarElement;
   }
 
-  #initHelperClassInstances(uniqueIdentifier, apiKey) {
+  #initHelperClassInstances() {
     const {
       elementReferenceManager,
       searchBarConstructor,
@@ -352,9 +356,9 @@ export class WeatherLocationSearchBar {
     //inits all of the helper class instances in the correct order,
     //some of these helpers use other helpers as dependencies
     elementReferenceManager();
-    searchBarConstructor(uniqueIdentifier);
+    searchBarConstructor();
     searchBarFunctionality();
-    findWeatherDataForLocation(apiKey);
+    findWeatherDataForLocation();
   }
 
   #initSubscriptions() {
@@ -373,13 +377,13 @@ export class WeatherLocationSearchBar {
       this.#helperClassInstances.elementReferenceManager =
         new ElementRefManager();
     },
-    searchBarConstructor: (uniqueIdentifier) => {
+    searchBarConstructor: () => {
       //init the search bar constructor, which requires the element ref manager instance as a dependency
       this.#helperClassInstances.searchBarConstructor =
         new SearchBarConstructor({
           elementReferenceManager:
             this.#helperClassInstances.elementReferenceManager,
-          uniqueIdentifier: uniqueIdentifier,
+          uniqueIdentifier: this.#uniqueIdentifier,
           dynamicOptionsOn: false,
         });
     },
