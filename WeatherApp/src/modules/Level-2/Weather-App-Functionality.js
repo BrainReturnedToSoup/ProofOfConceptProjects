@@ -15,7 +15,7 @@ class ApplyGeneralInfoData {
 
   //-------------------APIs------------------------//
 
-  applyGeneralInfoData(data) {}
+  applyData(data) {}
 }
 
 class ApplyCurrentWeatherData {
@@ -101,7 +101,7 @@ class ApplyCurrentWeatherData {
 
   //-------------------APIs------------------------//
 
-  applyCurrentWeatherData(data) {}
+  applyData(data) {}
 }
 
 //simply takes a data set and applies it to the
@@ -199,7 +199,7 @@ class ApplyForecastData {
 
   //-------------------APIs------------------------//
 
-  applyForecastData(data) {
+  applyData(data) {
     try {
       this.#argValidationData("applyForecastData", { data });
 
@@ -211,13 +211,261 @@ class ApplyForecastData {
 }
 
 class GeneralInfoDataFilter {
+  //----------ARGUMENT-VALIDATION----------//
+
+  #argValidationData = {
+    filterData: {
+      data: {
+        type: "object",
+      },
+    },
+  };
+
+  #validate = {
+    type: (suppliedArg, argName, methodOrigin, correctType) => {
+      if (typeof suppliedArg !== correctType) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed type validation,
+               received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
+                needs to have the type '${correctType}'`
+        );
+      }
+    },
+    instanceof: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (!(suppliedArg instanceof correctInstance)) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed instance validation,
+               received '${suppliedArg}' which is not an instance of '${correctInstance}'`
+        );
+      }
+    },
+  };
+
+  #argValidator(methodName, argsObj) {
+    if (this.#argValidationData.hasOwnProperty(methodName)) {
+      const methodValidationData = this.#argValidationData[methodName];
+
+      for (let arg in argsObj) {
+        const argValue = argsObj[arg];
+
+        //check if a supplied arg is a valid arg to supply
+        if (!methodValidationData.hasOwnProperty(arg)) {
+          throw new ReferenceError(
+            `Unrecognized argument for a specific method, received '${arg}' with a value of '${argsObj[arg]}'`
+          );
+        }
+
+        //go down the list of properties to check for on the specific arg
+        for (let property in methodValidationData[arg]) {
+          const correctValue = methodValidationData[arg][property]; //retrieve the data that will be used as a reference for validating the arg
+
+          this.#validate[property](argValue, arg, methodName, correctValue); //validate the arg based on the property being checked currently
+        }
+      }
+    } else {
+      throw new ReferenceError(
+        `Failed to validate the supplied arguments for a specific method, validation data
+             corresponding to this method does not exist, received '${methodName}' as the method being validated`
+      );
+    }
+  }
+
+  //-------------DATA-FILTERING------------//
+
+  #createFilteredDataSet(data) {
+    const locationData = data.location,
+      filteredDataSet = {
+        name: locationData.name,
+        country: locationData.country,
+      };
+
+    return filteredDataSet;
+  }
+
   //------------------APIs-----------------//
-  filterData(data, unitRules) {}
+
+  //will take the data and the unit rules to commence a filtering process
+  filterData(data) {
+    try {
+      this.#argValidator(`filterData`, { data }); //validate args
+
+      const filteredDataSet = this.#createFilteredDataSet(data); //get a filtered data set using the supplied data
+
+      return filteredDataSet; //returned said data set
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 class CurrentWeatherDataFilter {
+  //-----------ARGUMENT-VALIDATION---------//
+
+  #argValidationData = {
+    filterData: {
+      data: {
+        type: "object",
+      },
+      unitRules: {
+        type: "object",
+      },
+    },
+  };
+
+  #validate = {
+    type: (suppliedArg, argName, methodOrigin, correctType) => {
+      if (typeof suppliedArg !== correctType) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed type validation,
+               received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
+                needs to have the type '${correctType}'`
+        );
+      }
+    },
+    instanceof: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (!(suppliedArg instanceof correctInstance)) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed instance validation,
+               received '${suppliedArg}' which is not an instance of '${correctInstance}'`
+        );
+      }
+    },
+  };
+
+  #argValidator(methodName, argsObj) {
+    if (this.#argValidationData.hasOwnProperty(methodName)) {
+      const methodValidationData = this.#argValidationData[methodName];
+
+      for (let arg in argsObj) {
+        const argValue = argsObj[arg];
+
+        //check if a supplied arg is a valid arg to supply
+        if (!methodValidationData.hasOwnProperty(arg)) {
+          throw new ReferenceError(
+            `Unrecognized argument for a specific method, received '${arg}' with a value of '${argsObj[arg]}'`
+          );
+        }
+
+        //go down the list of properties to check for on the specific arg
+        for (let property in methodValidationData[arg]) {
+          const correctValue = methodValidationData[arg][property]; //retrieve the data that will be used as a reference for validating the arg
+
+          this.#validate[property](argValue, arg, methodName, correctValue); //validate the arg based on the property being checked currently
+        }
+      }
+    } else {
+      throw new ReferenceError(
+        `Failed to validate the supplied arguments for a specific method, validation data
+             corresponding to this method does not exist, received '${methodName}' as the method being validated`
+      );
+    }
+  }
+
+  //---------STATE-AND-CONFIG-DATA---------//
+
+  #unitRules = null;
+
+  //------------APPLY-UNIT-RULES-----------//
+
+  #applyUnitRules(unitRules) {
+    this.#unitRules = unitRules;
+  }
+
+  //-------------DATA-FILTERING------------//
+
+  #createFilteredDataSet(data) {
+    const { temp, windSpeed, pressure, precip, feelsLike, visibility } =
+      this.#dataFilteringMethods;
+
+    //create a new data set with filtered data
+    const filteredDataSet = {
+      temp: temp(data),
+      windSpeed: windSpeed(data),
+      windDir: `${data.wind_dir}`,
+      windDegree: `${data.wind_degree}deg`,
+      pressure: pressure(data),
+      precip: precip(data),
+      humidity: `${data.humidity}%`,
+      cloudy: `${data.cloudy}%`,
+      feelsLike: feelsLike(data),
+      visibility: visibility(data),
+    };
+
+    return filteredDataSet;
+  }
+
+  #dataFilteringMethods = {
+    temp: (data) => {
+      const { temperature } = this.#unitRules;
+
+      if (temperature === "metric") {
+        return `${data.temp_c} C`;
+      } else if (temperature === "customary") {
+        return `${data.temp_f} F`;
+      }
+    },
+    windSpeed: (data) => {
+      const { distance } = this.#unitRules;
+
+      if (distance === "metric") {
+        return `${data.wind_kph} kph`;
+      } else if (distance === "customary") {
+        return `${data.wind_mph} mph`;
+      }
+    },
+    pressure: (data) => {
+      const { measurement } = this.#unitRules;
+
+      if (measurement === "metric") {
+        return `${data.pressure_mb} mb`;
+      } else if (measurement === "customary") {
+        return `${data.pressure_in} in`;
+      }
+    },
+    precip: (data) => {
+      const { measurement } = this.#unitRules;
+
+      if (measurement === "metric") {
+        return `${data.precip_mm} mm`;
+      } else if (measurement === "customary") {
+        return `${data.precip_in} in`;
+      }
+    },
+    feelsLike: (data) => {
+      const { temperature } = this.#unitRules;
+
+      if (temperature === "metric") {
+        return `${data.feelslike_c} C`;
+      } else if (temperature === "customary") {
+        return `${data.feelslike_f} F`;
+      }
+    },
+    visibility: (data) => {
+      const { distance } = this.#unitRules;
+
+      if (distance === "metric") {
+        return `${data.vis_km} km`;
+      } else if (distance === "customary") {
+        return `${data.vis_miles} mi`;
+      }
+    },
+  };
+
   //------------------APIs-----------------//
-  filterData(data, unitRules) {}
+
+  filterData(data, unitRules) {
+    try {
+      this.#argValidator("filterData", { data, unitRules }); //validate args
+
+      this.#applyUnitRules(unitRules); //apply the unit filtering rules to the state
+
+      const filteredDataSet = this.#createFilteredDataSet(data); //make a filtered data set
+
+      return filteredDataSet;
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 class ForecastDataFilter {
@@ -582,21 +830,52 @@ class WeatherDataManager {
     this.#currentWeatherData = data;
   }
 
-  //----------WEATHER-DATA-FILTERING-----------//
-
   //defines whether to use inbound weather data,
   //or to use already stored data essentially
   #processWeatherData(useInboundData, data) {
+    let filteredDataSet = null;
+
     if (useInboundData) {
       this.#storeReceivedDataToState(data); //store the data in state first
 
-      const filteredDataSet = this.#filterInboundData(data); //filter the supplied data
-      //logic on what to do with said filtered data set
+      filteredDataSet = this.#filterInboundData(data);
     } else {
-      const filteredDataSet = this.#filterExistingData(); //filter the existing data
-      //logic on what to do with said filtered data set
+      filteredDataSet = this.#filterExistingData();
     }
+
+    this.#emitDataToHelpers(filteredDataSet);
   }
+
+  //------FILTERED-WEATHER-DATA-EMISSION-------//
+
+  #emitDataToHelpers(data) {
+    const { generalInfo, currentWeather, forecast } =
+      this.#emitDataToHelpersMethods;
+
+    generalInfo(data.generalInfo);
+    currentWeather(data.currentWeather);
+    forecast(data.forecast);
+  }
+
+  #emitDataToHelpersMethods = {
+    generalInfo: (data) => {
+      const { ApplyGeneralInfoData } = this.#helperClasses;
+
+      ApplyGeneralInfoData.applyData(data);
+    },
+    currentWeather: (data) => {
+      const { ApplyCurrentWeatherData } = this.#helperClasses;
+
+      ApplyCurrentWeatherData.applyData(data);
+    },
+    forecast: (data) => {
+      const { ApplyForecastData } = this.#helperClasses;
+
+      ApplyForecastData.applyData(data);
+    },
+  };
+
+  //----------WEATHER-DATA-FILTERING-----------//
 
   //the filtering will use rules from the
   //state to decide what to filter for
@@ -632,10 +911,7 @@ class WeatherDataManager {
   #sectionDataFiltering = {
     generalInfo: (data) => {
       const { generalInfoDataFilter } = this.#helperClasses,
-        filteredData = generalInfoDataFilter.filterData(
-          data,
-          this.#selectedUnits
-        );
+        filteredData = generalInfoDataFilter.filterData(data); //doesn't use the units rule
 
       return filteredData;
     },
