@@ -1,9 +1,79 @@
 import { ElementRefManager } from "../Level-0/Element-Ref-Manager";
 
 class ApplyGeneralInfoData {
-  constructor(elementReferenceManager) {}
+  constructor(elementReferenceManager) {
+    try {
+      this.#argValidator("constructor", { elementReferenceManager }); //validate args
+
+      this.#retrieveElementReferences(); //retrieve the necessary references
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 
   //-------------ARGUMENT-VALIDATION---------------//
+
+  #argValidationData = {
+    constructor: {
+      elementReferenceManager: {
+        instanceof: ElementRefManager,
+      },
+    },
+    applyData: {
+      data: {
+        type: "object",
+      },
+    },
+  };
+
+  #validate = {
+    type: (suppliedArg, argName, methodOrigin, correctType) => {
+      if (typeof suppliedArg !== correctType) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed type validation,
+               received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
+                needs to have the type '${correctType}'`
+        );
+      }
+    },
+    instanceof: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (!(suppliedArg instanceof correctInstance)) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed instance validation,
+               received '${suppliedArg}' which is not an instance of '${correctInstance}'`
+        );
+      }
+    },
+  };
+
+  #argValidator(methodName, argsObj) {
+    if (this.#argValidationData.hasOwnProperty(methodName)) {
+      const methodValidationData = this.#argValidationData[methodName];
+
+      for (let arg in argsObj) {
+        const argValue = argsObj[arg];
+
+        //check if a supplied arg is a valid arg to supply
+        if (!methodValidationData.hasOwnProperty(arg)) {
+          throw new ReferenceError(
+            `Unrecognized argument for a specific method, received '${arg}' with a value of '${argsObj[arg]}'`
+          );
+        }
+
+        //go down the list of properties to check for on the specific arg
+        for (let property in methodValidationData[arg]) {
+          const correctValue = methodValidationData[arg][property]; //retrieve the data that will be used as a reference for validating the arg
+
+          this.#validate[property](argValue, arg, methodName, correctValue); //validate the arg based on the property being checked currently
+        }
+      }
+    } else {
+      throw new ReferenceError(
+        `Failed to validate the supplied arguments for a specific method, validation data
+             corresponding to this method does not exist, received '${methodName}' as the method being validated`
+      );
+    }
+  }
 
   //------------STATE-AND-CONFIG-DATA--------------//
 
@@ -11,11 +81,46 @@ class ApplyGeneralInfoData {
     elementReferenceManager: null,
   };
 
+  #retrievedElementReferences = {
+    location: null,
+  };
+
   //---------------HELPER-METHODS------------------//
+
+  #retrieveElementReferences() {
+    const { elementReferenceManager } = this.#helperClasses,
+      locationElementRef = elementReferenceManager.retrieveRef(
+        `General-Info-Location`
+      );
+
+    this.#retrieveElementReferences.location = locationElementRef;
+  }
+
+  #applyDataToElementReference = {
+    location: (data) => {
+      const locationName = data.name,
+        locationCountry = data.country; //pull the references from the received data
+
+      const completeLocationString = `${locationName}, ${locationCountry}`, //make a complete string to display on the DOM
+        { location } = this.#retrievedElementReferences; //pull the references to the element being altered
+
+      location.textContent = completeLocationString; //apply the data as text within the element
+    },
+  };
 
   //-------------------APIs------------------------//
 
-  applyData(data) {}
+  applyData(data) {
+    try {
+      this.#argValidator("applyData", { data }); //validate args
+
+      const { location } = this.#applyDataToElementReference; //get the various helper methods that use the incoming data
+
+      location(data); //apply the data to the corresponding methods that update the DOM
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 class ApplyCurrentWeatherData {
@@ -23,7 +128,9 @@ class ApplyCurrentWeatherData {
     try {
       this.#argValidator("constructor", { elementReferenceManager });
 
-      //logic for initializing the the class instance
+      this.#helperClasses.elementReferenceManager = elementReferenceManager; //store the supplied reference manager instance into state
+
+      this.#retrieveElementReferences(); //retrieve the required references from the ref manager
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -97,11 +204,27 @@ class ApplyCurrentWeatherData {
     elementReferenceManager: null,
   };
 
+  #retrievedElementReferences = {};
+
   //---------------HELPER-METHODS------------------//
+
+  #retrieveElementReferences() {
+    const { elementReferenceManager } = this.#helperClasses;
+  }
+
+  #applyDataToElementReference = {};
 
   //-------------------APIs------------------------//
 
-  applyData(data) {}
+  applyData(data) {
+    try {
+      this.#argValidator("applyData", { data }); //validate args
+
+      //logic to apply data to corresponding elements
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 //simply takes a data set and applies it to the
@@ -469,8 +592,164 @@ class CurrentWeatherDataFilter {
 }
 
 class ForecastDataFilter {
+  //-----------ARGUMENT-VALIDATION---------//
+  #argValidationData = {
+    filterData: {
+      data: {
+        type: "object",
+      },
+      unitRules: {
+        type: "object",
+      },
+    },
+  };
+
+  #validate = {
+    type: (suppliedArg, argName, methodOrigin, correctType) => {
+      if (typeof suppliedArg !== correctType) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed type validation,
+               received '${suppliedArg}' which has a type of '${typeof suppliedArg}',
+                needs to have the type '${correctType}'`
+        );
+      }
+    },
+    instanceof: (suppliedArg, argName, methodOrigin, correctInstance) => {
+      if (!(suppliedArg instanceof correctInstance)) {
+        throw new Error(
+          `Argument '${argName}' for method '${methodOrigin}' failed instance validation,
+               received '${suppliedArg}' which is not an instance of '${correctInstance}'`
+        );
+      }
+    },
+  };
+
+  #argValidator(methodName, argsObj) {
+    if (this.#argValidationData.hasOwnProperty(methodName)) {
+      const methodValidationData = this.#argValidationData[methodName];
+
+      for (let arg in argsObj) {
+        const argValue = argsObj[arg];
+
+        //check if a supplied arg is a valid arg to supply
+        if (!methodValidationData.hasOwnProperty(arg)) {
+          throw new ReferenceError(
+            `Unrecognized argument for a specific method, received '${arg}' with a value of '${argsObj[arg]}'`
+          );
+        }
+
+        //go down the list of properties to check for on the specific arg
+        for (let property in methodValidationData[arg]) {
+          const correctValue = methodValidationData[arg][property]; //retrieve the data that will be used as a reference for validating the arg
+
+          this.#validate[property](argValue, arg, methodName, correctValue); //validate the arg based on the property being checked currently
+        }
+      }
+    } else {
+      throw new ReferenceError(
+        `Failed to validate the supplied arguments for a specific method, validation data
+             corresponding to this method does not exist, received '${methodName}' as the method being validated`
+      );
+    }
+  }
+
+  //----------STATE-AND-CONFIG-DATA--------//
+
+  #unitRules = null;
+
+  //------------APPLY-UNIT-RULES-----------//
+
+  #applyUnitRules(unitRules) {
+    this.#unitRules = unitRules;
+  }
+
+  //-------------DATA-FILTERING------------//
+
+  #createFilteredDataSet(data) {
+    const forecastDataArr = data.forecast.forecastday,
+      filteredForecastDataArr = [];
+
+    for (let forecastDay of forecastDataArr) {
+      const filteredDay = this.#filterByDay(forecastDay);
+
+      filteredForecastDataArr.push(filteredDay);
+    }
+
+    return filteredForecastDataArr;
+  }
+
+  #filterByDay(singleDayData) {
+    const dayDataObj = singleDayData.day,
+      dayDate = singleDayData.date; //define the received data sets
+
+    const { maxTemp, minTemp, totalPrecip } = this.#dataFilteringMethods; //reference the filtering methods
+
+    const filteredDayData = {
+      date: dayDate,
+      conditionText: dayDataObj.condition.text,
+      conditionImage: dayDataObj.condition.icon,
+      maxTemp: maxTemp(dayDataObj),
+      minTemp: minTemp(dayDataObj),
+      totalPrecip: totalPrecip(dayDataObj),
+    };
+
+    return filteredDayData;
+  }
+
+  #dataFilteringMethods = {
+    maxTemp: (dayDataObj) => {
+      const { temperature } = this.#unitRules;
+      let maxTempValue;
+
+      if (temperature === "metric") {
+        maxTempValue = `${dayDataObj.maxtemp_c} C`;
+      } else if (temperature === "customary") {
+        maxTempValue = `${dayDataObj.maxtemp_f} F`;
+      }
+
+      return maxTempValue;
+    },
+    minTemp: (dayDataObj) => {
+      const { temperature } = this.#unitRules;
+      let minTempValue;
+
+      if (temperature === "metric") {
+        minTempValue = `${dayDataObj.mintemp_c} C`;
+      } else if (temperature === "customary") {
+        minTempValue = `${dayDataObj.mintemp_f} F`;
+      }
+
+      return minTempValue;
+    },
+    totalPrecip: (dayDataObj) => {
+      const { measurement } = this.#unitRules;
+      let totalPrecip;
+
+      if (measurement === "metric") {
+        totalPrecip = `${dayDataObj.totalprecip_mm} mm`;
+      } else if (measurement === "customary") {
+        totalPrecip = `${dayDataObj.totalprecip_in} in`;
+      }
+
+      return totalPrecip;
+    },
+  };
+
   //------------------APIs-----------------//
-  filterData(data, unitRules) {}
+
+  filterData(data, unitRules) {
+    try {
+      this.#argValidator("filterData", { data, unitRules }); //validate args
+
+      this.#applyUnitRules(unitRules); //apply the unit filtering rules to the state
+
+      const filteredDataSet = this.#createFilteredDataSet(data); //make a filtered data set
+
+      return filteredDataSet;
+    } catch (error) {
+      console.error(error, error.stack);
+    }
+  }
 }
 
 //controls the user interface portion of the web app,

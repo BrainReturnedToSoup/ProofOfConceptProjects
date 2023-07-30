@@ -94,12 +94,11 @@ class GeneralInfoConstructor {
 
   #createGeneralInfoElement() {
     const { main } = this.#containerElementConstructors,
-      { clock, location } = this.#generalInfoElementConstructors;
+      { location } = this.#generalInfoElementConstructors;
 
     //create all of the necessary elements to create the general info fragment
     const mainContainerElement = main(),
       childElements = {
-        clock: clock(),
         location: location(),
       };
 
@@ -130,19 +129,6 @@ class GeneralInfoConstructor {
   };
 
   #generalInfoElementConstructors = {
-    clock: () => {
-      const clockElement = document.createElement("h3"),
-        generalIdentifier = this.#generalIdentifiers.general,
-        specificIdentifier = `Clock`,
-        combinedIdentifier = generalIdentifier + `-` + specificIdentifier;
-
-      clockElement.classList.add(generalIdentifier);
-      clockElement.classList.add(specificIdentifier);
-
-      this.#storeElementRef(combinedIdentifier, clockElement); //General-Info-Clock
-
-      return clockElement;
-    }, //will have a real time clock based on the users location
     location: () => {
       const locationElement = document.createElement("h3"),
         generalIdentifier = this.#generalIdentifiers.general,
