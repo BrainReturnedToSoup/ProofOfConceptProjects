@@ -204,15 +204,85 @@ class ApplyCurrentWeatherData {
     elementReferenceManager: null,
   };
 
-  #retrievedElementReferences = {};
+  #retrievedElementReferences = {
+    conditionText: null,
+    conditionImage: null,
+    temp: null,
+    feelsLikeTemp: null,
+    precip: null,
+    humidity: null,
+    dayOrNightImage: null,
+    visibility: null,
+    windDegree: null,
+    windDirection: null,
+    windSpeed: null,
+  };
 
   //---------------HELPER-METHODS------------------//
 
   #retrieveElementReferences() {
     const { elementReferenceManager } = this.#helperClasses;
+
+    this.#retrievedElementReferences = {
+      conditionText: elementReferenceManager.retrieveRef(
+        `Current-Weather-Condition-Text`
+      ),
+      conditionImage: elementReferenceManager.retrieveRef(
+        `Current-Weather-Condition-Image`
+      ),
+      temp: elementReferenceManager.retrieveRef(`Current-Weather-Temp`),
+      feelsLikeTemp: elementReferenceManager.retrieveRef(
+        `Current-Weather-Feels-Like-Temp`
+      ),
+      precip: elementReferenceManager.retrieveRef(`Current-Weather-Precip`),
+      humidity: elementReferenceManager.retrieveRef(`Current-Weather-Humidity`),
+      dayOrNightImage: elementReferenceManager.retrieveRef(
+        `Current-Weather-Day-Or-Night-Image`
+      ),
+      visibility: elementReferenceManager.retrieveRef(
+        `Current-Weather-Visibility`
+      ),
+      windDegree: elementReferenceManager.retrieveRef(
+        `Current-Weather-Wind-Degree`
+      ),
+      windDirection: elementReferenceManager.retrieveRef(
+        `Current-Weather-Wind-Direction`
+      ),
+      windSpeed: elementReferenceManager.retrieveRef(
+        `Current-Weather-Wind-Speed`
+      ),
+    };
   }
 
-  #applyDataToElementReference = {};
+  #applyDataToElementReferences(data) {}
+
+  #dataApplyingMethods = {
+    conditionText: (data) => {},
+    conditionImage: (data) => {},
+    temp: (data) => {},
+    feelsLike: (data) => {},
+    precip: (data) => {},
+    humidity: (data) => {},
+    isDay: (data) => {},
+    visibility: (data) => {},
+    windSpeed: (data) => {},
+    windDir: (data) => {},
+    windDegree: (data) => {},
+  };
+
+  // INCOMING DATA
+
+  // conditionText: data.condition.text,
+  // conditionImage: data.condition.icon,
+  // temp: temp(data),
+  // feelsLike: feelsLike(data),
+  // precip: precip(data),
+  // humidity: `${data.humidity}%`,
+  // isDay: data.is_day,
+  // visibility: visibility(data),
+  // windSpeed: windSpeed(data),
+  // windDir: `${data.wind_dir}`,
+  // windDegree: `${data.wind_degree}deg`,
 
   //-------------------APIs------------------------//
 
@@ -220,7 +290,7 @@ class ApplyCurrentWeatherData {
     try {
       this.#argValidator("applyData", { data }); //validate args
 
-      //logic to apply data to corresponding elements
+      this.#applyDataToElementReferences(data); //begin applying the received data to the corresponding elements
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -497,21 +567,22 @@ class CurrentWeatherDataFilter {
   //-------------DATA-FILTERING------------//
 
   #createFilteredDataSet(data) {
-    const { temp, windSpeed, pressure, precip, feelsLike, visibility } =
+    const { temp, windSpeed, precip, feelsLike, visibility } =
       this.#dataFilteringMethods;
 
     //create a new data set with filtered data
     const filteredDataSet = {
+      conditionText: data.condition.text,
+      conditionImage: data.condition.icon,
       temp: temp(data),
+      feelsLike: feelsLike(data),
+      precip: precip(data),
+      humidity: `${data.humidity}%`,
+      isDay: data.is_day,
+      visibility: visibility(data),
       windSpeed: windSpeed(data),
       windDir: `${data.wind_dir}`,
       windDegree: `${data.wind_degree}deg`,
-      pressure: pressure(data),
-      precip: precip(data),
-      humidity: `${data.humidity}%`,
-      cloudy: `${data.cloudy}%`,
-      feelsLike: feelsLike(data),
-      visibility: visibility(data),
     };
 
     return filteredDataSet;
@@ -534,15 +605,6 @@ class CurrentWeatherDataFilter {
         return `${data.wind_kph} kph`;
       } else if (distance === "customary") {
         return `${data.wind_mph} mph`;
-      }
-    },
-    pressure: (data) => {
-      const { measurement } = this.#unitRules;
-
-      if (measurement === "metric") {
-        return `${data.pressure_mb} mb`;
-      } else if (measurement === "customary") {
-        return `${data.pressure_in} in`;
       }
     },
     precip: (data) => {
