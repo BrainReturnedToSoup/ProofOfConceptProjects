@@ -254,35 +254,77 @@ class ApplyCurrentWeatherData {
     };
   }
 
-  #applyDataToElementReferences(data) {}
+  #applyDataToElementReferences(data) {
+    for (let dataMethod in this.#dataApplyingMethods) {
+      this.#dataApplyingMethods[dataMethod](data);
+    }
+  }
 
   #dataApplyingMethods = {
-    conditionText: (data) => {},
-    conditionImage: (data) => {},
-    temp: (data) => {},
-    feelsLike: (data) => {},
-    precip: (data) => {},
-    humidity: (data) => {},
-    isDay: (data) => {},
-    visibility: (data) => {},
-    windSpeed: (data) => {},
-    windDir: (data) => {},
-    windDegree: (data) => {},
+    conditionText: (data) => {
+      const { conditionText } = data;
+
+      this.#retrievedElementReferences.conditionText.textContent =
+        conditionText;
+    },
+    conditionImage: (data) => {
+      const { conditionImage } = data;
+
+      this.#retrieveElementReferences.conditionImage.src = conditionImage;
+    },
+    temp: (data) => {
+      const { temp } = data;
+
+      this.#retrieveElementReferences.temp.textContent = `Temp: ${temp}`;
+    },
+    feelsLike: (data) => {
+      const { feelsLike } = data;
+
+      this.#retrieveElementReferences.feelsLike.textContent = `Feels Like: ${feelsLike}`;
+    },
+    precip: (data) => {
+      const { precip } = data;
+
+      this.#retrieveElementReferences.precip.textContent = `Precip: ${precip}`;
+    },
+    humidity: (data) => {
+      const { humidity } = data;
+
+      this.#retrieveElementReferences.humidity.textContent = `Humidity: ${humidity}`;
+    },
+    isDay: (data) => {
+      const { isDay } = data,
+        { dayOrNightImage } = this.#retrieveElementReferences;
+
+      if (isDay === 1) {
+        dayOrNightImage.classList.remove("Night");
+        dayOrNightImage.classList.add("Day");
+      } else if (isDay === 0) {
+        dayOrNightImage.classList.remove("Day");
+        dayOrNightImage.classList.add("Night");
+      }
+    },
+    visibility: (data) => {
+      const { visibility } = data;
+
+      this.#retrieveElementReferences.visibility.textContent = `Vis: ${visibility}`;
+    },
+    windSpeed: (data) => {
+      const { windSpeed } = data;
+
+      this.#retrieveElementReferences.windSpeed.textContent = `Wind Speed: ${windSpeed}`;
+    },
+    windDir: (data) => {
+      const { windDir } = data;
+
+      this.#retrieveElementReferences.windDir.textContent = `Wind Dir: ${windDir}`;
+    },
+    windDegree: (data) => {
+      const { windDegree } = data;
+
+      this.#retrieveElementReferences.windDegree.textContent = `Wind Degree: ${windDegree}`;
+    },
   };
-
-  // INCOMING DATA
-
-  // conditionText: data.condition.text,
-  // conditionImage: data.condition.icon,
-  // temp: temp(data),
-  // feelsLike: feelsLike(data),
-  // precip: precip(data),
-  // humidity: `${data.humidity}%`,
-  // isDay: data.is_day,
-  // visibility: visibility(data),
-  // windSpeed: windSpeed(data),
-  // windDir: `${data.wind_dir}`,
-  // windDegree: `${data.wind_degree}deg`,
 
   //-------------------APIs------------------------//
 
@@ -378,13 +420,64 @@ class ApplyForecastData {
     elementReferenceManager: null,
   };
 
-  #elementReferences = {};
+  #retrievedElementRefs = {
+    "Day-1": {},
+    "Day-2": {},
+    "Day-3": {},
+    "Day-4": {},
+    "Day-5": {},
+    "Day-6": {},
+    "Day-7": {},
+  };
 
   //---------------HELPER-METHODS------------------//
 
   //gets the necessary element references for the
   //current weather portion of the web page
-  #retrieveElementRefs() {}
+  #retrieveElementRefs() {
+    for (let dayString in this.#elementReferences) {
+      this.#retrieveElementRefsByDay(dayString);
+    }
+  }
+
+  #retrieveElementRefsByDay(dayString) {
+    const { elementReferenceManager } = this.#helperClasses,
+      forecastDayObj = this.#retrieveElementRefs[dayString];
+
+    forecastDayObj["Container"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Card-Container-${dayString}`
+    );
+
+    forecastDayObj["Condition-Text"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Condition-Text-${dayString}`
+    );
+
+    forecastDayObj["Condition-Image"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Condition-Image-${dayString}`
+    );
+
+    forecastDayObj["Temp-High"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Temp-High-${dayString}`
+    );
+
+    forecastDayObj["Temp-Low"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Temp-Low-${dayString}`
+    );
+
+    forecastDayObj["Precip-Chance"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Precip-Chance-${dayString}`
+    );
+  }
+
+  //List of identifier keys for the ref manager, need to get all of the elements from day 1 to 7 essentially
+
+  //Forecast-Main-Container
+  //Forecast-Day-Card-Container-Day-${number}
+  //Forecast-Day-Condition-Text-Day-${number}
+  //Forecast-Day-Condition-Image-Day-${number}
+  //Forecast-Day-Temp-High-Day-${number}
+  //Forecast-Day-Temp-Low-Day-${number}
+  //Forecast-Day-Precip-Chance-Day-${number}
 
   //takes the data and updates the corresponding
   //elements on the DOM to reflect the data

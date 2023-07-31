@@ -700,7 +700,7 @@ class ForecastConstructor {
       precipChanceElement.classList.add(specificIdentifier);
       precipChanceElement.classList.add(dayNumString);
 
-      this.#storeElementRef(combinedIdentifier, precipChanceElement); //Forecast-Day-Temp-Low-Day-${number}
+      this.#storeElementRef(combinedIdentifier, precipChanceElement); //Forecast-Day-Precip-Chance-Day-${number}
 
       return precipChanceElement;
     }, //the predicted amount of precipitation for a given forecast day

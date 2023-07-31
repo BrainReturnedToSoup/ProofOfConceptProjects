@@ -13,7 +13,7 @@ import { SearchBarConstructor } from "../Level-1/Search-Bar-Constructor.js";
 //REQUEST. SUBSCRIBE TO THIS CLASS TO DO SO FOR WEATHER DATA BASED ON THE LOCATION SUPPLIED
 
 //will use the location emitted from the search bar functionality helper class in order to make an api request to the
-//weather api
+//weather api in the FindWeatherDataForLocation helper class
 class FindWeatherDataForLocation {
   constructor(searchBarFunctionalityInstance, apiKey) {
     try {

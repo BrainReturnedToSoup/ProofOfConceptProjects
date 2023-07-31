@@ -18,13 +18,6 @@ export class WeatherApp {
 }
 
 //config = {
-//  numberOfDaysForecast: [3, 7],
-//  currentWeatherStats: boolean,
-//  currentTempStats: boolean,
-//  forecastTimeframe: [daily, hourly, both],
-//  date: boolean,
-//  tempUnit: [F, C, both],
-//  locationSearchBar: boolean,
 //  useCurrentLocation: boolean,
 //  weatherApiSource: [''],
 //  apiKey: string,
