@@ -346,7 +346,7 @@ class ApplyForecastData {
     try {
       this.#argValidator("constructor", { elementReferenceManager });
 
-      //logic to initialize class state
+      this.#helperClasses.elementReferenceManager = elementReferenceManager;
     } catch (error) {
       console.error(error, error.stack);
     }
@@ -420,22 +420,26 @@ class ApplyForecastData {
     elementReferenceManager: null,
   };
 
-  #retrievedElementRefs = {
-    "Day-1": {},
-    "Day-2": {},
-    "Day-3": {},
-    "Day-4": {},
-    "Day-5": {},
-    "Day-6": {},
-    "Day-7": {},
+  #retrievedElementRefs = {};
+
+  #stateData = {
+    numOfForecastDays: null,
   };
+
+  //---------INITIALIZE-ELEMENT-REFS-CACHE---------//
+
+  #initRetrievedElementRefsStruct(numOfDays) {
+    for (let i = 1; i < numOfDays; i++) {
+      this.#retrievedElementRefs[`Day-${i}`] = {};
+    }
+  }
 
   //---------------HELPER-METHODS------------------//
 
   //gets the necessary element references for the
   //current weather portion of the web page
   #retrieveElementRefs() {
-    for (let dayString in this.#elementReferences) {
+    for (let dayString in this.#retrieveElementRefs) {
       this.#retrieveElementRefsByDay(dayString);
     }
   }
@@ -444,50 +448,74 @@ class ApplyForecastData {
     const { elementReferenceManager } = this.#helperClasses,
       forecastDayObj = this.#retrieveElementRefs[dayString];
 
-    forecastDayObj["Container"] = elementReferenceManager.retrieveRef(
+    //define all of the necessary element references corresponding to the day
+    //they represent in each corresponding retrievedelementref key value pair
+    forecastDayObj["container"] = elementReferenceManager.retrieveRef(
       `Forecast-Day-Card-Container-${dayString}`
     );
 
-    forecastDayObj["Condition-Text"] = elementReferenceManager.retrieveRef(
+    forecastDayObj["date"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Date-Day-${dayString}`
+    );
+
+    forecastDayObj["conditionText"] = elementReferenceManager.retrieveRef(
       `Forecast-Day-Condition-Text-${dayString}`
     );
 
-    forecastDayObj["Condition-Image"] = elementReferenceManager.retrieveRef(
+    forecastDayObj["conditionImage"] = elementReferenceManager.retrieveRef(
       `Forecast-Day-Condition-Image-${dayString}`
     );
 
-    forecastDayObj["Temp-High"] = elementReferenceManager.retrieveRef(
+    forecastDayObj["tempHigh"] = elementReferenceManager.retrieveRef(
       `Forecast-Day-Temp-High-${dayString}`
     );
 
-    forecastDayObj["Temp-Low"] = elementReferenceManager.retrieveRef(
+    forecastDayObj["tempLow"] = elementReferenceManager.retrieveRef(
       `Forecast-Day-Temp-Low-${dayString}`
     );
 
-    forecastDayObj["Precip-Chance"] = elementReferenceManager.retrieveRef(
+    forecastDayObj["precipChance"] = elementReferenceManager.retrieveRef(
       `Forecast-Day-Precip-Chance-${dayString}`
     );
   }
 
-  //List of identifier keys for the ref manager, need to get all of the elements from day 1 to 7 essentially
+  #updateElements(data) {
+    for (let i = 1; i < data.length; i++) {
+      //retrieve the forecast element references based on the target day
+      const elementRefs = this.#retrieveElementRefs[`Day-${i}`];
 
-  //Forecast-Main-Container
-  //Forecast-Day-Card-Container-Day-${number}
-  //Forecast-Day-Condition-Text-Day-${number}
-  //Forecast-Day-Condition-Image-Day-${number}
-  //Forecast-Day-Temp-High-Day-${number}
-  //Forecast-Day-Temp-Low-Day-${number}
-  //Forecast-Day-Precip-Chance-Day-${number}
+      //define properties on the corresponding element
+      //references retrieved corresponding to the data array
+      elementRefs.conditionText.date = data[i - 1].date;
 
-  //takes the data and updates the corresponding
-  //elements on the DOM to reflect the data
-  #updateElements(data) {}
+      elementRefs.conditionText.textContent = data[i - 1].conditionText;
+
+      elementRefs.conditionImage.src = data[i - 1].conditionImage;
+
+      elementRefs.tempHigh.textContent = `Temp High: ${data[i - 1].tempHigh}`;
+
+      elementRefs.tempLow.textContent = `Temp Low: ${data[i - 1].tempLow}`;
+
+      elementRefs.precipChance.textContent = `Precip Chance: ${
+        data[i - 1].precipChance
+      }`;
+    }
+  }
 
   //-------------------APIs------------------------//
 
   applyData(data) {
     try {
       this.#argValidationData("applyForecastData", { data });
+
+      //only initialize and retrieve if the number of forecast days changes
+      if (data.length !== this.#stateData.numOfForecastDays) {
+        this.#initRetrievedElementRefsStruct(data.length);
+
+        this.#retrieveElementRefs();
+
+        this.#stateData.numOfForecastDays = data.length;
+      }
 
       this.#updateElements(data); //apply the data to the elements
     } catch (error) {
@@ -906,7 +934,6 @@ class ForecastDataFilter {
     }
   }
 }
-
 //controls the user interface portion of the web app,
 //so that the supplied buttons will toggle the units being used for existing
 //data sets

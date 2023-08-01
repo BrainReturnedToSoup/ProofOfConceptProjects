@@ -573,13 +573,20 @@ class ForecastConstructor {
   } //will construct and assemble all of the necessary cards and containers to create the entire fragment
 
   #createDayCard(dayNumString) {
-    const { conditionText, conditionImage, tempHigh, tempLow, precipChance } =
-        this.#dayCardElementConstructors,
+    const {
+        dayDate,
+        conditionText,
+        conditionImage,
+        tempHigh,
+        tempLow,
+        precipChance,
+      } = this.#dayCardElementConstructors,
       { dayCardContainer } = this.#containerConstructors;
 
     //create all of the necessary elements that make up a single day card
     const dayCardContainerElement = dayCardContainer(dayNumString),
       dayCardChildElements = {
+        date: dayDate(dayNumString),
         conditionText: conditionText(dayNumString),
         conditionImage: conditionImage(dayNumString),
         tempHigh: tempHigh(dayNumString),
@@ -629,6 +636,21 @@ class ForecastConstructor {
   };
 
   #dayCardElementConstructors = {
+    dayDate: (dayNumString) => {
+      const dayDateTextElement = document.createElement("p"),
+        generalIdentifier = this.#generalIdentifiers.dayCardElements,
+        specificIdentifier = `Date`,
+        combinedIdentifier =
+          generalIdentifier + `-` + specificIdentifier + `-` + dayNumString;
+
+      dayDateTextElement.classList.add(generalIdentifier);
+      dayDateTextElement.classList.add(specificIdentifier);
+      dayDateTextElement.classList.add(dayNumString);
+
+      this.#storeElementRef(combinedIdentifier, dayDateTextElement); //Forecast-Day-Date-Day-${number}
+
+      return dayDateTextElement;
+    },
     conditionText: (dayNumString) => {
       const conditionTextElement = document.createElement("p"),
         generalIdentifier = this.#generalIdentifiers.dayCardElements,
