@@ -689,21 +689,22 @@ class CurrentWeatherDataFilter {
 
   #createFilteredDataSet(data) {
     const { temp, windSpeed, precip, feelsLike, visibility } =
-      this.#dataFilteringMethods;
+        this.#dataFilteringMethods,
+      currentWeatherData = data.current;
 
     //create a new data set with filtered data
     const filteredDataSet = {
-      conditionText: data.condition.text,
-      conditionImage: data.condition.icon,
-      temp: temp(data),
-      feelsLike: feelsLike(data),
-      precip: precip(data),
-      humidity: `${data.humidity}%`,
-      isDay: data.is_day,
-      visibility: visibility(data),
-      windSpeed: windSpeed(data),
-      windDir: `${data.wind_dir}`,
-      windDegree: `${data.wind_degree}deg`,
+      conditionText: currentWeatherData.condition.text,
+      conditionImage: currentWeatherData.condition.icon,
+      temp: temp(currentWeatherData),
+      feelsLike: feelsLike(currentWeatherData),
+      precip: precip(currentWeatherData),
+      humidity: `${currentWeatherData.humidity}%`,
+      isDay: currentWeatherData.is_day,
+      visibility: visibility(currentWeatherData),
+      windSpeed: windSpeed(currentWeatherData),
+      windDir: `${currentWeatherData.wind_dir}`,
+      windDegree: `${currentWeatherData.wind_degree}deg`,
     };
 
     return filteredDataSet;
@@ -1308,6 +1309,8 @@ class WeatherDataManager {
   //or to use already stored data essentially
   #processWeatherData(useInboundData, data) {
     let filteredDataSet = null;
+
+    console.log(data);
 
     if (useInboundData) {
       this.#storeReceivedDataToState(data); //store the data in state first

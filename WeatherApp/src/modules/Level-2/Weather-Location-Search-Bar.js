@@ -116,6 +116,8 @@ class FindWeatherDataForLocation {
     weatherApi: null,
   };
 
+  #numOfForecastDays = 7;
+
   #requestInProgress = false;
 
   //---------------HELPER-METHODS--------------------//
@@ -140,7 +142,10 @@ class FindWeatherDataForLocation {
 
       const { weatherApi } = this.#helperClasses;
 
-      const weatherDataPromise = weatherApi.getCurrentWeather(inputValue),
+      const weatherDataPromise = weatherApi.getForecast(
+          inputValue,
+          this.#numOfForecastDays
+        ),
         classScope = this;
 
       weatherDataPromise

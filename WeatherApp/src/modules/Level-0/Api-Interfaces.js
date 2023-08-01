@@ -153,7 +153,12 @@ export class WeatherApi extends ApiInterface {
     apiKey: null,
   };
 
-  #urlTemplate = `http://api.weatherapi.com/v1/current.json?key=`;
+  #urlTemplate = `http://api.weatherapi.com/v1/`;
+
+  #endPoints = {
+    current: `current.json?`,
+    forecast: `forecast.json?`,
+  };
 
   //---------------------ARGUMENT-VALIDATION--------------------//
 
@@ -237,7 +242,7 @@ export class WeatherApi extends ApiInterface {
 
   #urlParams = {
     key: () => {
-      return this.configData.apiKey;
+      return `key=${this.configData.apiKey}`;
     },
     location: (location) => {
       return `&q=${location}`;
@@ -282,7 +287,8 @@ export class WeatherApi extends ApiInterface {
         { get } = this.requestMethods;
 
       //build the necessary parameters
-      const keyString = key(),
+      const endPointString = this.#endPoints.current,
+        keyString = key(),
         locString = location(loc),
         airQualityString = airQuality(false),
         weatherAlertsString = weatherAlerts(false);
@@ -290,6 +296,7 @@ export class WeatherApi extends ApiInterface {
       //concat into the final url string
       const finalUrl =
         baseUrl +
+        endPointString +
         keyString +
         locString +
         airQualityString +
@@ -316,7 +323,8 @@ export class WeatherApi extends ApiInterface {
         { get } = this.requestMethods;
 
       //build the necessary parameters
-      const keyString = key(),
+      const endPointString = this.#endPoints.forecast,
+        keyString = key(),
         locString = location(loc),
         numOfDaysString = numOfDays(days),
         airQualityString = airQuality(false),
@@ -325,6 +333,7 @@ export class WeatherApi extends ApiInterface {
       //concat into the final url string
       const finalUrl =
         baseUrl +
+        endPointString +
         keyString +
         locString +
         numOfDaysString +
