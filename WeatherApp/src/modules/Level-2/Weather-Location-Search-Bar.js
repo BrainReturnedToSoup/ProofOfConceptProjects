@@ -328,8 +328,6 @@ export class WeatherLocationSearchBar {
 
   #uniqueIdentifier = null;
 
-  #searchBarAppended = false;
-
   #functionalityOn = false;
 
   #completeSearchBarElement = null;
@@ -577,20 +575,9 @@ export class WeatherLocationSearchBar {
   }
 
   //append the complete search bar element after it has been made completely
-  append(parentElement) {
+  returnFragment() {
     try {
-      this.#argValidator("append", { parentElement });
-
-      if (!this.#searchBarAppended) {
-        parentElement.append(this.#completeSearchBarElement);
-
-        this.#searchBarAppended = true;
-      } else {
-        throw new Error(
-          `Failed to append a weather app search bar instance, as the target instance was
-             already appended somewhere else`
-        );
-      }
+      return this.#completeSearchBarElement;
     } catch (error) {
       console.error(error, error.stack);
     }

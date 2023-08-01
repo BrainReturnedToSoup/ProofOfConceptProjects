@@ -5,6 +5,8 @@ class ApplyGeneralInfoData {
     try {
       this.#argValidator("constructor", { elementReferenceManager }); //validate args
 
+      this.#helperClasses.elementReferenceManager = elementReferenceManager; //add helper class to state
+
       this.#retrieveElementReferences(); //retrieve the necessary references
     } catch (error) {
       console.error(error, error.stack);
@@ -439,14 +441,14 @@ class ApplyForecastData {
   //gets the necessary element references for the
   //current weather portion of the web page
   #retrieveElementRefs() {
-    for (let dayString in this.#retrieveElementRefs) {
+    for (let dayString in this.#retrievedElementRefs) {
       this.#retrieveElementRefsByDay(dayString);
     }
   }
 
   #retrieveElementRefsByDay(dayString) {
     const { elementReferenceManager } = this.#helperClasses,
-      forecastDayObj = this.#retrieveElementRefs[dayString];
+      forecastDayObj = this.#retrievedElementRefs[dayString];
 
     //define all of the necessary element references corresponding to the day
     //they represent in each corresponding retrievedelementref key value pair
@@ -480,25 +482,23 @@ class ApplyForecastData {
   }
 
   #updateElements(data) {
-    for (let i = 1; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       //retrieve the forecast element references based on the target day
-      const elementRefs = this.#retrieveElementRefs[`Day-${i}`];
+      const elementRefs = this.#retrieveElementRefs[`Day-${i + 1}`];
 
       //define properties on the corresponding element
       //references retrieved corresponding to the data array
-      elementRefs.conditionText.date = data[i - 1].date;
+      elementRefs.conditionText.date = data[i].date;
 
-      elementRefs.conditionText.textContent = data[i - 1].conditionText;
+      elementRefs.conditionText.textContent = data[i].conditionText;
 
-      elementRefs.conditionImage.src = data[i - 1].conditionImage;
+      elementRefs.conditionImage.src = data[i].conditionImage;
 
-      elementRefs.tempHigh.textContent = `Temp High: ${data[i - 1].tempHigh}`;
+      elementRefs.tempHigh.textContent = `Temp High: ${data[i].tempHigh}`;
 
-      elementRefs.tempLow.textContent = `Temp Low: ${data[i - 1].tempLow}`;
+      elementRefs.tempLow.textContent = `Temp Low: ${data[i].tempLow}`;
 
-      elementRefs.precipChance.textContent = `Precip Chance: ${
-        data[i - 1].precipChance
-      }`;
+      elementRefs.precipChance.textContent = `Precip Chance: ${data[i].precipChance}`;
     }
   }
 
@@ -934,6 +934,7 @@ class ForecastDataFilter {
     }
   }
 }
+
 //controls the user interface portion of the web app,
 //so that the supplied buttons will toggle the units being used for existing
 //data sets
@@ -957,6 +958,19 @@ class UserInterfaceFunctionality {
     constructor: {
       elementReferenceManager: {
         instanceof: ElementRefManager,
+      },
+    },
+    subscribe: {
+      subName: {
+        type: "string",
+      },
+      entryPointMethod: {
+        type: "function",
+      },
+    },
+    unsubscribe: {
+      subName: {
+        type: "string",
       },
     },
   };
@@ -1034,7 +1048,7 @@ class UserInterfaceFunctionality {
 
     this.#elementReferences.unitToggleButtonContainer =
       elementReferenceManager.retrieveRef(
-        `User-Interface-Buttons-Button-Container`
+        `User-Interface-Containers-Button-Container`
       ); // get ref for the container for the buttons
 
     this.#elementReferences.toggleDistance =
@@ -1065,10 +1079,9 @@ class UserInterfaceFunctionality {
     if (!this.#stateData.eventListenersOn) {
       const { unitToggleButtonContainer } = this.#elementReferences; //get the ref for the button container
 
-      unitToggleButtonContainer.addEventListener(
-        "click",
-        this.#clickFunctionality
-      ); //append the event listener to said container
+      unitToggleButtonContainer.addEventListener("click", (e) => {
+        this.#clickFunctionality(e);
+      }); //append the event listener to said container
 
       this.#stateData.eventListenersOn = true; //change the class state to reflect the event listener being initialized
     } else {
@@ -1477,6 +1490,8 @@ export class WeatherAppFunctionality {
       this.#initStateAndConfig(); //create the class instances
 
       this.#linkWeatherDataManagerToPublisher(); //link the emit weather data to helpers class instance to the UI Functionality publisher
+
+      this.activate(); //activate the functionality right off the bat
     } catch (error) {
       console.error(error, error.stack);
     }

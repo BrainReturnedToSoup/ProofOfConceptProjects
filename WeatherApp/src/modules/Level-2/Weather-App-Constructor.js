@@ -879,7 +879,7 @@ class UserInterfaceConstructor {
       mainContainer.classList.add(generalIdentifier);
       mainContainer.classList.add(specificIdentifier);
 
-      this.#storeElementRef(combinedIdentifier, mainContainer); //User-Interface-Buttons-Main-Container
+      this.#storeElementRef(combinedIdentifier, mainContainer); //User-Interface-Containers-Main-Container
 
       return mainContainer;
     },
@@ -892,7 +892,7 @@ class UserInterfaceConstructor {
       buttonContainer.classList.add(generalIdentifier);
       buttonContainer.classList.add(specificIdentifier);
 
-      this.#storeElementRef(combinedIdentifier, buttonContainer); //User-Interface-Buttons-Button-Container
+      this.#storeElementRef(combinedIdentifier, buttonContainer); //User-Interface-Containers-Button-Container
 
       return buttonContainer;
     },
