@@ -323,7 +323,7 @@ class CurrentWeatherConstuctor {
       return conditionTextField;
     }, //will say a phrase like 'partly cloudly' or 'sunny' etc to represent the weather
     conditionImage: () => {
-      const conditionImageElement = document.createElement("div"),
+      const conditionImageElement = document.createElement("img"),
         generalIdentifier = this.#generalIdentifiers.general,
         specificIdentifier = `Condition-Image`,
         combinedIdentifier = generalIdentifier + "-" + specificIdentifier;
@@ -579,7 +579,7 @@ class ForecastConstructor {
         conditionImage,
         tempHigh,
         tempLow,
-        precipChance,
+        totalPrecip,
       } = this.#dayCardElementConstructors,
       { dayCardContainer } = this.#containerConstructors;
 
@@ -591,7 +591,7 @@ class ForecastConstructor {
         conditionImage: conditionImage(dayNumString),
         tempHigh: tempHigh(dayNumString),
         tempLow: tempLow(dayNumString),
-        precipChance: precipChance(dayNumString),
+        totalPrecip: totalPrecip(dayNumString),
       }; //all of the child elements of the day card container, will be appended in this order
 
     //append the child elements to the container
@@ -667,7 +667,7 @@ class ForecastConstructor {
       return conditionTextElement;
     }, //will say a phrase like 'partly cloudly' or 'sunny' etc to represent the weather for a given day
     conditionImage: (dayNumString) => {
-      const conditionImageElement = document.createElement("div"),
+      const conditionImageElement = document.createElement("img"),
         generalIdentifier = this.#generalIdentifiers.dayCardElements,
         specificIdentifier = `Condition-Image`,
         combinedIdentifier =
@@ -711,20 +711,20 @@ class ForecastConstructor {
 
       return tempLowElement;
     }, //the predicted low temp for a given forecast day
-    precipChance: (dayNumString) => {
-      const precipChanceElement = document.createElement("p"),
+    totalPrecip: (dayNumString) => {
+      const totalPrecipElement = document.createElement("p"),
         generalIdentifier = this.#generalIdentifiers.dayCardElements,
-        specificIdentifier = `Precip-Chance`,
+        specificIdentifier = `Total-Precip`,
         combinedIdentifier =
           generalIdentifier + `-` + specificIdentifier + `-` + dayNumString;
 
-      precipChanceElement.classList.add(generalIdentifier);
-      precipChanceElement.classList.add(specificIdentifier);
-      precipChanceElement.classList.add(dayNumString);
+      totalPrecipElement.classList.add(generalIdentifier);
+      totalPrecipElement.classList.add(specificIdentifier);
+      totalPrecipElement.classList.add(dayNumString);
 
-      this.#storeElementRef(combinedIdentifier, precipChanceElement); //Forecast-Day-Precip-Chance-Day-${number}
+      this.#storeElementRef(combinedIdentifier, totalPrecipElement); //Forecast-Day-Total-Precip-Day-${number}
 
-      return precipChanceElement;
+      return totalPrecipElement;
     }, //the predicted amount of precipitation for a given forecast day
   };
 

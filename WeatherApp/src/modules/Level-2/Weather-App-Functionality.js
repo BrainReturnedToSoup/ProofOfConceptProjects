@@ -95,7 +95,7 @@ class ApplyGeneralInfoData {
         `General-Info-Location`
       );
 
-    this.#retrieveElementReferences.location = locationElementRef;
+    this.#retrievedElementReferences.location = locationElementRef;
   }
 
   #applyDataToElementReference = {
@@ -146,8 +146,8 @@ class ApplyCurrentWeatherData {
         instanceof: ElementRefManager,
       },
     },
-    applyForecastData: {
-      data: { type: "string" },
+    applyData: {
+      data: { type: "object" },
     },
   };
 
@@ -272,31 +272,31 @@ class ApplyCurrentWeatherData {
     conditionImage: (data) => {
       const { conditionImage } = data;
 
-      this.#retrieveElementReferences.conditionImage.src = conditionImage;
+      this.#retrievedElementReferences.conditionImage.src = conditionImage;
     },
     temp: (data) => {
       const { temp } = data;
 
-      this.#retrieveElementReferences.temp.textContent = `Temp: ${temp}`;
+      this.#retrievedElementReferences.temp.textContent = `Temp: ${temp}`;
     },
     feelsLike: (data) => {
       const { feelsLike } = data;
 
-      this.#retrieveElementReferences.feelsLike.textContent = `Feels Like: ${feelsLike}`;
+      this.#retrievedElementReferences.feelsLikeTemp.textContent = `Feels Like: ${feelsLike}`;
     },
     precip: (data) => {
       const { precip } = data;
 
-      this.#retrieveElementReferences.precip.textContent = `Precip: ${precip}`;
+      this.#retrievedElementReferences.precip.textContent = `Precip: ${precip}`;
     },
     humidity: (data) => {
       const { humidity } = data;
 
-      this.#retrieveElementReferences.humidity.textContent = `Humidity: ${humidity}`;
+      this.#retrievedElementReferences.humidity.textContent = `Humidity: ${humidity}`;
     },
     isDay: (data) => {
       const { isDay } = data,
-        { dayOrNightImage } = this.#retrieveElementReferences;
+        { dayOrNightImage } = this.#retrievedElementReferences;
 
       if (isDay === 1) {
         dayOrNightImage.classList.remove("Night");
@@ -309,22 +309,22 @@ class ApplyCurrentWeatherData {
     visibility: (data) => {
       const { visibility } = data;
 
-      this.#retrieveElementReferences.visibility.textContent = `Vis: ${visibility}`;
+      this.#retrievedElementReferences.visibility.textContent = `Vis: ${visibility}`;
     },
     windSpeed: (data) => {
       const { windSpeed } = data;
 
-      this.#retrieveElementReferences.windSpeed.textContent = `Wind Speed: ${windSpeed}`;
+      this.#retrievedElementReferences.windSpeed.textContent = `Wind Speed: ${windSpeed}`;
     },
     windDir: (data) => {
       const { windDir } = data;
 
-      this.#retrieveElementReferences.windDir.textContent = `Wind Dir: ${windDir}`;
+      this.#retrievedElementReferences.windDirection.textContent = `Wind Dir: ${windDir}`;
     },
     windDegree: (data) => {
       const { windDegree } = data;
 
-      this.#retrieveElementReferences.windDegree.textContent = `Wind Degree: ${windDegree}`;
+      this.#retrievedElementReferences.windDegree.textContent = `Wind Degree: ${windDegree}`;
     },
   };
 
@@ -362,8 +362,8 @@ class ApplyForecastData {
         instanceof: ElementRefManager,
       },
     },
-    applyForecastData: {
-      data: { type: "string" },
+    applyData: {
+      data: { type: "object" },
     },
   };
 
@@ -431,7 +431,7 @@ class ApplyForecastData {
   //---------INITIALIZE-ELEMENT-REFS-CACHE---------//
 
   #initRetrievedElementRefsStruct(numOfDays) {
-    for (let i = 1; i < numOfDays; i++) {
+    for (let i = 1; i <= numOfDays; i++) {
       this.#retrievedElementRefs[`Day-${i}`] = {};
     }
   }
@@ -457,7 +457,7 @@ class ApplyForecastData {
     );
 
     forecastDayObj["date"] = elementReferenceManager.retrieveRef(
-      `Forecast-Day-Date-Day-${dayString}`
+      `Forecast-Day-Date-${dayString}`
     );
 
     forecastDayObj["conditionText"] = elementReferenceManager.retrieveRef(
@@ -476,29 +476,29 @@ class ApplyForecastData {
       `Forecast-Day-Temp-Low-${dayString}`
     );
 
-    forecastDayObj["precipChance"] = elementReferenceManager.retrieveRef(
-      `Forecast-Day-Precip-Chance-${dayString}`
+    forecastDayObj["totalPrecip"] = elementReferenceManager.retrieveRef(
+      `Forecast-Day-Total-Precip-${dayString}`
     );
   }
 
   #updateElements(data) {
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i <= data.length; i++) {
       //retrieve the forecast element references based on the target day
-      const elementRefs = this.#retrieveElementRefs[`Day-${i + 1}`];
+      const elementRefs = this.#retrievedElementRefs[`Day-${i + 1}`];
 
       //define properties on the corresponding element
       //references retrieved corresponding to the data array
-      elementRefs.conditionText.date = data[i].date;
+      elementRefs.date.textContent = data[i].date;
 
       elementRefs.conditionText.textContent = data[i].conditionText;
 
       elementRefs.conditionImage.src = data[i].conditionImage;
 
-      elementRefs.tempHigh.textContent = `Temp High: ${data[i].tempHigh}`;
+      elementRefs.tempHigh.textContent = `Temp High: ${data[i].maxTemp}`;
 
-      elementRefs.tempLow.textContent = `Temp Low: ${data[i].tempLow}`;
+      elementRefs.tempLow.textContent = `Temp Low: ${data[i].minTemp}`;
 
-      elementRefs.precipChance.textContent = `Precip Chance: ${data[i].precipChance}`;
+      elementRefs.totalPrecip.textContent = `Total Precip: ${data[i].totalPrecip}`;
     }
   }
 
@@ -506,7 +506,7 @@ class ApplyForecastData {
 
   applyData(data) {
     try {
-      this.#argValidationData("applyForecastData", { data });
+      this.#argValidator("applyData", { data });
 
       //only initialize and retrieve if the number of forecast days changes
       if (data.length !== this.#stateData.numOfForecastDays) {
@@ -1310,8 +1310,6 @@ class WeatherDataManager {
   #processWeatherData(useInboundData, data) {
     let filteredDataSet = null;
 
-    console.log(data);
-
     if (useInboundData) {
       this.#storeReceivedDataToState(data); //store the data in state first
 
@@ -1336,19 +1334,19 @@ class WeatherDataManager {
 
   #emitDataToHelpersMethods = {
     generalInfo: (data) => {
-      const { ApplyGeneralInfoData } = this.#helperClasses;
+      const { applyGeneralInfoData } = this.#helperClasses;
 
-      ApplyGeneralInfoData.applyData(data);
+      applyGeneralInfoData.applyData(data);
     },
     currentWeather: (data) => {
-      const { ApplyCurrentWeatherData } = this.#helperClasses;
+      const { applyCurrentWeatherData } = this.#helperClasses;
 
-      ApplyCurrentWeatherData.applyData(data);
+      applyCurrentWeatherData.applyData(data);
     },
     forecast: (data) => {
-      const { ApplyForecastData } = this.#helperClasses;
+      const { applyForecastData } = this.#helperClasses;
 
-      ApplyForecastData.applyData(data);
+      applyForecastData.applyData(data);
     },
   };
 
