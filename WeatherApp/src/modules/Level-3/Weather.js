@@ -1,12 +1,11 @@
 //general dependencies
 import { ElementRefManager } from "../Level-0/Element-Ref-Manager.js";
-import { WeatherApi } from "../Level-0/Api-Interfaces.js";
-import { CurrentLocationQuery } from "../Level-1/Current-Location-Query.js";
 
 //specific implementation for this app specifically
 import { WeatherLocationSearchBar } from "../Level-2/Weather-Location-Search-Bar.js";
 import { WeatherAppConstructor } from "../Level-2/Weather-App-Constructor.js";
 import { WeatherAppFunctionality } from "../Level-2/Weather-App-Functionality.js";
+import { CurrentLocationWeather } from "../Level-2/Weather-Current-Location.js";
 
 //orchestrates all of these sub classes together in order to form the entire weather app
 //will inject dependencies where they are needed etc. Will provide a way to customize
@@ -14,7 +13,7 @@ import { WeatherAppFunctionality } from "../Level-2/Weather-App-Functionality.js
 export class WeatherApp {
   constructor() {
     try {
-      this.#initHelperMethods(); //initialize the helper class instances that make up the entire weather app
+      this.#initHelperClasses(); //initialize the helper class instances that make up the entire weather app
 
       this.#appendSearchBarFeatureToUI();
       //appends the search bar feature to the main weather app element fragment, since the search
@@ -97,6 +96,7 @@ export class WeatherApp {
     weatherAppConstructor: null,
     weatherAppFunctionality: null,
     weatherLocationSearchBar: null,
+    currentLocationWeather: null,
   };
 
   #weatherAppFragment = null;
@@ -108,7 +108,7 @@ export class WeatherApp {
 
   //---------------HELPER-METHODS---------------//
 
-  #initHelperMethods() {
+  #initHelperClasses() {
     //create the helper classes in this order, so that the element references stored upon
     //element creation can be transfered from the constructor helper to the functionality helper
     this.#helperClasses.elementReferenceManager = new ElementRefManager();
@@ -125,6 +125,12 @@ export class WeatherApp {
     //the functionality helper will subscribe to this class in order to receive weather data
     this.#helperClasses.weatherLocationSearchBar = new WeatherLocationSearchBar(
       this.#configData.searchBarUniqueIdentifier,
+      this.#configData.apiKey
+    );
+
+    //a module that takes the current location of the user, and then makes a weather api request
+    //using their location
+    this.#helperClasses.currentLocationWeather = new CurrentLocationWeather(
       this.#configData.apiKey
     );
   }
@@ -148,14 +154,22 @@ export class WeatherApp {
   }
 
   #linkObserverToWeatherDataPublishers() {
-    const { weatherLocationSearchBar, weatherAppFunctionality } =
-      this.#helperClasses;
+    const {
+      weatherLocationSearchBar,
+      weatherAppFunctionality,
+      currentLocationWeather,
+    } = this.#helperClasses;
 
-    //link the functionality helper to the search bar, so that
-    //it can receive weather data that is emitted by the search bar,
+    //link the functionality helper to the search bar and the current location query module, so that
+    //it can receive weather data that is emitted by either the search bar or current location query,
     //have to make sure to bind the supplied method to the functionality
     //helper instance
     weatherLocationSearchBar.subscribeToApiData(
+      "Observer",
+      weatherAppFunctionality.weatherDataReceiver.bind(weatherAppFunctionality)
+    );
+
+    currentLocationWeather.subscribeToApiData(
       "Observer",
       weatherAppFunctionality.weatherDataReceiver.bind(weatherAppFunctionality)
     );
