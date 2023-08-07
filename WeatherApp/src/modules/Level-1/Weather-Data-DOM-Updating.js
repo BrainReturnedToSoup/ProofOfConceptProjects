@@ -480,7 +480,7 @@ export class ApplyForecastData {
   }
 
   #updateElements(data) {
-    for (let i = 0; i <= data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       //retrieve the forecast element references based on the target day
       const elementRefs = this.#retrievedElementRefs[`Day-${i + 1}`];
 
