@@ -10,7 +10,7 @@
 
 .Forecast-Day.Card-Container {
   width: 150px;
-  height: 150px;
+  height: 175px;
 
   margin: 20px;
   padding: 10px;
@@ -27,6 +27,8 @@
 
 .Forecast-Day.Date {
   font-size: 0.6rem;
+
+  text-decoration: underline;
 }
 
 .Forecast-Day.Condition-Image {
@@ -40,7 +42,8 @@
 }
 
 .Forecast-Day.Condition-Text {
-  font-size: 1.35rem;
+  font-size: 0.9rem;
+  font-weight: 600;
 
   grid-row: 3/4;
   justify-self: center;
