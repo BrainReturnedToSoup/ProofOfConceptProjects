@@ -28,6 +28,6 @@ body {
 
   box-sizing: border-box;
 
-  grid-template-columns: 1.5fr 1fr;
-  grid-template-rows: 100px repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 100px repeat(8, 1fr);
 }

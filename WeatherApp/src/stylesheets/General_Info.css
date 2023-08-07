@@ -1,16 +1,17 @@
 .General-Info.Main-Container {
-  grid-column: 1/3;
-  grid-row: 1;
+  grid-column: 1/4;
+  grid-row: 1/2;
 
   display: flex;
 
   justify-content: center;
   align-items: center;
+
+  padding-left: 40px;
 }
 
 .General-Info.Location {
-  font-weight: 500;
-  font-size: 1.6rem;
+  font-size: 2.1rem;
 
   display: inherit;
 

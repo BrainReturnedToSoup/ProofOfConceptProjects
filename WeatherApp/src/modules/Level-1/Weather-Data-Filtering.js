@@ -169,7 +169,6 @@ export class CurrentWeatherDataFilter {
     //create a new data set with filtered data
     const filteredDataSet = {
       conditionText: currentWeatherData.condition.text,
-      conditionImage: currentWeatherData.condition.icon,
       temp: temp(currentWeatherData),
       feelsLike: feelsLike(currentWeatherData),
       precip: precip(currentWeatherData),

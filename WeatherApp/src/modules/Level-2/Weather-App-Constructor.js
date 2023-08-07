@@ -251,7 +251,6 @@ class CurrentWeatherConstuctor {
     const { main } = this.#containerConstructors,
       {
         conditionText,
-        conditionImage,
         temp,
         tempFeelsLike,
         precip,
@@ -266,7 +265,6 @@ class CurrentWeatherConstuctor {
     //define the order to create and append the corresponding elements within the
     //main container
     const createAndAppendOrder = [
-      conditionImage,
       conditionText,
       temp,
       tempFeelsLike,
@@ -320,19 +318,6 @@ class CurrentWeatherConstuctor {
 
       return conditionTextField;
     }, //will say a phrase like 'partly cloudly' or 'sunny' etc to represent the weather
-    conditionImage: () => {
-      const conditionImageElement = document.createElement("img"),
-        generalIdentifier = this.#generalIdentifiers.general,
-        specificIdentifier = `Condition-Image`,
-        combinedIdentifier = generalIdentifier + "-" + specificIdentifier;
-
-      conditionImageElement.classList.add(generalIdentifier);
-      conditionImageElement.classList.add(specificIdentifier);
-
-      this.#storeElementRef(combinedIdentifier, conditionImageElement); //Current-Weather-Condition-Image
-
-      return conditionImageElement;
-    }, //holds an image that will match the condition text phrase
     temp: () => {
       const tempTextField = document.createElement("h1"),
         generalIdentifier = this.#generalIdentifiers.general,
@@ -548,8 +533,8 @@ class ForecastConstructor {
     const { mainContainer } = this.#containerConstructors,
       mainContainerElement = mainContainer();
 
-    for (let i = 0; i < 7; i++) {
-      const dayCard = this.#createDayCard(`Day-${i}`); //create a day card corresponding to the day, this way each created day card element has something unique attached to them
+    for (let i = 0; i < 3; i++) {
+      const dayCard = this.#createDayCard(`Day-${i+1}`); //create a day card corresponding to the day, this way each created day card element has something unique attached to them
 
       mainContainerElement.append(dayCard);
     }

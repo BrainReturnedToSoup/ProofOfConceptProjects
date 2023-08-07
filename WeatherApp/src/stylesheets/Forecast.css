@@ -1,4 +1,26 @@
 .Forecast.Main-Container {
-    grid-column: 2/3;
-    grid-row: 2/5;
+  grid-column: 1/4;
+  grid-row: 8/9;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.Forecast-Day.Card-Container {
+  width: 175px;
+  height: 175px;
+
+  margin: 20px;
+
+
+  border-radius: 7.5px;
+
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.Forecast-Day.Condition-Image {
+  aspect-ratio: 1/1;
+  height: 40px;
 }

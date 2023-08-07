@@ -208,12 +208,10 @@ export class ApplyCurrentWeatherData {
 
   #retrievedElementReferences = {
     conditionText: null,
-    conditionImage: null,
     temp: null,
     feelsLikeTemp: null,
     precip: null,
     humidity: null,
-    dayOrNightImage: null,
     visibility: null,
     windDegree: null,
     windDirection: null,
@@ -228,9 +226,6 @@ export class ApplyCurrentWeatherData {
     this.#retrievedElementReferences = {
       conditionText: elementReferenceManager.retrieveRef(
         `Current-Weather-Condition-Text`
-      ),
-      conditionImage: elementReferenceManager.retrieveRef(
-        `Current-Weather-Condition-Image`
       ),
       temp: elementReferenceManager.retrieveRef(`Current-Weather-Temp`),
       feelsLikeTemp: elementReferenceManager.retrieveRef(
@@ -266,11 +261,6 @@ export class ApplyCurrentWeatherData {
       this.#retrievedElementReferences.conditionText.textContent =
         conditionText;
     },
-    conditionImage: (data) => {
-      const { conditionImage } = data;
-
-      this.#retrievedElementReferences.conditionImage.src = conditionImage;
-    },
     temp: (data) => {
       const { temp } = data;
 
@@ -284,32 +274,32 @@ export class ApplyCurrentWeatherData {
     precip: (data) => {
       const { precip } = data;
 
-      this.#retrievedElementReferences.precip.textContent = `Precip ${precip}`;
+      this.#retrievedElementReferences.precip.textContent = `Precipitation - ${precip}`;
     },
     humidity: (data) => {
       const { humidity } = data;
 
-      this.#retrievedElementReferences.humidity.textContent = `Humidity ${humidity}`;
+      this.#retrievedElementReferences.humidity.textContent = `Humidity - ${humidity}`;
     },
     visibility: (data) => {
       const { visibility } = data;
 
-      this.#retrievedElementReferences.visibility.textContent = `Vis ${visibility}`;
+      this.#retrievedElementReferences.visibility.textContent = `Visibility - ${visibility}`;
     },
     windSpeed: (data) => {
       const { windSpeed } = data;
 
-      this.#retrievedElementReferences.windSpeed.textContent = `Wind Speed ${windSpeed}`;
+      this.#retrievedElementReferences.windSpeed.textContent = `Wind Speed - ${windSpeed}`;
     },
     windDir: (data) => {
       const { windDir } = data;
 
-      this.#retrievedElementReferences.windDirection.textContent = `Wind Dir ${windDir}`;
+      this.#retrievedElementReferences.windDirection.textContent = `Wind Direction - ${windDir}`;
     },
     windDegree: (data) => {
       const { windDegree } = data;
 
-      this.#retrievedElementReferences.windDegree.textContent = `Wind Degree ${windDegree}`;
+      this.#retrievedElementReferences.windDegree.textContent = `Wind Direction (deg) - ${windDegree}`;
     },
   };
 
