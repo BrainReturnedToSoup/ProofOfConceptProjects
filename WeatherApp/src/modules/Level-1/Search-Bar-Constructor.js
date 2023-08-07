@@ -5,11 +5,12 @@ export class SearchBarConstructor {
     try {
       this.#argValidator("constructor", argsObj);
 
-      //apply the arguments to the state as part of configuring said state
+      //reference the properties within the supplied argsObj
       const { uniqueIdentifier, elementReferenceManager, dynamicOptionsOn } =
         argsObj;
 
-      this.#configData.uniqueIdentifier = uniqueIdentifier; //config data to determine some characteristics of the constructed search bar
+      //config data to determine some characteristics of the constructed search bar
+      this.#configData.uniqueIdentifier = uniqueIdentifier;
       this.#configData.dynamicOptionsOn = dynamicOptionsOn;
 
       this.#helperClasses.elementReferenceManager = elementReferenceManager; //class instance to store each individual element reference

@@ -908,6 +908,8 @@ class UserInterfaceConstructor {
       tempToggleButton.classList.add(generalIdentifier);
       tempToggleButton.classList.add(specificIdentifier);
 
+      tempToggleButton.textContent = "Temperature";
+
       this.#storeElementRef(combinedIdentifier, tempToggleButton); //User-Interface-Buttons-Temp-Toggle
 
       return tempToggleButton;
@@ -921,6 +923,8 @@ class UserInterfaceConstructor {
       distanceToggleButton.classList.add(generalIdentifier);
       distanceToggleButton.classList.add(specificIdentifier);
 
+      distanceToggleButton.textContent = "Distance";
+
       this.#storeElementRef(combinedIdentifier, distanceToggleButton); //User-Interface-Buttons-Distance-Toggle
 
       return distanceToggleButton;
@@ -933,6 +937,8 @@ class UserInterfaceConstructor {
 
       measurementToggleButton.classList.add(generalIdentifier);
       measurementToggleButton.classList.add(specificIdentifier);
+
+      measurementToggleButton.textContent = "Measurement";
 
       this.#storeElementRef(combinedIdentifier, measurementToggleButton); //User-Interface-Buttons-Measurement-Toggle
 

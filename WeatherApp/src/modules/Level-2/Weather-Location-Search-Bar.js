@@ -20,13 +20,19 @@ class FindWeatherDataForLocation {
       this.#argValidator("constructor", {
         searchBarFunctionalityInstance,
         apiKey,
-      });
+      }); //validate inbound args
 
+      //save the helper class dependency to state
       this.#helperClasses.searchBarFunctionality =
         searchBarFunctionalityInstance;
 
+      //make a new weather api interface instance in order to
+      //communicate with the api
       this.#initWeatherApiInstance(apiKey);
 
+      //have this class subscribe to the supplied helper class
+      //since the helper class emits input data that will be used
+      //to make weather api requests
       this.#subscribeToSearchBarFunctionalityPublisher();
     } catch (error) {
       console.error(error, error.stack);
@@ -134,20 +140,30 @@ class FindWeatherDataForLocation {
       "WeatherApiRequest",
       this.#makeApiRequest.bind(classScope)
     );
+    //the supplied subscriber method executes an api request to the weather
+    //api using the input data. Also the method has to be binded to this class
+    //since the method came from this class scope but will be executed within the functionality
+    //manager helper scope
   }
 
   #makeApiRequest(inputValue) {
+    //wont make another request until the previous is done
     if (!this.#requestInProgress) {
       this.#requestInProgress = true;
 
       const { weatherApi } = this.#helperClasses;
 
+      //return a promise for the weather api forecast data using the
+      //methods on the helper class instance
       const weatherDataPromise = weatherApi.getForecast(
-          inputValue,
+          inputValue, //the location
           this.#numOfForecastDays
         ),
         classScope = this;
 
+      //when the promise sucessfully resolves, the retrieved data
+      //is emitted to the subscribers of this class. Have to bind the scope
+      //to this class since the scope points to the promise object otherwise
       weatherDataPromise
         .then((data) => {
           this.#emitRetrievedWeatherData.bind(classScope)(data);
@@ -158,6 +174,8 @@ class FindWeatherDataForLocation {
         .finally(() => {
           this.#requestInProgress = false;
         });
+      //no matter what happens the request is over,
+      //so reset the state to allow another to be made
     }
   }
 
@@ -214,16 +232,14 @@ export class WeatherLocationSearchBar {
   constructor(uniqueIdentifier, apiKey) {
     this.#argValidator("constructor", { uniqueIdentifier, apiKey }); //validate constructor args
 
-    this.#apiKey = apiKey; //save the supplied api key to state to be used later
-
-    this.#uniqueIdentifier = uniqueIdentifier; //save to supplied unique identifier to state to be used later
+    //save the args to the class state
+    this.#apiKey = apiKey;
+    this.#uniqueIdentifier = uniqueIdentifier;
 
     this.#initHelperClassInstances(); //init all of the helper class instances which they will already be supplied with the correct dependencies
-
     this.#buildSearchBar(); //builds the search bar and saves it to the state
 
-    this.#initSubscriptions(); //initializes the necessary subscriptions of the helper classes, both the search bar input values, and the api request values
-
+    this.#subscribeToHelperPublishers(); //initializes the necessary subscriptions of the helper classes, both the search bar input values, and the api request values
     this.activateFunctionality(); //turn on the functionality of the search bar after everything else
   }
 
@@ -364,7 +380,7 @@ export class WeatherLocationSearchBar {
     findWeatherDataForLocation();
   }
 
-  #initSubscriptions() {
+  #subscribeToHelperPublishers() {
     const { subscribeToApiData, subscribeToSearchBarInputValues } =
       this.#initMethods;
 
@@ -388,6 +404,7 @@ export class WeatherLocationSearchBar {
             this.#helperClassInstances.elementReferenceManager,
           uniqueIdentifier: this.#uniqueIdentifier,
           dynamicOptionsOn: false,
+          //all this means is to add a datalist element when applicable
         });
     },
     searchBarFunctionality: () => {
@@ -424,6 +441,8 @@ export class WeatherLocationSearchBar {
         "WeatherLocationSearchBarController",
         this.#apiDataPublisherEntryPoint.bind(classScope)
       );
+      //since this method is from the controller class scope, need to
+      //bind the scope when its executed within the helper class
     },
     subscribeToSearchBarInputValues: () => {
       const { searchBarFunctionality } = this.#helperClassInstances,
@@ -433,6 +452,8 @@ export class WeatherLocationSearchBar {
         "WeatherLocationSearchBarController",
         this.#searchBarInputPublisherEntryPoint.bind(classScope)
       );
+      //since this method is from the controller class scope, need to
+      //bind the scope when its executed within the helper class
     },
   };
 

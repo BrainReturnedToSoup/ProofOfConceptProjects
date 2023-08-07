@@ -21,7 +21,8 @@ export class WeatherApp {
 
       this.#linkObserverToWeatherDataPublishers();
       //links the functionality helper class to any publishers that will emit
-      //weather data for said helper to use and render on the DOM
+      //weather data for said helper to use and render on the DOM, this includes the search bar
+      //and the current location weather helper classes
 
       this.#retrieveWeatherAppFragment();
       //retrieves the complete weather app from the constructor helper after everything else is initialized
@@ -116,17 +117,23 @@ export class WeatherApp {
     this.#helperClasses.weatherAppConstructor = new WeatherAppConstructor(
       this.#helperClasses.elementReferenceManager
     );
+    //uses the ref manager as a dependency, so that all created elements are immediately stored in the cache
 
     this.#helperClasses.weatherAppFunctionality = new WeatherAppFunctionality(
       this.#helperClasses.elementReferenceManager
     );
+    //uses the same ref manager with all of the necessary elements already stored within it in order
+    //to facilitate functionality to existing elements
 
     //a completely separate feature in nature, outside of the functionality helper, in fact
     //the functionality helper will subscribe to this class in order to receive weather data
+    //based on locations that are searched
     this.#helperClasses.weatherLocationSearchBar = new WeatherLocationSearchBar(
       this.#configData.searchBarUniqueIdentifier,
       this.#configData.apiKey
     );
+    //need a unique identifier since the search bar is an independent feature in nature
+    //also needs an api key to connect with the weather api
 
     //a module that takes the current location of the user, and then makes a weather api request
     //using their location
@@ -150,7 +157,7 @@ export class WeatherApp {
 
     containerForUI.insertBefore(searchBarFrag, firstChild);
     //using the previously saved first child, insert the search bar
-    //before it so that the search bar is now the first child
+    //before it so that the search bar is now the first child of the UI container
   }
 
   #linkObserverToWeatherDataPublishers() {
@@ -160,7 +167,7 @@ export class WeatherApp {
       currentLocationWeather,
     } = this.#helperClasses;
 
-    //link the functionality helper to the search bar and the current location query module, so that
+    //link the weather app functionality helper to the search bar and the current location query module, so that
     //it can receive weather data that is emitted by either the search bar or current location query,
     //have to make sure to bind the supplied method to the functionality
     //helper instance
@@ -191,5 +198,11 @@ export class WeatherApp {
     } catch (error) {
       console.error(error, error.stack);
     }
+  }
+
+  useUserLocation() {
+    const { currentLocationWeather } = this.#helperClasses;
+
+    currentLocationWeather.requestCurrentLocation();
   }
 }

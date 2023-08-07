@@ -1,14 +1,9 @@
 import { WeatherApp } from "./modules/Level-3/Weather";
-import { CurrentLocationWeather } from "./modules/Level-2/Weather-Current-Location";
 
-// (() => {
-//   const weatherApp = new WeatherApp();
+(() => {
+  const weatherApp = new WeatherApp();
 
-//   weatherApp.append(document.body);
-// })();
-
-const CLW = new CurrentLocationWeather(`d9563f6e601e4aa199a205713232607`);
-
-CLW.subscribeToApiData("test", (data) => {console.log(data)})
-
-CLW.requestCurrentLocation();
+  weatherApp.append(document.body); //append the app fragment
+  
+  weatherApp.useUserLocation(); //request the user location for weather data 
+})();
