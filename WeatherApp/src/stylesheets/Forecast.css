@@ -9,18 +9,53 @@
 }
 
 .Forecast-Day.Card-Container {
-  width: 175px;
-  height: 175px;
+  width: 150px;
+  height: 150px;
 
   margin: 20px;
-
+  padding: 10px;
 
   border-radius: 7.5px;
 
   background-color: rgba(0, 0, 0, 0.6);
+
+  display: grid;
+
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr repeat(5, 2fr);
+}
+
+.Forecast-Day.Date {
+  font-size: 0.6rem;
 }
 
 .Forecast-Day.Condition-Image {
   aspect-ratio: 1/1;
-  height: 40px;
+  height: 75px;
+
+  justify-self: center;
+  align-items: center;
+
+  grid-row: 2/3;
+}
+
+.Forecast-Day.Condition-Text {
+  font-size: 1.35rem;
+
+  grid-row: 3/4;
+  justify-self: center;
+  align-items: center;
+
+  margin-bottom: 7px;
+}
+
+.Forecast-Day.Temp-High,
+.Forecast-Day.Temp-Low,
+.Forecast-Day.Total-Precip {
+  font-size: 0.7rem;
+
+  justify-self: center;
+  align-items: center;
+
+  margin: 2px;
 }
