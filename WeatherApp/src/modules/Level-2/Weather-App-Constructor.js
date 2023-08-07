@@ -114,7 +114,7 @@ class GeneralInfoConstructor {
 
   #containerElementConstructors = {
     main: () => {
-      const mainContainerElement = document.createElement("h3"),
+      const mainContainerElement = document.createElement("div"),
         generalIdentifier = this.#generalIdentifiers.general,
         specificIdentifier = `Main-Container`,
         combinedIdentifier = generalIdentifier + `-` + specificIdentifier;
@@ -256,7 +256,6 @@ class CurrentWeatherConstuctor {
         tempFeelsLike,
         precip,
         humidity,
-        dayOrNightImage,
         visibility,
         windDegree,
         windDirection,
@@ -267,17 +266,16 @@ class CurrentWeatherConstuctor {
     //define the order to create and append the corresponding elements within the
     //main container
     const createAndAppendOrder = [
-      dayOrNightImage,
       conditionImage,
       conditionText,
       temp,
       tempFeelsLike,
       precip,
+      humidity,
+      visibility,
       windDirection,
       windDegree,
       windSpeed,
-      humidity,
-      visibility,
     ];
 
     //create and append each imported method that represents a specific data display element,
@@ -387,19 +385,6 @@ class CurrentWeatherConstuctor {
 
       return humidityTextField;
     }, //how humid the air is
-    dayOrNightImage: () => {
-      const dayOrNightImage = document.createElement("div"),
-        generalIdentifier = this.#generalIdentifiers.general,
-        specificIdentifier = `Day-Or-Night-Image`,
-        combinedIdentifier = generalIdentifier + `-` + specificIdentifier;
-
-      dayOrNightImage.classList.add(generalIdentifier);
-      dayOrNightImage.classList.add(specificIdentifier);
-
-      this.#storeElementRef(combinedIdentifier, dayOrNightImage); //Current-Weather-Day-Or-Night-Image
-
-      return dayOrNightImage;
-    }, //value that represents if its day or night
     visibility: () => {
       const visibilityTextField = document.createElement("h3"),
         generalIdentifier = this.#generalIdentifiers.general,

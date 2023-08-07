@@ -7,6 +7,7 @@ import { WeatherAppConstructor } from "../Level-2/Weather-App-Constructor.js";
 import { WeatherAppFunctionality } from "../Level-2/Weather-App-Functionality.js";
 import { CurrentLocationWeather } from "../Level-2/Weather-Current-Location.js";
 
+
 //orchestrates all of these sub classes together in order to form the entire weather app
 //will inject dependencies where they are needed etc. Will provide a way to customize
 //some features with the weather app

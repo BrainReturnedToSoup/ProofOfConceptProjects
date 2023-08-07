@@ -174,7 +174,6 @@ export class CurrentWeatherDataFilter {
       feelsLike: feelsLike(currentWeatherData),
       precip: precip(currentWeatherData),
       humidity: `${currentWeatherData.humidity}%`,
-      isDay: currentWeatherData.is_day,
       visibility: visibility(currentWeatherData),
       windSpeed: windSpeed(currentWeatherData),
       windDir: `${currentWeatherData.wind_dir}`,

@@ -238,9 +238,6 @@ export class ApplyCurrentWeatherData {
       ),
       precip: elementReferenceManager.retrieveRef(`Current-Weather-Precip`),
       humidity: elementReferenceManager.retrieveRef(`Current-Weather-Humidity`),
-      dayOrNightImage: elementReferenceManager.retrieveRef(
-        `Current-Weather-Day-Or-Night-Image`
-      ),
       visibility: elementReferenceManager.retrieveRef(
         `Current-Weather-Visibility`
       ),
@@ -293,18 +290,6 @@ export class ApplyCurrentWeatherData {
       const { humidity } = data;
 
       this.#retrievedElementReferences.humidity.textContent = `Humidity ${humidity}`;
-    },
-    isDay: (data) => {
-      const { isDay } = data,
-        { dayOrNightImage } = this.#retrievedElementReferences;
-
-      if (isDay === 1) {
-        dayOrNightImage.classList.remove("Night");
-        dayOrNightImage.classList.add("Day");
-      } else if (isDay === 0) {
-        dayOrNightImage.classList.remove("Day");
-        dayOrNightImage.classList.add("Night");
-      }
     },
     visibility: (data) => {
       const { visibility } = data;

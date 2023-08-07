@@ -1,0 +1,21 @@
+.General-Info.Main-Container {
+  grid-column: 1/3;
+  grid-row: 1;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.General-Info.Location {
+  font-weight: 500;
+  font-size: 1.6rem;
+
+  display: inherit;
+
+  width: 100%;
+  height: 100%;
+
+  align-items: center;
+}
