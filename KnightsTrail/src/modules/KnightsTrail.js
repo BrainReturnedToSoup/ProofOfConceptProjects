@@ -11,17 +11,11 @@ class TraversalNode {
     this.path.push(temp);
   }
 
-  split(possibleCoords) {
-    const splitNodes = [];
+  split(possibleCoord) {
+    const newNode = new TraversalNode(possibleCoord);
+    newNode.path = this.path.slice();
 
-    for (let i = 1; i < possibleCoords.length; i++) {
-      const newNode = new TraversalNode(possibleCoords[i]);
-
-      newNode.path = this.path.slice();
-      splitNodes.push(newNode);
-    }
-
-    return splitNodes;
+    return newNode;
   }
 }
 
@@ -37,36 +31,49 @@ class KnightsTrail {
   };
 
   #calcEuclideanDist(startingCoord, targetCoord) {
-    const xDif = startingCoord[0] - targetCoord[0],
-    yDif = startingCoord[1] - targetCoord[1];
+    const xDiff = startingCoord[0] - targetCoord[0],
+      yDiff = startingCoord[1] - targetCoord[1];
 
-    return Math.sqrt(yDif**2 - xDif**2);
+    return Math.sqrt(yDiff ** 2 + xDiff ** 2);
   }
 
   #findValidMoveCoords(startingCoord) {
     const validMoveCoords = [],
-    { x, y } = this.#validMoves;
+      { x, y } = this.#validMoves;
 
-    for(let i = 0; i < x.length; i++) {
-        
+    for (let i = 0; i < x.length; i++) {
+      const xDiff = startingCoord[0] + x[i],
+        yDiff = startingCoord[1] + y[i];
+
+      if (
+        xDiff >= this.#boardSize.x[0] &&
+        xDiff <= this.#boardSize.x[1] &&
+        yDiff >= this.#boardSize.y[0] &&
+        yDiff <= this.#boardSize.y[1]
+      ) {
+        const newValidMoveCoord = [xDiff, yDiff];
+
+        validMoveCoords.push(newValidMoveCoord);
+      }
     }
 
+    return validMoveCoords;
   }
 
   #pickFourShortestMoves(possibleCoords, corresDists) {
     const bindedCoordsArr = [];
 
-    for(let i = 0; i < possibleCoords.length; i++) {
-        const newPair = Array.from(corresDists[i], possibleCoords[i]);
+    for (let i = 0; i < possibleCoords.length; i++) {
+      const newPair = [corresDists[i], possibleCoords[i]];
 
-        bindedCoordsArr.push(newPair);
+      bindedCoordsArr.push(newPair);
     }
 
     const sortedBindedCoords = this.#mergeSort(bindedCoordsArr),
-    fourShortestMoves = [];
+      fourShortestMoves = [];
 
-    for(let i = 0; i < 4; i++) {
-        fourShortestMoves.push(sortedBindedCoords[i][1]);
+    for (let i = 0; i < 4; i++) {
+      fourShortestMoves.push(sortedBindedCoords[i][1]);
     }
 
     return fourShortestMoves;
@@ -92,11 +99,11 @@ class KnightsTrail {
           returnedLeftSide[i] <= returnedRightSide[j] ||
           j === returnedRightSide.length
         ) {
-            newSortedArr.push(returnedLeftSide[i]);
-            i++;
+          newSortedArr.push(returnedLeftSide[i]);
+          i++;
         } else {
-            newSortedArr.push(returnedRightSide[j]);
-            j++;
+          newSortedArr.push(returnedRightSide[j]);
+          j++;
         }
       }
 
@@ -108,5 +115,43 @@ class KnightsTrail {
 
   #shortestFoundPaths = [];
 
-  findShortestPath(startCoord, finishCoord) {}
+  #initQueue(startCoord) {}
+
+  #findShortestValidMoves(startingCoord) {}
+
+  #checkNode(node, finishCoord) {}
+
+  #updateNode(node) {}
+
+  #splitNode(parentNode, possibleCoord) {}
+
+  findShortestPath(startCoord, finishCoord) {
+    const nodeQueue = this.#initQueue(startCoord);
+
+    while (nodeQueue.length > 0) {
+      const frontOfQueueNode = nodeQueue.shift();
+
+      //if the node already exceeds the shortest amount of moves, no point in processing it further
+      if (frontOfQueueNode.path.length < this.#shortestAmountOfMoves) {
+        possibleCoords = this.#checkNode(frontOfQueueNode, finishCoord);
+
+        for (let i = 0; i < possibleCoords.length; i++) {
+          if (i === 0) {
+            //update the parent node using the shortest next move
+            this.#updateNode(frontOfQueueNode);
+            nodeQueue.push(frontOfQueueNode);
+          } else {
+            //make new nodes that split from the parent node, copying the path information
+            //but choosing the next shortest coords as the next new position
+            const newNode = this.#splitNode(
+              frontOfQueueNode,
+              possibleCoords[i]
+            );
+            nodeQueue.push(newNode);
+          }
+        }
+      }
+      
+    }
+  }
 }
