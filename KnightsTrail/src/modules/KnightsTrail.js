@@ -19,7 +19,7 @@ class TraversalNode {
   }
 }
 
-class KnightsTrail {
+export class KnightsTrail {
   #validMoves = {
     x: [-2, -2, -1, -1, 1, 1, 2, 2],
     y: [1, -1, 2, -2, 2, -2, 1, -1],
@@ -68,7 +68,7 @@ class KnightsTrail {
     return validMoveCoords;
   }
 
-  #pickFourShortestMoves(possibleCoords, corresDists) {
+  #pickFourOrLessShortestMoves(possibleCoords, corresDists) {
     //takes the possible move coordinates, and an array of the corresponding distances each coordinate
     //is from the target with matching indices, bind the corresponding elements, and use the binded coordinates
     //to their distances in order to sort the coordinates themselves from shortest to longest distance from the
@@ -76,60 +76,71 @@ class KnightsTrail {
     const bindedCoordsArr = [];
 
     for (let i = 0; i < possibleCoords.length; i++) {
-      const newPair = [corresDists[i], possibleCoords[i]];
+      const newPair = {
+        dist: corresDists[i],
+        coord: possibleCoords[i],
+      };
 
       bindedCoordsArr.push(newPair);
     }
 
-    const sortedBindedCoords = this.#mergeSort(bindedCoordsArr),
-      fourShortestMoves = [];
+    const sortedBindedCoords = this.#selectionSort(bindedCoordsArr),
+      shortestMoves = [];
 
     for (let i = 0; i < this.#numOfShortestMovesToUseMax; i++) {
       //just in case there are less than 4 sorted coords
       if (sortedBindedCoords[i]) {
-        fourShortestMoves.push(sortedBindedCoords[i][1]);
+        shortestMoves.push(sortedBindedCoords[i].coord);
       }
     }
 
-    return fourShortestMoves;
+    return shortestMoves;
   }
 
-  #mergeSort(bindedCoordsArr) {
-    //used to sort the coords by distance from the target
-    if (bindedCoordsArr.length <= 1) {
-      return bindedCoordsArr;
-    } else {
-      const newSortedArr = [],
-        middle = Math.floor(bindedCoordsArr.length / 2),
-        leftSide = bindedCoordsArr.slice(0, middle),
-        rightSide = bindedCoordsArr.slice(middle, bindedCoordsArr.length);
+  #selectionSort(bindedCoordsArr) {
+    const n = bindedCoordsArr.length;
 
-      const returnedLeftSide = this.#mergeSort(leftSide),
-        returnedRightSide = this.#mergeSort(rightSide);
+    for (let i = 0; i < n - 1; i++) {
+      let minIndex = i;
 
-      let i = 0,
-        j = 0;
-
-      while (i + j < bindedCoordsArr.length) {
-        if (
-          returnedLeftSide[i][0] <= returnedRightSide[j][0] ||
-          j === returnedRightSide.length
-        ) {
-          newSortedArr.push(returnedLeftSide[i]);
-          i++;
-        } else {
-          newSortedArr.push(returnedRightSide[j]);
-          j++;
+      for (let j = i + 1; j < n; j++) {
+        if (bindedCoordsArr[j].dist < bindedCoordsArr[minIndex].dist) {
+          minIndex = j;
         }
       }
 
-      return newSortedArr;
+      if (minIndex !== i) {
+        const temp = bindedCoordsArr[i];
+        bindedCoordsArr[i] = bindedCoordsArr[minIndex];
+        bindedCoordsArr[minIndex] = temp;
+      }
     }
+
+    return bindedCoordsArr;
   }
 
   #shortestAmountOfMoves = -1;
 
-  #shortestFoundPaths = [];
+  #shortestFoundPaths = null;
+
+  #foundAValidPath(node) {
+    //create the complete path and measure it to see if it
+    //is either shorter than the established shortest amount of moves
+    //or the first found valid path
+    const completeFinalPath = node.path;
+    completeFinalPath.push(node.currentCoord);
+
+    if (
+      completeFinalPath.length < this.#shortestAmountOfMoves ||
+      this.#shortestAmountOfMoves === -1
+    ) {
+      this.#shortestFoundPaths = [];
+      this.#shortestAmountOfMoves = completeFinalPath.length - 1;
+      this.#shortestFoundPaths.push(completeFinalPath);
+    } else {
+      this.#shortestFoundPaths.push(completeFinalPath);
+    }
+  }
 
   #initQueue(startCoord) {
     const nodeQueue = [],
@@ -145,12 +156,12 @@ class KnightsTrail {
       corresDists = validMoveCoords.map((coord) => {
         return this.#calcEuclideanDist(coord, finishCoord);
       }),
-      fourShortestMoves = this.#pickFourShortestMoves(
+      shortestMoves = this.#pickFourOrLessShortestMoves(
         validMoveCoords,
         corresDists
       );
 
-    return fourShortestMoves;
+    return shortestMoves;
   }
 
   #checkNode(node, finishCoord) {
@@ -158,22 +169,28 @@ class KnightsTrail {
       node.currentCoord[0] === finishCoord[0] &&
       node.currentCoord[1] === finishCoord[1]
     ) {
-
+      this.#foundAValidPath(node);
+      return [];
     } else if (
-      node.path.length <= this.#shortestAmountOfMoves ||
+      node.path.length < this.#shortestAmountOfMoves ||
       this.#shortestAmountOfMoves === -1
     ) {
-        
+      //should return an array filled with the best possible moves
+      return this.#findShortestValidMoves(node.currentCoord, finishCoord);
     } else {
       return [];
     }
   }
 
   #updateNode(node, possibleCoord) {
+    //updates the coord, adds the new coord as the current coord,
+    //and puts the last current coord in the path
     node.update(possibleCoord);
   }
 
   #splitNode(parentNode, possibleCoord) {
+    //clones the parent node, and defines the new current coord that may
+    //be different than the parent node's current coord
     const newSplitNode = parentNode.split(possibleCoord);
 
     return newSplitNode;
@@ -186,27 +203,36 @@ class KnightsTrail {
       const frontOfQueueNode = nodeQueue.shift();
 
       //if the node already exceeds the shortest amount of moves, no point in processing it further
-      if (frontOfQueueNode.path.length < this.#shortestAmountOfMoves) {
+      if (
+        frontOfQueueNode.path.length < this.#shortestAmountOfMoves ||
+        this.#shortestAmountOfMoves === -1
+      ) {
         //should either return new possible coords in an array, or an empty array when there aren't any possible moves any more
         //or if the front of queue node reached the finish destination
-        const possibleCoords = this.#checkNode(frontOfQueueNode, finishCoord);
+        const possibleBestCoords = this.#checkNode(
+          frontOfQueueNode,
+          finishCoord
+        );
 
-        for (let i = 0; i < possibleCoords.length; i++) {
+        for (let i = 0; i < possibleBestCoords.length; i++) {
           if (i === 0) {
             //update the parent node using the shortest next move
-            this.#updateNode(frontOfQueueNode, possibleCoords[i]);
+            this.#updateNode(frontOfQueueNode, possibleBestCoords[i]);
             nodeQueue.push(frontOfQueueNode);
           } else {
             //make new nodes that split from the parent node, copying the path information
             //but choosing the next shortest coords as the next new position
             const newNode = this.#splitNode(
               frontOfQueueNode,
-              possibleCoords[i]
+              possibleBestCoords[i]
             );
             nodeQueue.push(newNode);
           }
         }
       }
     }
+
+    console.log(this.#shortestAmountOfMoves);
+    console.log(this.#shortestFoundPaths);
   }
 }
