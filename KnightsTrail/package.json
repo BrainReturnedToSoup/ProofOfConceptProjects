@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "build": "webpack",
     "devserver": "webpack serve --config webpack.config.js"
   },
@@ -15,6 +15,7 @@
     "clean-webpack-plugin": "^4.0.0",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.3",
+    "jest": "^29.6.3",
     "source-map": "^0.7.4",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",

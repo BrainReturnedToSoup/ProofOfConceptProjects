@@ -19,7 +19,7 @@ class TraversalNode {
   }
 }
 
-export class KnightsTrail {
+class KnightsTrail {
   #validMoves = {
     x: [-2, -2, -1, -1, 1, 1, 2, 2],
     y: [1, -1, 2, -2, 2, -2, 1, -1],
@@ -30,7 +30,7 @@ export class KnightsTrail {
     y: [0, 7],
   };
 
-  #numOfShortestMovesToUseMax = 4;
+  #numOfShortestMovesToUseMax = 3;
 
   #calcEuclideanDist(startingCoord, targetCoord) {
     //calculates the distance of a given coordinate to the target coordinate
@@ -232,7 +232,10 @@ export class KnightsTrail {
       }
     }
 
-    console.log(this.#shortestAmountOfMoves);
     console.log(this.#shortestFoundPaths);
+
+    return this.#shortestAmountOfMoves;
   }
 }
+
+module.exports = KnightsTrail;
